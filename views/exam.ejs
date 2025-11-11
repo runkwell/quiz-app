@@ -20,7 +20,7 @@
     <main class="container-fluid mt-4">
       <div class="row g-4">
         
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-10 order-lg-1">
           <div class="card bg-body-secondary">
             <div class="card-body">
               <h3 class="h5 card-title">Câu <%= qNum %>:</h3>
@@ -35,8 +35,7 @@
               
               <hr>
               
-              <div class="options-container">
-                <% const savedAnswers = userAnswers[qNum] || []; %>
+              <div class="options-container list-group"> <% const savedAnswers = userAnswers[qNum] || []; %>
                 <% question.options.forEach((opt, index) => { %>
                   <% const optionValue = (index + 1).toString(); %>
                   <% const isChecked = savedAnswers.includes(optionValue); %>
@@ -65,7 +64,7 @@
           </div>
         </div>
         
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-lg-2 order-3 order-lg-2">
           <div class="card bg-body-secondary sticky-top" style="top: 70px;">
             <div class="card-header">
               <h4 class="h6 mb-0">Tổng quan (Nhảy câu)</h4>

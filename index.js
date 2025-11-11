@@ -3,95 +3,141 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
+const bodyParser = require('body-parser');
+
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 
-// --- Thiết lập CSDL lịch sử ---
+// Cấu hình Database (Lịch sử)
 const adapter = new FileSync('db.json');
 const db = low(adapter);
+
+// Cấu hình Database mặc định
 db.defaults({ history: [] }).write();
 
-// --- Thiết lập Express ---
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true })); // Để đọc dữ liệu form
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-  secret: 'my-secret-key-12345', // Đổi key này thành 1 chuỗi bí mật
+  secret: 'your-secret-key',
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 180 * 60 * 1000 + 10000 } // Hết hạn sau 180 phút + 10s
+  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 hours
 }));
 
-// --- Hàm trợ giúp ---
+const QUESTIONS_FILE_PATH = path.join(__dirname, 'data', 'questions.json');
+const EXPLAIN_FILE_PATH = path.join(__dirname, 'Explain.txt');
+
+
+// ----------------------------------------------------------------------
+// CORE FUNCTIONS
+// ----------------------------------------------------------------------
+
+// 1. Load Questions (Pool)
 function loadQuestions() {
-  const rawData = fs.readFileSync(path.join(__dirname, 'data/questions.json'));
-  return JSON.parse(rawData);
+  try {
+    const data = fs.readFileSync(QUESTIONS_FILE_PATH, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Lỗi khi đọc file questions.json:', err);
+    return [];
+  }
 }
 
-function shuffle(array) {
+// 2. Hàm xáo trộn mảng (Fisher-Yates)
+function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
-  return array;
 }
 
-// --- Các Route (Đường dẫn) ---
+// 3. Hàm phân tích file giải thích
+function parseExplanations(rawContent) {
+  const explanations = {};
+  // Tách nội dung theo cú pháp [số].Explain và giữ lại delimiter (header)
+  const parts = rawContent.split(/(\d+\.Explain)/).filter(p => p.trim() !== '');
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    
+    // Kiểm tra nếu là header: X.Explain
+    if (part.match(/^\d+\.Explain$/)) {
+      const qNumMatch = part.match(/(\d+)/);
+      if (qNumMatch && i + 1 < parts.length) {
+        const qNum = qNumMatch[1];
+        // Phần tử tiếp theo (i+1) là nội dung giải thích cho header này
+        explanations[qNum] = parts[i+1].trim();
+        i++; // Bỏ qua phần tử nội dung vì đã xử lý
+      }
+    }
+  }
+  return explanations;
+}
+
+// 4. Hàm tải giải thích
+function loadExplanations() {
+    try {
+        const rawData = fs.readFileSync(EXPLAIN_FILE_PATH, 'utf8');
+        return parseExplanations(rawData);
+    } catch (err) {
+        console.error('Lỗi khi đọc file Explain.txt:', err);
+        return {}; 
+    }
+}
+
+
+// ----------------------------------------------------------------------
+// ROUTES
+// ----------------------------------------------------------------------
 
 // 1. Trang chủ
 app.get('/', (req, res) => {
   res.render('index');
 });
 
-// 2. Bắt đầu bài thi (Nhấn nút "Bắt đầu")
+// 2. Route Bắt đầu bài thi (Bốc thăm ngẫu nhiên và Ánh xạ)
 app.post('/start', (req, res) => {
-  const allQuestions = loadQuestions();
-  const shuffledQuestions = shuffle([...allQuestions]);
-  const examQuestions = shuffledQuestions.slice(0, 65);
+  const questionsRaw = loadQuestions();
+
+  // Bốc ngẫu nhiên câu hỏi
+  let randomizedQuestions = [...questionsRaw];
+  shuffleArray(randomizedQuestions);
+
+  // Tạo Question Map: Exam Q num (1, 2, 3...) -> Pool Q num (35, 12, 51...)
+  const questionMap = {};
+  const questionsForExam = [];
   
+  randomizedQuestions.forEach((q, index) => {
+    // Lưu mapping: Exam Q num (1-based) -> Pool Q num (q.id)
+    questionMap[index + 1] = q.id; 
+    
+    // Gán lại ID theo thứ tự trong bài thi (Exam Q num)
+    questionsForExam.push({
+        ...q,
+        id: index + 1
+    });
+  });
+  
+  // Initialize session
   req.session.exam = {
-    questions: examQuestions,
-    userAnswers: {}, // Lưu câu trả lời của người dùng
-    startTime: Date.now()
+    questions: questionsForExam,  // Danh sách câu hỏi đã bị xáo trộn và đánh số lại
+    questionMap: questionMap,     // BẢN ĐỒ ÁNH XẠ (Cực kỳ quan trọng)
+    totalQuestions: questionsForExam.length,
+    userAnswers: {},
+    startTime: Date.now(),
+    timeLimit: 180 * 60 // 180 minutes
   };
-  
+
   res.redirect('/exam/1');
 });
 
-// 3. Trang làm bài thi (ví dụ: /exam/5 là câu số 5)
-app.get('/exam/:qNum', (req, res) => {
-  if (!req.session.exam) {
-    return res.redirect('/');
-  }
-
-  const qNum = parseInt(req.params.qNum);
-  if (isNaN(qNum) || qNum < 1 || qNum > 65) {
-    return res.redirect('/exam/1');
-  }
-
-  const { questions, userAnswers, startTime } = req.session.exam;
-  const question = questions[qNum - 1]; // Lấy câu hỏi hiện tại (index 0)
-
-  res.render('exam', {
-    question: question,
-    qNum: qNum,
-    totalQuestions: 65,
-    userAnswers: userAnswers,
-    startTime: startTime,
-    timeLimit: 180 * 60 // 180 phút
-  });
-});
-
-// 4. Nộp câu trả lời (Next, Back, Jump, Finish)
-// index.js
-
-// ... (các code khác giữ nguyên) ...
-
+// 3. Route Xử lý câu trả lời
 app.post('/submit-answer', (req, res) => {
   if (!req.session.exam) {
     return res.redirect('/');
@@ -108,8 +154,7 @@ app.post('/submit-answer', (req, res) => {
     req.session.exam.userAnswers[currentQNum] = [];
   }
 
-  // === SỬA LOGIC ĐIỀU HƯỚNG TẠI ĐÂY ===
-  // Ưu tiên 'jumpTo' trước, nếu nó tồn tại, chúng ta luôn nhảy
+  // Điều hướng
   if (jumpTo) {
     res.redirect(`/exam/${jumpTo}`);
   } else if (action === 'next') {
@@ -119,97 +164,91 @@ app.post('/submit-answer', (req, res) => {
   } else if (action === 'finish') {
     res.redirect('/results');
   } else {
-    // Trường hợp dự phòng nếu không có hành động nào
     res.redirect(`/exam/${currentQNum}`);
   }
 });
 
-// ... (các code khác giữ nguyên) ...
-
-// 5. Trang kết quả
-app.get('/results', (req, res) => {
+// 4. Route Chi tiết câu hỏi
+app.get('/exam/:qNum', (req, res) => {
   if (!req.session.exam) {
     return res.redirect('/');
   }
 
-  const { questions, userAnswers } = req.session.exam;
-  let score = 0;
+  const qNum = parseInt(req.params.qNum);
+  const { questions, totalQuestions, userAnswers, startTime, timeLimit } = req.session.exam;
   
-  // Tính toán kết quả
-  const results = questions.map((q, index) => {
-    const qNum = index + 1;
-    const correctOptions = q.options
-      .map((opt, optIndex) => opt.isCorrect ? (optIndex + 1).toString() : null)
-      .filter(Boolean);
-      
-    const userAns = userAnswers[qNum] || [];
-    
-    // So sánh (phải chính xác tuyệt đối)
-    const isCorrect = userAns.length === correctOptions.length &&
-                      userAns.every(ans => correctOptions.includes(ans)) &&
-                      correctOptions.every(ans => userAns.includes(ans));
-                      
-    if (isCorrect) {
-      score++;
-    }
+  // Tìm câu hỏi theo Exam Q num (ID mới)
+  const question = questions.find(q => q.id === qNum); 
 
+  if (!question) {
+    return res.redirect('/');
+  }
+
+  res.render('exam', {
+    qNum: qNum,
+    question: question,
+    totalQuestions: totalQuestions,
+    userAnswers: userAnswers,
+    startTime: startTime,
+    timeLimit: timeLimit
+  });
+});
+
+// 5. Trang kết quả
+app.get('/results', (req, res) => {
+  if (!req.session.exam || !req.session.exam.userAnswers) {
+    const latestHistory = db.get('history').orderBy('timestamp', 'desc').first().value();
+    if (latestHistory) {
+      return res.redirect(`/history/${latestHistory.id}`);
+    }
+    return res.redirect('/');
+  }
+
+  // Lấy dữ liệu cần thiết từ session
+  const { questions, userAnswers, totalQuestions, questionMap } = req.session.exam;
+  
+  // TÍNH ĐIỂM VÀ LƯU ÁNH XẠ POOL
+  const results = questions.map(q => {
+    
+    // LẤY MAPPING: Exam Q num (q.id) -> Pool Q num (Pool Q num)
+    const poolQNum = questionMap[q.id]; 
+
+    // Logic tính toán đáp án đúng
+    const correctOptions = q.options
+      .map((opt, index) => opt.isCorrect ? (index + 1).toString() : null)
+      .filter(id => id !== null);
+    
+    const userAns = userAnswers[q.id] || [];
+    
+    const isCorrect = userAns.length === correctOptions.length && 
+                      userAns.every(ans => correctOptions.includes(ans));
+                      
     return {
-      qNum: qNum,
+      qNum: q.id, // Exam Q num
+      poolQNum: poolQNum, // Pool Q num (NEW: Dùng cho Giải thích)
       question: q,
       userAns: userAns,
       correctOptions: correctOptions,
       isCorrect: isCorrect
     };
   });
-
-  const totalScore = (score / 65) * 100;
-
-  // Lưu vào lịch sử
-  const historyEntry = {
-    id: Date.now().toString(),
-    date: new Date().toLocaleString('vi-VN'),
-    score: totalScore.toFixed(2),
-    results: results // Lưu chi tiết kết quả
-  };
-  db.get('history').push(historyEntry).write();
   
-const EXPLAIN_FILE_PATH = path.join(__dirname, 'Explain.txt');
-
-// Hàm phân tích file giải thích
-function parseExplanations(rawContent) {
-  const explanations = {};
-  // Tách nội dung theo cú pháp [số].Explain
-  const parts = rawContent.split(/(\d+\.Explain)/).filter(p => p.trim() !== '');
-
-  let currentQ = null;
-  for (const part of parts) {
-    if (part.match(/\d+\.Explain/)) {
-      // Tìm số câu hỏi
-      currentQ = part.match(/(\d+)/)[1];
-    } else if (currentQ) {
-      // Lưu nội dung giải thích
-      explanations[currentQ] = part.trim();
-      currentQ = null; 
-    }
-  }
-  return explanations;
-}
-
-// Hàm tải giải thích
-function loadExplanations() {
-    try {
-        // Đọc file Explain.txt
-        const rawData = fs.readFileSync(EXPLAIN_FILE_PATH, 'utf8');
-        return parseExplanations(rawData);
-    } catch (err) {
-        // Ghi log nếu lỗi đọc file
-        console.error('Lỗi khi đọc file Explain.txt (Đảm bảo file đã được tạo và lưu ở thư mục gốc):', err);
-        return {}; // Trả về object rỗng nếu lỗi
-    }
-}
-
-// Tải giải thích
-  const questionExplanations = loadExplanations();
+  const score = results.filter(r => r.isCorrect).length;
+  const totalScore = (score / totalQuestions) * 100;
+  
+  // Tải giải thích
+  const questionExplanations = loadExplanations(); 
+  
+  // Lưu vào lịch sử
+  db.get('history')
+    .push({
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      score: totalScore.toFixed(2),
+      results: results,
+      questionMap: questionMap // LƯU MAPPING VÀO LỊCH SỬ
+    })
+    .write();
 
   // Xóa session thi
   req.session.exam = null;
@@ -218,15 +257,16 @@ function loadExplanations() {
     results: results,
     score: score,
     totalScore: totalScore.toFixed(2),
-    totalQuestions: 65,
-    userAnswers: userAnswers, // Gửi để tô màu overview
-    explanations: questionExplanations // TRUYỀN DỮ LIỆU
+    totalQuestions: totalQuestions,
+    userAnswers: userAnswers,
+    explanations: questionExplanations,
+    questionMap: questionMap // TRUYỀN MAPPING
   });
 });
 
-// 6. Trang Lịch sử
+// 6. Trang lịch sử
 app.get('/history', (req, res) => {
-  const history = db.get('history').orderBy('date', 'desc').value();
+  const history = db.get('history').orderBy('timestamp', 'desc').value();
   res.render('history', { history: history });
 });
 
@@ -242,18 +282,20 @@ app.get('/history/:id', (req, res) => {
 
   res.render('results', {
     results: entry.results,
-    score: (parseFloat(entry.score) / 100) * 65,
+    score: entry.results.filter(r => r.isCorrect).length,
     totalScore: entry.score,
-    totalQuestions: 65,
+    totalQuestions: entry.results.length,
     userAnswers: entry.results.reduce((acc, r) => {
       acc[r.qNum] = r.userAns;
       return acc;
     }, {}),
-    explanations: questionExplanations // TRUYỀN DỮ LIỆU
+    explanations: questionExplanations,
+    questionMap: entry.questionMap // LẤY MAPPING TỪ LỊCH SỬ
   });
 });
 
-// Khởi chạy server
+
+// Khởi động server
 app.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
 });

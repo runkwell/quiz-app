@@ -28,7 +28,10 @@
         <% results.forEach(r => { %>
           <div class="card mb-3 <%= r.isCorrect ? 'border-success' : 'border-danger' %>" id="q-<%= r.qNum %>">
             <div class="card-header <%= r.isCorrect ? 'text-success' : 'text-danger' %>">
-              <h4 class="h6 mb-0">Câu <%= r.qNum %>: <%= r.isCorrect ? '(Đúng)' : '(Sai)' %></h4>
+              <h4 class="h6 mb-0">
+                Câu <%= r.qNum %>: <%= r.isCorrect ? '(Đúng)' : '(Sai)' %>
+                <span class="badge bg-secondary ms-2">Mapping câu <%= r.poolQNum %> trong Pool</span>
+              </h4>
             </div>
             <div class="card-body">
               <% if (r.question.questionText) { %><p><%= r.question.questionText %></p><% } %>
@@ -43,11 +46,9 @@
                   <% 
                     let optClass = "list-group-item";
                     if (isCorrectOption) {
-                      // Dùng class mới đã được chỉnh màu trong style.css
                       optClass += " list-group-item-success"; 
                     }
                     if (isUserSelected && !isCorrectOption) {
-                      // Dùng class mới đã được chỉnh màu trong style.css
                       optClass += " list-group-item-danger"; 
                     }
                   %>
@@ -67,11 +68,19 @@
                 <% }); %>
               </div>
               
-              <% const explanationText = explanations[r.qNum]; %>
+              <% const explanationText = explanations[r.poolQNum]; %>
               <% if (explanationText) { %>
+                <%
+                  // Logic tìm kiếm và thay thế để in màu chữ "correct" và "wrong"
+                  let coloredExplanation = explanationText
+                    .replace(/correct/g, '<span class="correct">correct</span>')
+                    .replace(/wrong/g, '<span class="wrong">wrong</span>')
+                    .replace(/Correct/g, '<span class="correct">Correct</span>')
+                    .replace(/Wrong/g, '<span class="wrong">Wrong</span>');
+                %>
                 <div class="explanation-container">
                   <h6 class="text-primary">Giải thích chi tiết:</h6>
-                  <pre class="mb-0 text-white-50"><%= explanationText %></pre> 
+                  <pre class="mb-0 text-white-50"><%- coloredExplanation %></pre> 
                 </div>
               <% } %>
               </div>
