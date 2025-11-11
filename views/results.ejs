@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kết quả thi</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="exam-layout">
+    <div class="question-container">
+      <h2>Kết quả bài thi</h2>
+      <p class="score">
+        Điểm số: <%= score %> / <%= totalQuestions %> (<%= totalScore %>%)
+      </p>
+      
+      <a href="/">Về trang chủ</a> | <a href="/history">Xem lịch sử</a>
+      <hr>
+      
+      <% results.forEach(r => { %>
+        <div class="result-item <%= r.isCorrect ? 'correct-answer' : 'incorrect-answer' %>" id="q-<%= r.qNum %>">
+          <h4>Câu <%= r.qNum %>: <%= r.isCorrect ? '(Đúng)' : '(Sai)' %></h4>
+          
+          <% if (r.question.questionText) { %>
+            <p><%= r.question.questionText %></p>
+          <% } %>
+          
+          <% if (r.question.questionImage) { %>
+            <img src="/<%= r.question.questionImage %>" alt="Hình ảnh câu hỏi" class="question-image">
+          <% } %>
+          
+          <div class="options-container">
+            <% r.question.options.forEach((opt, index) => { %>
+              <% const optionValue = (index + 1).toString(); %>
+              <% const isUserSelected = r.userAns.includes(optionValue); %>
+              <% const isCorrectOption = r.correctOptions.includes(optionValue); %>
+              
+              <% 
+                let optClass = "option-result";
+                if (isCorrectOption) {
+                  optClass += " correct"; // Tô xanh lá đáp án đúng
+                }
+                if (isUserSelected && !isCorrectOption) {
+                  optClass += " incorrect"; // Tô đỏ nếu chọn sai
+                }
+              %>
+              
+              <div class="<%= optClass %>">
+                <input 
+                  type="<%= r.question.isMultipleChoice ? 'checkbox' : 'radio' %>" 
+                  disabled
+                  <%= isUserSelected ? 'checked' : '' %>>
+                
+                <% if (opt.text) { %>
+                  <span><%= opt.text %></span>
+                <% } %>
+                
+                <% if (opt.image) { %>
+                  <img src="/<%= opt.image %>" alt="Hình ảnh lựa chọn" class="option-image">
+                <% } %>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+    
+    <div class="overview-container sticky-overview">
+      <h4>Tổng quan</h4>
+      <%- include('partials/overview', { totalQuestions: totalQuestions, userAnswers: userAnswers, results: results, currentQNum: null }) %>
+    </div>
+  </div>
+</body>
+</html>

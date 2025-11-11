@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Câu hỏi <%= qNum %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  
+  <form class="exam-form" id="exam-form" action="/submit-answer" method="POST">
+    <div class="exam-header">
+      <h2>Bài thi trắc nghiệm</h2>
+      <div id="timer" class="timer">180:00</div>
+    </div>
+    
+    <div class="exam-layout">
+      <div class="question-container">
+        <h3>Câu <%= qNum %>:</h3>
+        
+        <% if (question.questionText) { %>
+          <p><%= question.questionText %></p>
+        <% } %>
+        
+        <% if (question.questionImage) { %>
+          <img src="/<%= question.questionImage %>" alt="Hình ảnh câu hỏi" class="question-image">
+        <% } %>
+        
+        <hr>
+        
+        <div class="options-container">
+          <% const savedAnswers = userAnswers[qNum] || []; %>
+          <% question.options.forEach((opt, index) => { %>
+            <% const optionValue = (index + 1).toString(); %>
+            <% const isChecked = savedAnswers.includes(optionValue); %>
+            
+            <label class="option">
+              <input 
+                type="<%= question.isMultipleChoice ? 'checkbox' : 'radio' %>" 
+                name="answer" 
+                value="<%= optionValue %>"
+                <%= isChecked ? 'checked' : '' %>>
+              
+              <% if (opt.text) { %>
+                <span><%= opt.text %></span>
+              <% } %>
+              
+              <% if (opt.image) { %>
+                <img src="/<%= opt.image %>" alt="Hình ảnh lựa chọn" class="option-image">
+              <% } %>
+            </label>
+          <% }); %>
+        </div>
+      </div>
+      
+      <div class="overview-container">
+        <h4>Tổng quan</h4>
+        <%- include('partials/overview', { totalQuestions: totalQuestions, userAnswers: userAnswers, results: null, currentQNum: qNum }) %>
+      </div>
+    </div>
+    
+    <div class="navigation-bar">
+      <% if (qNum > 1) { %>
+        <button type="submit" name="action" value="back">Quay lại</button>
+      <% } else { %>
+        <button disabled>Quay lại</button>
+      <% } %>
+      
+      <% if (qNum < totalQuestions) { %>
+        <button type="submit" name="action" value="next">Tiếp theo</button>
+      <% } else { %>
+        <button disabled>Tiếp theo</button>
+      <% } %>
+      
+      <button type="submit" name="action" value="finish" class="finish-button">Nộp bài</button>
+    </div>
+    
+    <input type="hidden" name="qNum" value="<%= qNum %>">
+    
+  </form>
+
+  <script>
+    // Truyền dữ liệu từ EJS sang JS
+    const startTime = <%= startTime %>;
+    const timeLimitInSeconds = <%= timeLimit %>;
+  </script>
+  <script src="/js/timer.js"></script>
+</body>
+</html>

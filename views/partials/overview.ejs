@@ -1,0 +1,30 @@
+<div class="overview-grid">
+  <% for (let i = 1; i <= totalQuestions; i++) { %>
+    <% 
+      let className = "overview-item";
+      if (userAnswers && userAnswers[i] && userAnswers[i].length > 0) {
+        className += " answered"; // Đã trả lời
+      }
+      if (currentQNum && i === currentQNum) {
+        className += " current"; // Câu hiện tại
+      }
+      
+      // Dùng cho trang kết quả
+      if (results) {
+        const result = results.find(r => r.qNum === i);
+        if (result.isCorrect) {
+          className += " correct";
+        } else {
+          className += " incorrect";
+        }
+      }
+    %>
+    
+    <% if (results) { %>
+      <a href="#q-<%= i %>" class="<%= className %>"><%= i %></a>
+    <% } else { %>
+      <button type="submit" name="jumpTo" value="<%= i %>" class="<%= className %>"><%= i %></button>
+    <% } %>
+    
+  <% } %>
+</div>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch sử thi</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="main-container">
+    <h2>Lịch sử các lần thi</h2>
+    <a href="/">Về trang chủ</a>
+    
+    <ul class="history-list">
+      <% if (history.length === 0) { %>
+        <p>Bạn chưa có lịch sử thi.</p>
+      <% } else { %>
+        <% history.forEach(entry => { %>
+          <li>
+            <a href="/history/<%= entry.id %>">
+              Ngày thi: <%= entry.date %> - Điểm: <%= entry.score %>%
+            </a>
+          </li>
+        <% }); %>
+      <% } %>
+    </ul>
+  </div>
+</body>
+</html>
