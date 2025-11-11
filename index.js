@@ -88,6 +88,10 @@ app.get('/exam/:qNum', (req, res) => {
 });
 
 // 4. Nộp câu trả lời (Next, Back, Jump, Finish)
+// index.js
+
+// ... (các code khác giữ nguyên) ...
+
 app.post('/submit-answer', (req, res) => {
   if (!req.session.exam) {
     return res.redirect('/');
@@ -99,24 +103,28 @@ app.post('/submit-answer', (req, res) => {
   // Lưu câu trả lời
   let answer = req.body.answer;
   if (answer) {
-    // Đảm bảo answer luôn là một mảng
     req.session.exam.userAnswers[currentQNum] = Array.isArray(answer) ? answer : [answer];
   } else {
-    // Nếu không chọn gì, lưu mảng rỗng
     req.session.exam.userAnswers[currentQNum] = [];
   }
 
-  // Xử lý hành động
-  if (action === 'next') {
+  // === SỬA LOGIC ĐIỀU HƯỚNG TẠI ĐÂY ===
+  // Ưu tiên 'jumpTo' trước, nếu nó tồn tại, chúng ta luôn nhảy
+  if (jumpTo) {
+    res.redirect(`/exam/${jumpTo}`);
+  } else if (action === 'next') {
     res.redirect(`/exam/${currentQNum + 1}`);
   } else if (action === 'back') {
     res.redirect(`/exam/${currentQNum - 1}`);
-  } else if (action === 'jump') {
-    res.redirect(`/exam/${jumpTo}`);
   } else if (action === 'finish') {
     res.redirect('/results');
+  } else {
+    // Trường hợp dự phòng nếu không có hành động nào
+    res.redirect(`/exam/${currentQNum}`);
   }
 });
+
+// ... (các code khác giữ nguyên) ...
 
 // 5. Trang kết quả
 app.get('/results', (req, res) => {
@@ -164,6 +172,44 @@ app.get('/results', (req, res) => {
     results: results // Lưu chi tiết kết quả
   };
   db.get('history').push(historyEntry).write();
+  
+const EXPLAIN_FILE_PATH = path.join(__dirname, 'Explain.txt');
+
+// Hàm phân tích file giải thích
+function parseExplanations(rawContent) {
+  const explanations = {};
+  // Tách nội dung theo cú pháp [số].Explain
+  const parts = rawContent.split(/(\d+\.Explain)/).filter(p => p.trim() !== '');
+
+  let currentQ = null;
+  for (const part of parts) {
+    if (part.match(/\d+\.Explain/)) {
+      // Tìm số câu hỏi
+      currentQ = part.match(/(\d+)/)[1];
+    } else if (currentQ) {
+      // Lưu nội dung giải thích
+      explanations[currentQ] = part.trim();
+      currentQ = null; 
+    }
+  }
+  return explanations;
+}
+
+// Hàm tải giải thích
+function loadExplanations() {
+    try {
+        // Đọc file Explain.txt
+        const rawData = fs.readFileSync(EXPLAIN_FILE_PATH, 'utf8');
+        return parseExplanations(rawData);
+    } catch (err) {
+        // Ghi log nếu lỗi đọc file
+        console.error('Lỗi khi đọc file Explain.txt (Đảm bảo file đã được tạo và lưu ở thư mục gốc):', err);
+        return {}; // Trả về object rỗng nếu lỗi
+    }
+}
+
+// Tải giải thích
+  const questionExplanations = loadExplanations();
 
   // Xóa session thi
   req.session.exam = null;
@@ -173,7 +219,8 @@ app.get('/results', (req, res) => {
     score: score,
     totalScore: totalScore.toFixed(2),
     totalQuestions: 65,
-    userAnswers: userAnswers // Gửi để tô màu overview
+    userAnswers: userAnswers, // Gửi để tô màu overview
+    explanations: questionExplanations // TRUYỀN DỮ LIỆU
   });
 });
 
@@ -189,8 +236,10 @@ app.get('/history/:id', (req, res) => {
   if (!entry) {
     return res.redirect('/history');
   }
-  
-  // Chúng ta tái sử dụng trang results để hiển thị
+
+  // Tải giải thích
+  const questionExplanations = loadExplanations();
+
   res.render('results', {
     results: entry.results,
     score: (parseFloat(entry.score) / 100) * 65,
@@ -199,10 +248,10 @@ app.get('/history/:id', (req, res) => {
     userAnswers: entry.results.reduce((acc, r) => {
       acc[r.qNum] = r.userAns;
       return acc;
-    }, {})
+    }, {}),
+    explanations: questionExplanations // TRUYỀN DỮ LIỆU
   });
 });
-
 
 // Khởi chạy server
 app.listen(PORT, () => {
