@@ -1,30 +1,33 @@
-<div class="overview-grid">
+<div class="row row-cols-5 g-2">
   <% for (let i = 1; i <= totalQuestions; i++) { %>
     <% 
-      let className = "overview-item";
-      if (userAnswers && userAnswers[i] && userAnswers[i].length > 0) {
-        className += " answered"; // Đã trả lời
-      }
+      let btnClass = "btn btn-sm";
       if (currentQNum && i === currentQNum) {
-        className += " current"; // Câu hiện tại
+        btnClass += " btn-warning"; // Câu hiện tại
+      } else if (userAnswers && userAnswers[i] && userAnswers[i].length > 0) {
+        btnClass += " btn-outline-info"; // Đã trả lời
+      } else {
+        btnClass += " btn-outline-secondary"; // Chưa trả lời
       }
       
       // Dùng cho trang kết quả
       if (results) {
         const result = results.find(r => r.qNum === i);
         if (result.isCorrect) {
-          className += " correct";
+          btnClass = "btn btn-sm btn-success"; // Đúng
         } else {
-          className += " incorrect";
+          btnClass = "btn btn-sm btn-danger"; // Sai
         }
       }
     %>
     
-    <% if (results) { %>
-      <a href="#q-<%= i %>" class="<%= className %>"><%= i %></a>
-    <% } else { %>
-      <button type="submit" name="jumpTo" value="<%= i %>" class="<%= className %>"><%= i %></button>
-    <% } %>
+    <div class="col">
+      <% if (results) { %>
+        <a href="#q-<%= i %>" class="<%= btnClass %> w-100"><%= i %></a>
+      <% } else { %>
+        <button type="submit" name="jumpTo" value="<%= i %>" class="<%= btnClass %> w-100"><%= i %></button>
+      <% } %>
+    </div>
     
   <% } %>
 </div>
