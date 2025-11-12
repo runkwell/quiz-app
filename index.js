@@ -101,19 +101,23 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+const EXAM_QUESTION_LIMIT = 65;
 // 2. Route Bắt đầu bài thi (Bốc thăm ngẫu nhiên và Ánh xạ)
 app.post('/start', (req, res) => {
   const questionsRaw = loadQuestions();
 
-  // Bốc ngẫu nhiên câu hỏi
+  // 1. Xáo trộn toàn bộ câu hỏi trong pool
   let randomizedQuestions = [...questionsRaw];
   shuffleArray(randomizedQuestions);
 
-  // Tạo Question Map: Exam Q num (1, 2, 3...) -> Pool Q num (35, 12, 51...)
+  // 2. GIỚI HẠN số lượng câu hỏi cho bài thi (SỬA LỖI 2)
+  const questionsToUse = randomizedQuestions.slice(0, EXAM_QUESTION_LIMIT);
+
+  // 3. Tạo Question Map và đánh số lại cho Exam
   const questionMap = {};
   const questionsForExam = [];
   
-  randomizedQuestions.forEach((q, index) => {
+  questionsToUse.forEach((q, index) => { // Dùng questionsToUse
     // Lưu mapping: Exam Q num (1-based) -> Pool Q num (q.id)
     questionMap[index + 1] = q.id; 
     
@@ -126,12 +130,13 @@ app.post('/start', (req, res) => {
   
   // Initialize session
   req.session.exam = {
-    questions: questionsForExam,  // Danh sách câu hỏi đã bị xáo trộn và đánh số lại
-    questionMap: questionMap,     // BẢN ĐỒ ÁNH XẠ (Cực kỳ quan trọng)
+    questions: questionsForExam,
+    questionMap: questionMap,
     totalQuestions: questionsForExam.length,
     userAnswers: {},
     startTime: Date.now(),
-    timeLimit: 180 * 60 // 180 minutes
+    
+    timeLimit: 180 * 60
   };
 
   res.redirect('/exam/1');
