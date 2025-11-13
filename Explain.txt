@@ -364,11 +364,13 @@ Answer D wrong because Redshift analytics.
 link ref: https://aws.amazon.com/elasticache/redis/
 
 52.Explain
-Answer A wrong because memory no time.
-Answer B wrong because same bucket possible.
-Answer C correct because timeout 15min, 500s >3s default.
-Answer D wrong because Java fine.
-link ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html
+Answer A correct because Lambda allocates CPU proportionally to memory. EC2 test with 1GB RAM took 500s. Default Lambda memory (512MB or less) provides ~half the CPU → ~1,000s+ execution → exceeds 900s max timeout → fails silently. Increasing to 1GB+ matches EC2 performance and completes within limit.
+Answer B wrong because cross-bucket copy is valid and common.
+Answer C wrong because max timeout is 900s (15 min); 500s fits if CPU is sufficient.
+Answer D wrong because Java runtime is fully supported; EC2 proves logic works.
+Root cause: Insufficient memory → insufficient CPU → execution too slow → hits 900s limit.
+Fix: Increase memory to ≥1GB (e.g., 1536MB) to reduce runtime <900s.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html
 
 53.Explain
 Answer A wrong because SSL transit.
@@ -2424,14 +2426,12 @@ Answer D correct because Cognito unauth roles for limited access.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/iam-roles.html
 
 339.Explain
-Answer A correct because bucket policy grants key access? Wait, no - for SSE-KMS, role needs KMS access.
-Wait, correction based on standard: 
-Answer A wrong because bucket policy for S3, but KMS for decrypt.
-Answer B correct because IAM role on EC2 needs KMS decrypt permission.
-Answer C wrong because key policy enables, but instance needs access.
-Answer D wrong because ACL for objects.
-Answer E wrong because Parameter for storage.
-link ref: https://docs.aws.amazon.com/kms/latest/developerguide/iam-policies.html
+Answer A correct because an S3 bucket policy can explicitly grant s3:GetObject and s3:ListBucket to the EC2 role, but for SSE-KMS objects, the bucket policy must also allow kms:Decrypt on the CMK by including a Condition that permits the key usage when the request comes from the bucket. This is required when the key policy alone doesn’t grant access.
+Answer B correct because the IAM role attached to the EC2 instance must include kms:Decrypt (and kms:GenerateDataKey if writing) on the CMK to decrypt SSE-KMS objects. This is the primary mechanism for granting application access.
+Answer C wrong because the key policy must allow IAM policies to grant access—this is default for customer-managed CMKs unless explicitly denied. But this alone is not sufficient; explicit IAM or bucket policy grants are still needed.
+Answer D wrong because S3 ACLs control object-level permissions but do not grant KMS key access—KMS permissions are separate.
+Answer E wrong because Systems Manager Parameter Store stores values, not grants KMS permissions.
+link ref: https://docs.aws.amazon.com/kms/latest/developerguide/iam-policies.html#iam-policy-example-s3
 
 340.Explain
 Answer A correct because delay hides on add.
