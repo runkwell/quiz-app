@@ -1423,860 +1423,835 @@ Answer D wrong because ACL upload no KMS.
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/iam-policies.html
 
 201.Explain
-Answer A wrong because eventual no error range.
-Answer B wrong because 5xx server.
-Answer C wrong because 306 not used.
-Answer D correct because 4xx client.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/CommonErrors.html
+Answer A correct because Amazon Cognito hosted UI allows customization with logos, CSS, and branding for login pages without building custom interfaces.
+Answer B wrong because Cognito doesn't host uploaded login pages; it's for auth flows, not static hosting.
+Answer C wrong because API Gateway proxies APIs, not hosts login pages; Cognito integration is for auth, not saving links.
+Answer D wrong because Cognito app settings handle client details but don't upload logos for custom pages; hosted UI is for that.
+link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/hosted-ui.html
 
 202.Explain
-Answer A wrong because visibility after.
-Answer B correct because long polling reduces empty.
-Answer C wrong because retention delete.
-Answer D wrong because delay new.
-link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-long-polling.html
+Answer A wrong because DeleteItem removes items, unnecessary for update/create.
+Answer B wrong because UpdateItem assumes existence; DescribeTable is metadata, not data ops.
+Answer C wrong because GetRecords is Streams, UpdateTable schema.
+Answer D correct because UpdateItem modifies existing or creates if absent (with condition); GetItem retrieves, PutItem creates.
+link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html
 
 203.Explain
+Answer A wrong because SSE-S3 uses AWS keys with no user audit trails.
+Answer B correct because SSE-KMS provides CloudTrail-audited key usage for who/when.
+Answer C wrong because SSE-C uses customer keys without AWS auditing.
+Answer D wrong because self-managed keys lack AWS integration/audit.
+link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html
+
+204.Explain
+Answer A wrong because doubling max servers increases cost without fixing static latency.
+Answer B wrong because Lambda is serverless compute, not for static content hosting.
+Answer C wrong because vertical scaling improves instance performance but not global distribution.
+Answer D correct because CloudFront caches static content at edges, reducing latency worldwide.
+Answer E correct because S3 stores static files durably/scalably; pair with CloudFront for delivery.
+link ref: https://aws.amazon.com/cloudfront/
+
+205.Explain
+Answer A wrong because presigned URLs expire; saving invalidates over time.
+Answer B correct because S3 key in DynamoDB persists; VPC endpoint secures private access post-login.
+Answer C wrong because base64 bloats data, inefficient for images.
+Answer D wrong because generating presigned on login is per-session overhead.
+link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/vpc-endpoints.html
+
+206.Explain
+Answer A wrong because multiple Regions add latency/complexity, no CPU boost.
+Answer B wrong because AZs are for HA, not compute.
+Answer C wrong because layers reduce size but not CPU.
+Answer D correct because Lambda CPU scales with memory; max memory maximizes CPU.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html
+
+207.Explain
+Answer A correct because update connection strings to RDS endpoint/port for seamless migration.
+Answer B wrong because SDK creds unnecessary; RDS uses IAM DB auth optional.
+Answer C wrong because new EC2 role doesn't update existing app connections.
+Answer D wrong because Lambda routing adds latency/complexity.
+link ref: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToInstance.html
+
+208.Explain
+Answer A correct because target tracking scales ECS on SQS visible messages, handling spikes cost-effectively.
+Answer B wrong because Swarm is Docker orchestration, not AWS-native.
+Answer C wrong because scheduler manages tasks, not scales on metrics.
+Answer D wrong because step scaling is reactive thresholds, less dynamic than target.
+link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-auto-scaling.html
+
+209.Explain
+Answer A wrong because IAM is for AWS access, not social/app login.
+Answer B wrong because identity pools map identities to creds, not user registration.
+Answer C correct because user pools handle sign-up, social federation (Google/Facebook).
+Answer D wrong because Directory Service is enterprise AD, not social/mobile.
+link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-social-idp.html
+
+210.Explain
+Answer A correct because Lambda authorizer validates headers against DynamoDB for custom auth.
+Answer B wrong because models define payloads, no auth; access to table unnecessary.
+Answer C wrong because integration requests map, no auth comparison.
+Answer D wrong because Cognito authorizer uses pools, not DynamoDB tables.
+link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html
+
+211.Explain
+Answer A wrong because GetFederationToken for role assumption, no MFA.
+Answer B wrong because GetCallerIdentity gets identity, no MFA temp creds.
+Answer C correct because GetSessionToken generates MFA-protected temp creds for API calls.
+Answer D wrong because DecodeAuthorizationMessage decodes errors, no MFA.
+link ref: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
+
+212.Explain
+Answer A correct because KMS throttling (e.g., 10k req/s) requires support increase for high reads.
+Answer B correct because exponential backoff retries throttled requests without overwhelming.
+Answer C wrong because S3 limits separate; error is KMS.
+Answer D wrong because CMK size fixed (256-bit); import no larger.
+Answer E wrong because multiple CMKs distribute but no solve single-key throttling.
+link ref: https://docs.aws.amazon.com/kms/latest/developerguide/quotas.html
+
+213.Explain
+Answer A wrong because handler/core separation is best practice, not for notifications.
+Answer B wrong because CloudWatch Events schedules/triggers, no data send.
+Answer C correct because SNS publishes processed data to admins (email/SMS).
+Answer D wrong because SQS queues for processing, not direct notify.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/services-sns.html
+
+214.Explain
+Answer A wrong because client-side manual rotation.
+Answer B wrong because import custom no auto annual.
+Answer C correct because KMS auto-rotates managed keys annually.
+Answer D wrong because export KMS no encrypt.
+link ref: https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html
+
+215.Explain
+Answer A wrong because x-Version header custom routing in Lambda, no Gateway support.
+Answer B wrong because authorizer validates, no version routing.
+Answer C wrong because resource policy secures, no version isolation.
+Answer D correct because stages (dev/prod) unique endpoints; variables pass context.
+link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/stages.html
+
+216.Explain
+Answer A wrong because Encrypt small payloads.
+Answer B wrong because library custom no KMS.
+Answer C wrong because encrypted key no decrypt.
+Answer D correct because GenerateDataKey plaintext encrypt.
+link ref: https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys
+
+217.Explain
+Answer A wrong because CLI disassociate no.
+Answer B wrong because AWS CLI no disassociate.
+Answer C wrong because policy no disassociate.
+Answer D correct because recreate no RDS.
+link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.db.html
+
+218.Explain
+Answer A wrong because sticky same instance.
+Answer B wrong because SQS no sessions.
+Answer C correct because DynamoDB scalable sessions.
+Answer D wrong because draining termination.
+link ref: https://aws.amazon.com/blogs/aws/elastic-load-balancer-support-for-amazon-dynamodb/
+
+219.Explain
+Answer A wrong because Glue ETL no real-time.
+Answer B wrong because ElastiCache no updates.
+Answer C wrong because Firehose delivery no updates.
+Answer D correct because Streams changes real-time.
+link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html
+
+220.Explain
+Answer A wrong because Subversion central.
+Answer B wrong because CodeBuild builds.
+Answer C correct because CodeCommit git distributed.
+Answer D wrong because CodeStar projects.
+link ref: https://aws.amazon.com/codecommit/
+
+221.Explain
+Answer A wrong because EC2 cron managed.
+Answer B wrong because env no scheduling.
+Answer C correct because Events schedule Lambda.
+Answer D wrong because SNS timer no.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents.html
+
+222.Explain
+Answer A wrong because query no sort score.
+Answer B correct because GSI partition sport sort score top.
+Answer C wrong because scan inefficient.
+Answer D wrong because LSI partition.
+link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
+
+223.Explain
+Answer A wrong because bucket policy S3 no KMS.
+Answer B correct because IAM role EC2 KMS decrypt.
+Answer C wrong because key policy enable instance no.
+Answer D wrong because ACL objects.
+Answer E wrong because Parameter storage.
+link ref: https://docs.aws.amazon.com/kms/latest/developerguide/iam-policies.html
+
+224.Explain
+Answer A correct because delay hides add.
+Answer B wrong because after consume no delay.
+Answer C wrong because poll consumer.
+Answer D wrong because delete delay no.
+link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-delay-queues.html
+
+225.Explain
+Answer A wrong because S3 direct no concurrent.
+Answer B wrong because FTP central no AWS.
+Answer C correct because CodeCommit direct deploy minimal.
+Answer D wrong because EC2 repo bottleneck.
+link ref: https://aws.amazon.com/codecommit/
+
+226.Explain
+Answer A wrong because EMR big data.
+Answer B correct because DAX caches DynamoDB.
+Answer C wrong because SQS messaging.
+Answer D wrong because CloudFront CDN.
+link ref: https://aws.amazon.com/dynamodb/dax/
+
+227.Explain
+Answer A wrong because default SSE-S3 no client.
+Answer B wrong because Cognito auth no encryption.
+Answer C wrong because Lambda processing.
+Answer D correct because client-side KMS secure transmit/storage.
+link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingClientSideEncryption.html
+
+228.Explain
+Answer A wrong because role AROA assumed.
+Answer B wrong because default no.
+Answer C correct because ASge access key principal.
+Answer D wrong because account service.
+link ref: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html
+
+229.Explain
+Answer A correct because pagination large lists.
+Answer B wrong because shorthand input.
+Answer C wrong because parameters commands.
+Answer D wrong because quoting args.
+link ref: https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
+
+230.Explain
+Answer A wrong because security groups network.
+Answer B wrong because ECR images.
+Answer C wrong because agent containers.
+Answer D correct because task ports.
+link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html
+
+231.Explain
+Answer A wrong because DynamoDB NoSQL metadata.
+Answer B wrong because EC2 no storage.
+Answer C wrong because Lambda compute.
+Answer D wrong because RDS relational slow indexing.
+link ref: https://aws.amazon.com/dynamodb/
+
+232.Explain
+Answer A wrong because VPC Flow network.
+Answer B correct because CloudWatch app logs.
+Answer C wrong because CloudSearch search.
+Answer D wrong because Trail API.
+link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
+
+233.Explain
+Answer A wrong because KPL producers.
+Answer B wrong because reduce retention less.
+Answer C correct because UpdateShardCount capacity.
+Answer D wrong because PutRecords batches puts shards needed.
+link ref: https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-kpl.html
+
+234.Explain
+Answer A correct because nested reusable.
+Answer B wrong because credentials insecure.
+Answer C wrong because remove mappings flexibility.
+Answer D wrong because Include snippets public risky.
+link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/best-practices.html
+
+235.Explain
+Answer A correct because backoffs rate.
+Answer B wrong because load balance no API.
+Answer C wrong because EC2 no.
+Answer D wrong because delay worse.
+link ref: https://docs.aws.amazon.com/general/latest/gr/api-retries.html
+
+236.Explain
+Answer A wrong because script cron managed.
+Answer B correct because TTL auto-deletes.
+Answer C wrong because new table daily costly.
+Answer D wrong because ItemExpiration no; TTL.
+link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-how-to.html
+
+237.Explain
+Answer A wrong because split smaller serial.
+Answer B wrong because sync one slow.
+Answer C correct because async event parallel.
+Answer D wrong because join first serial.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html
+
+238.Explain
+Answer A correct because multi-part large.
+Answer B wrong because Direct Connect network no size.
+Answer C wrong because no support size.
+Answer D wrong because region no.
+link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
+
+239.Explain
+Answer A wrong because docker pull direct no auth.
+Answer B correct because get-login docker login pull.
+Answer C wrong because get-login output run.
+Answer D wrong because get-download layers no pull.
+link ref: https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-pull-ecr-image.html
+
+240.Explain
+Answer A wrong because user pools email sign-up.
+Answer B wrong because Mobile Hub deprecated.
+Answer C wrong because Sync data.
+Answer D wrong because cloud logic backend.
+link ref: https://aws.amazon.com/cognito/
+
+241.Explain
 Answer A wrong because no www.
-Answer B correct because s3-website format.
+Answer B correct because s3-website-region.
 Answer C wrong because no endpoint.
 Answer D wrong because no tokyo.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html
 
-204.Explain
-Answer A wrong because single accumulates.
-Answer B wrong because delete costly.
-Answer C correct because delete/create minimal.
+242.Explain
+Answer A wrong because single table accumulates.
+Answer B wrong because individual delete costly.
+Answer C correct because delete/create per hour minimal.
 Answer D wrong because create no delete accumulates.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.DeleteTable.html
 
-205.Explain
-Answer A wrong because memory not shared.
-Answer B wrong because storage not.
-Answer C wrong because EBS not shared.
+243.Explain
+Answer A wrong because memory no shared.
+Answer B wrong because storage no.
+Answer C wrong because EBS no shared.
 Answer D correct because ElastiCache shared.
 Answer E wrong because Glacier no.
 link ref: https://aws.amazon.com/elasticache/
 
-206.Explain
-Answer A wrong because EBS block.
+244.Explain
+Answer A wrong because EBS no serving.
 Answer B correct because signed URLs control.
 Answer C wrong because CloudFront signed too.
-Answer D wrong because SG EC2.
+Answer D wrong because SG EC2 no S3.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html
-
-207.Explain
-Answer A wrong because provider auth.
-Answer B wrong because Lambda create complex.
-Answer C wrong because KMS encrypt.
-Answer D correct because Cognito unauth roles.
-link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/iam-roles.html
-
-208.Explain
-Answer A wrong because user creds insecure.
-Answer B correct because execution role secure.
-Answer C wrong because bucket policy principal.
-Answer D wrong because managed too broad.
-link ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html
-
-209.Explain
-Answer A wrong because pass-through no encrypt.
-Answer B correct because certificates offload.
-Answer C wrong because LSS no.
-Answer D wrong because install on EC2 CPU.
-Answer E correct because termination offloads.
-link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-create-https-ssl-load-balancer.html
-
-210.Explain
-Answer A wrong because runtime increases time.
-Answer B correct because Layers share libs.
-Answer C wrong because S3 env path not.
-Answer D wrong because buildspec CodeBuild.
-link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html
-
-211.Explain
-Answer A wrong because GetFederationToken federated.
-Answer B wrong because GetCallerIdentity info.
-Answer C correct because GetSessionToken MFA temp.
-Answer D wrong because Decode message.
-link ref: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
-
-212.Explain
-Answer A correct because KMS limit causes.
-Answer B correct because backoff handles.
-Answer C wrong because S3 limit not.
-Answer D wrong because key size no.
-Answer E wrong because multiple keys not help rate.
-link ref: https://docs.aws.amazon.com/kms/latest/developerguide/limits.html
-
-213.Explain
-Answer A wrong because separate no.
-Answer B wrong because Events triggers.
-Answer C correct because SNS publish notifies.
-Answer D wrong because SQS queue.
-link ref: https://aws.amazon.com/sns/
-
-214.Explain
-Answer A wrong because before no.
-Answer B wrong because import no rotate.
-Answer C correct because KMS auto rotate.
-Answer D wrong because export no.
-link ref: https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html
-
-215.Explain
-Answer A wrong because header version.
-Answer B wrong because authorizer auth.
-Answer C wrong because policy context.
-Answer D correct because stages versions.
-link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/stages.html
-
-216.Explain
-Answer A wrong because Encrypt small.
-Answer B wrong because Encrypt material small.
-Answer C correct because GenerateDataKey plaintext.
-Answer D wrong because without plaintext no.
-link ref: https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys
-
-217.Explain
-Answer A wrong because GitHub no.
-Answer B wrong because SSH for SSH.
-Answer C correct because IAM creds HTTPS.
-Answer D wrong because role permissions no.
-link ref: https://docs.aws.amazon.com/codecommit/latest/userguide/setting-up-https-unixes.html
-
-218.Explain
-Answer A wrong because GetItem single.
-Answer B correct because BatchGetItem multiple.
-Answer C wrong because no GetMultipleItems.
-Answer D wrong because no GetItemRange.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchGetItem.html
-
-219.Explain
-Answer A wrong because ENI private no.
-Answer B wrong because ENI public no.
-Answer C correct because disable check NAT.
-Answer D wrong because EIP private no.
-link ref: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html
-
-220.Explain
-Answer A correct because eventual consistency GETs.
-Answer B wrong because no replication.
-Answer C wrong because no delay.
-Answer D wrong because no limit.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Introduction.html#ConsistencyModel
-
-221.Explain
-Answer A wrong because 100 region.
-Answer B wrong because limit.
-Answer C wrong because no 1M.
-Answer D wrong because 500 no.
-Answer E wrong because 100 IAM no.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html
-
-222.Explain
-Answer A wrong because user write no.
-Answer B wrong because add role running.
-Answer C wrong because add user no.
-Answer D correct because launch role.
-Answer E correct because role write.
-Answer F wrong because user launch no.
-link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
-
-223.Explain
-Answer A correct because default deny.
-Answer B wrong because allow not deny.
-Answer C correct because allow default deny.
-Answer D wrong because deny allow.
-Answer E wrong because default deny.
-link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
-
-224.Explain
-Answer A wrong because NAT public.
-Answer B wrong because routing ok assumed.
-Answer C wrong because OS IP no.
-Answer D correct because EIP public access.
-link ref: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html
-
-225.Explain
-Answer A wrong because 0 no.
-Answer B wrong because 1 hour no.
-Answer C wrong because 1 day no.
-Answer D wrong because forever no.
-Answer E correct because 30s default visibility.
-link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
-
-226.Explain
-Answer A wrong because XML UnsubscribeURL.
-Answer B wrong because JSON DuplicateFlag no.
-Answer C wrong because XML DuplicateFlag no.
-Answer D correct because JSON unsubscribeURL.
-link ref: https://docs.aws.amazon.com/sns/latest/dg/sns-message-formats.html
-
-227.Explain
-Answer A wrong because storage-class.
-Answer B wrong because MD5 integrity.
-Answer C wrong because token session.
-Answer D correct because server-side-encryption header.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html
-
-228.Explain
-Answer A correct because Tomcat supported.
-Answer B correct because .NET supported.
-Answer C wrong because Websphere no.
-Answer D wrong because JBoss no.
-Answer E wrong because Jetty no.
-link ref: https://aws.amazon.com/elasticbeanstalk/
-
-229.Explain
-Answer A correct because Join http GetAtt DNSName.
-Answer B wrong because no Url att.
-Answer C wrong because no ElasticLoadBalancerUrl.
-Answer D wrong because Ref DNSName no.
-link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-elasticloadbalancing-loadbalancer.html
-
-230.Explain
-Answer A wrong because Hosting no restrict.
-Answer B correct because bucket policy restrict.
-Answer C wrong because Federation identities.
-Answer D correct because ACL restrict.
-Answer E wrong because CloudFront distribution.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html
-
-231.Explain
-Answer A wrong because deleted on fail.
-Answer B correct because rollback deletes.
-Answer C wrong because stops on fail.
-Answer D wrong because not advance.
-link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-stack-rollback.html
-
-232.Explain
-Answer A correct because TopicArn target.
-Answer B correct because Subject optional.
-Answer C wrong because no Destination.
-Answer D wrong because no Format.
-Answer E correct because Message body.
-Answer F wrong because no Language.
-link ref: https://docs.aws.amazon.com/sns/latest/api/API_Publish.html
-
-233.Explain
-Answer A wrong because CloudWatch no IP.
-Answer B wrong because ifconfig local.
-Answer C wrong because userdata no IP.
-Answer D correct because metadata IP.
-link ref: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-metadata.html
-
-234.Explain
-Answer A wrong because region specific.
-Answer B wrong because no country.
-Answer C correct because same region.
-Answer D wrong because AZ no.
-link ref: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
-
-235.Explain
-Answer A wrong because DescribeInstances no AMIs.
-Answer B wrong because no DescribeAMIs.
-Answer C correct because DescribeImages AMIs.
-Answer D wrong because no GetAMIs.
-Answer E wrong because can list.
-link ref: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeImages.html
-
-236.Explain
-Answer A correct because customer IAM.
-Answer B wrong because AWS.
-Answer C correct because customer SG/ACL.
-Answer D correct because customer EBS.
-Answer E wrong because AWS physical.
-Answer F correct because customer patch.
-link ref: https://aws.amazon.com/compliance/shared-responsibility-model/
-
-237.Explain
-Answer A correct because smaller page less impact.
-Answer B wrong because parallel more.
-Answer C wrong because range no scan.
-Answer D wrong because prewarm no.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html
-
-238.Explain
-Answer A wrong because SSL no.
-Answer B wrong because random no.
-Answer C correct because encrypted FS.
-Answer D wrong because S3 no EBS.
-Answer E wrong because IAM access no encrypt.
-link ref: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html
-
-239.Explain
-Answer A wrong because ap-northeast-1 no.
-Answer B wrong because us-west-2 no.
-Answer C correct because us-east-1 default.
-Answer D wrong because eu-west-1 no.
-Answer E wrong because us-central-1 no.
-link ref: https://docs.aws.amazon.com/sdkref/latest/guide/settings-reference.html
-
-240.Explain
-Answer A correct because tasks unique.
-Answer B wrong because no S3.
-Answer C correct because year executions.
-Answer D wrong because no SNS.
-Answer E correct because deciders/workers.
-Answer F wrong because no EC2.
-link ref: https://aws.amazon.com/swf/
-
-241.Explain
-Answer A wrong because region no help stickiness.
-Answer B correct because re-resolve rotates.
-Answer C correct because global clients distribute.
-Answer D wrong because AZs no.
-Answer E wrong because app cookie no distribution.
-link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-sticky-sessions.html
-
-242.Explain
-Answer A correct because HTTP.
-Answer B wrong because UDP no.
-Answer C correct because SMS.
-Answer D wrong because DynamoDB no.
-Answer E wrong because pipes no.
-link ref: https://aws.amazon.com/sns/features/
-
-243.Explain
-Answer A wrong because serialize multiple no.
-Answer B wrong because Images table foreign complex.
-Answer C wrong because binary size.
-Answer D correct because S3 URL pointer low.
-link ref: https://aws.amazon.com/dynamodb/
-
-244.Explain
-Answer A wrong because hash no.
-Answer B wrong because storage no.
-Answer C correct because tables.
-Answer D wrong because LSI no.
-Answer E correct because throughput.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Limits.html
 
 245.Explain
-Answer A correct because timeout process delete.
-Answer B wrong because delete before loss.
-Answer C wrong because DelaySeconds delay.
-Answer D wrong because delete before.
-link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
-
-246.Explain
-Answer A wrong because anonymous no.
-Answer B correct because pre-signed download.
-Answer C wrong because MFA no.
-Answer D wrong because encryption no access.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html
-
-247.Explain
-Answer A correct because User ID even.
-Answer B wrong because Status same.
-Answer C wrong because Device hot.
-Answer D wrong because Game few.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html
-
-248.Explain
-Answer A wrong because hash name range office sort.
-Answer B correct because range name hash office query.
-Answer C wrong because hash name no range.
-Answer D wrong because hash office no range.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html
-
-249.Explain
-Answer A wrong because VPC for both.
-Answer B correct because EBS persists on stop/start.
-Answer C wrong because ASG for both.
-Answer D wrong because instance-store no stop/start.
-link ref: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html
-
-250.Explain
-Answer A wrong because S3 costs.
-Answer B wrong because EC2 costs.
-Answer C correct because Auto Scaling free.
-Answer D wrong because ELB costs.
-Answer E correct because CloudFormation free.
-Answer F wrong because SWF costs.
-link ref: https://aws.amazon.com/pricing/
-
-251.Explain
-Answer A wrong because limit 5TB now, but was 5GB.
-Answer B correct because multi-part for >5GB.
-Answer C wrong because no large API.
-Answer D wrong because no support increase.
-Answer E wrong because region not limit.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
-
-252.Explain
-Answer A correct because ASG deployed.
-Answer B wrong because Route 53 separate.
-Answer C correct because ELB deployed.
-Answer D correct because RDS optional.
-Answer E wrong because EIP manual.
-Answer F wrong because SQS separate.
-link ref: https://aws.amazon.com/elasticbeanstalk/
-
-253.Explain
-Answer A wrong because IAM user creds insecure.
-Answer B wrong because root creds bad.
-Answer C correct because web federation temp creds.
-Answer D wrong because cross-account for accounts.
-link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html
-
-254.Explain
-Answer A wrong because Perl supported.
-Answer B correct because PHP supported.
-Answer C wrong because Pascal not.
-Answer D correct because Java supported.
-Answer E wrong because SQL not SDK.
-link ref: https://aws.amazon.com/tools/
-
-255.Explain
-Answer A wrong because 1 too low.
-Answer B correct because 600/60=10 WCU for 1KB writes.
-Answer C wrong because 60 over.
-Answer D wrong because 600 over.
-Answer E wrong because 3600 way over.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ProvisionedThroughput.html
-
-256.Explain
-Answer A wrong because 5xx server errors.
-Answer B wrong because 200 success.
-Answer C wrong because 306 unused.
-Answer D correct because 4xx client errors.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/CommonErrors.html
-
-257.Explain
-Answer A wrong because visibility after receive.
-Answer B correct because long polling waits 20s reduces empty.
-Answer C wrong because retention for delete.
-Answer D wrong because delay for new messages.
-link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-long-polling.html
-
-258.Explain
-Answer A wrong because no www.
-Answer B correct because s3-website-region format.
-Answer C wrong because no endpoint.
-Answer D wrong because no tokyo.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html
-
-259.Explain
-Answer A wrong because single table accumulates.
-Answer B wrong because individual delete costly.
-Answer C correct because delete/create per hour minimal provision.
-Answer D wrong because create without delete accumulates.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.DeleteTable.html
-
-260.Explain
-Answer A wrong because memory not shared.
-Answer B wrong because storage not shared.
-Answer C wrong because EBS not easily shared.
-Answer D correct because ElastiCache shared sessions.
-Answer E wrong because Glacier archival.
-link ref: https://aws.amazon.com/elasticache/
-
-261.Explain
-Answer A wrong because EBS not for serving.
-Answer B correct because signed URLs control access.
-Answer C wrong because CloudFront can use signed too.
-Answer D wrong because SG for EC2, not S3.
-link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html
-
-262.Explain
-Answer A wrong because pessimistic not used.
+Answer A wrong because pessimistic no.
 Answer B correct because optimistic control.
 Answer C correct because conditional writes.
 Answer D wrong because no restrict reads.
 Answer E wrong because no restrict writes.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html#WorkingWithItems.ConditionalUpdate
 
-263.Explain
-Answer A wrong because bulk not for devices.
-Answer B wrong because push service handles, but SNS needs register.
-Answer C wrong because vending for custom.
-Answer D correct because CreatePlatformEndpoint registers tokens.
+246.Explain
+Answer A wrong because bulk no devices.
+Answer B wrong because push handles SNS register.
+Answer C wrong because vending custom.
+Answer D correct because CreatePlatformEndpoint tokens.
 link ref: https://docs.aws.amazon.com/sns/latest/dg/sns-mobile-application-as-subscriber.html
 
-264.Explain
+247.Explain
 Answer A wrong because no storage instances.
 Answer B wrong because range secondary.
-Answer C correct because hot hash key throttling.
-Answer D wrong because sort not capacity.
+Answer C correct because hot hash throttling.
+Answer D wrong because sort no capacity.
 Answer E wrong because no auto scaling then.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html
 
-265.Explain
+248.Explain
 Answer A wrong because sequential hotspots.
-Answer B correct because instanceID first distributes.
-Answer C wrong because year first less distribution.
-Answer D wrong because hour first hotspots.
+Answer B correct because instanceID distributes.
+Answer C wrong because year less.
+Answer D wrong because hour hotspots.
 Answer E wrong because year hotspots.
 link ref: https://aws.amazon.com/premiumsupport/knowledge-center/s3-request-limit-avoid/
 
-266.Explain
+249.Explain
 Answer A wrong because not exactly once/FIFO.
 Answer B wrong because not exactly once.
 Answer C wrong because FIFO order.
-Answer D correct because at-least-once, no order.
+Answer D correct because at-least-once no order.
 link ref: https://aws.amazon.com/sqs/features/
 
-267.Explain
-Answer A wrong because IAM no LDAP login.
-Answer B correct because LDAP to STS assume role.
+250.Explain
+Answer A wrong because IAM no LDAP.
+Answer B correct because LDAP STS assume.
 Answer C wrong because STS no LDAP.
-Answer D correct because broker LDAP to STS federated.
-Answer E wrong because broker to STS assume.
+Answer D correct because broker LDAP STS federated.
+Answer E wrong because broker STS assume.
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html
 
-268.Explain
+251.Explain
 Answer A correct because upload welcome.html.
-Answer B wrong because no subfolder needed.
-Answer C correct because set index to welcome.html.
-Answer D wrong because move index unnecessary.
-Answer E wrong because error for errors.
+Answer B wrong because no subfolder.
+Answer C correct because set index welcome.html.
+Answer D wrong because move index no.
+Answer E wrong because error errors.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/IndexDocumentSupport.html
 
-269.Explain
-Answer A wrong because Triple DES not S3.
+252.Explain
+Answer A wrong because Triple DES no S3.
 Answer B correct because AES-256 SSE.
-Answer C wrong because Blowfish not.
-Answer D wrong because RC5 not.
+Answer C wrong because Blowfish no.
+Answer D wrong because RC5 no.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html
 
-270.Explain
-Answer A correct because annotations for custom data indexed.
-Answer B wrong because metadata not indexed.
-Answer C wrong because env vars config.
+253.Explain
+Answer A correct because annotations custom indexed.
+Answer B wrong because metadata no indexed.
+Answer C wrong because env config.
 Answer D wrong because plugins SDK.
 link ref: https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-annotations
 
-271.Explain
-Answer A wrong because no direct select type in deployment.
-Answer B correct because new env with ALB, swap CNAME.
-Answer C correct because clone change type, swap.
-Answer D wrong because edit not change LB type.
+254.Explain
+Answer A wrong because no direct select deployment.
+Answer B correct because new env ALB swap CNAME.
+Answer C correct because clone change type swap.
+Answer D wrong because edit no change LB.
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.elb.html
 
-272.Explain
+255.Explain
 Answer A wrong because CodePipeline CI/CD.
 Answer B wrong because S3 storage.
 Answer C wrong because CodeBuild builds.
 Answer D correct because CodeCommit git repo.
 link ref: https://aws.amazon.com/codecommit/
 
-273.Explain
+256.Explain
 Answer A wrong because CodePipeline orchestrates.
 Answer B wrong because CodeBuild compiles.
 Answer C wrong because Beanstalk PaaS.
-Answer D correct because CodeDeploy deploys to EC2/on-prem.
+Answer D correct because CodeDeploy EC2/on-prem.
 link ref: https://aws.amazon.com/codedeploy/
 
-274.Explain
-Answer A wrong because DLQ for async.
-Answer B wrong because API Gateway source.
-Answer C wrong because error handling not prevent.
-Answer D correct because support increase account limit.
+257.Explain
+Answer A wrong because DLQ async.
+Answer B wrong because Gateway source.
+Answer C wrong because error no prevent.
+Answer D correct because support account limit.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-limits.html
 
-275.Explain
-Answer A wrong because RDS app level slow.
+258.Explain
+Answer A wrong because RDS app slow.
 Answer B wrong because shared file complex.
 Answer C correct because Memcached low latency.
-Answer D wrong because DynamoDB higher latency.
+Answer D wrong because DynamoDB higher.
 link ref: https://aws.amazon.com/elasticache/memcached/
 
-276.Explain
-Answer A correct because GSI separate provision, underprovisioned.
-Answer B wrong because read on primary ok.
-Answer C wrong because streams for changes.
+259.Explain
+Answer A wrong because GSI separate provision under.
+Answer B wrong because read primary ok.
+Answer C wrong because streams changes.
 Answer D wrong because other table separate.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
 
-277.Explain
+260.Explain
 Answer A wrong because concurrent no prevent.
 Answer B correct because conditional prevent overwrite.
-Answer C wrong because atomic per operation.
-Answer D wrong because batch no condition across.
+Answer C wrong because atomic per.
+Answer D wrong because batch no condition.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html#WorkingWithItems.ConditionalUpdate
 
-278.Explain
-Answer A wrong because view type for content.
-Answer B correct because event source mapping triggers.
-Answer C wrong because SNS not needed.
-Answer D wrong because timeout not trigger.
+261.Explain
+Answer A wrong because view type content.
+Answer B correct because event source triggers.
+Answer C wrong because SNS no.
+Answer D wrong because timeout no trigger.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html
 
-279.Explain
-Answer A wrong because 30s too infrequent.
-Answer B correct because high-res every 5s for 15s average.
+262.Explain
+Answer A wrong because 30s infrequent.
+Answer B correct because high-res 5s 15s average.
 Answer C wrong because standard 1min.
 Answer D wrong because standard infrequent.
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
 
-280.Explain
-Answer A wrong because SQS/EC2 not real-time.
+263.Explain
+Answer A wrong because SQS/EC2 no real-time.
 Answer B wrong because S3/Redshift batch.
-Answer C wrong because Data Pipeline scheduled.
-Answer D correct because Kinesis Streams real-time ingest.
+Answer C wrong because Pipeline scheduled.
+Answer D correct because Kinesis Streams real-time.
 link ref: https://aws.amazon.com/kinesis/data-streams/
 
-281.Explain
+264.Explain
 Answer A correct because specific Create/DeleteBranch.
-Answer B wrong because Put* too broad.
-Answer C wrong because Update* not for branches.
-Answer D wrong because * all access.
+Answer B wrong because Put* broad.
+Answer C wrong because Update* no branches.
+Answer D wrong because * all.
 link ref: https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html
 
-282.Explain
+265.Explain
 Answer A wrong because ACM certs.
-Answer B correct because Parameter Store secure storage.
-Answer C wrong because Trusted Advisor recommendations.
+Answer B correct because Parameter Store secure.
+Answer C wrong because Advisor recommendations.
 Answer D correct because KMS encrypts.
 Answer E wrong because GuardDuty security.
 link ref: https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store.html
 
-283.Explain
-Answer A wrong because dockerrun for ECS.
-Answer B wrong because buildspec for CodeBuild.
-Answer C correct because appspec for deployment hooks.
+266.Explain
+Answer A wrong because dockerrun ECS.
+Answer B wrong because buildspec CodeBuild.
+Answer C correct because appspec hooks.
 Answer D wrong because ebextensions config.
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html
 
-284.Explain
-Answer A wrong because Encrypt not for large.
+267.Explain
+Answer A wrong because Encrypt no large.
 Answer B wrong because GenerateRandom no KMS.
-Answer C wrong because encrypted key not decrypt.
-Answer D correct because plaintext data key from KMS.
+Answer C wrong because encrypted no decrypt.
+Answer D correct because plaintext data key KMS.
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys
 
-285.Explain
-Answer A wrong because CacheHit for caching.
-Answer B correct because IntegrationLatency measures backend time.
+268.Explain
+Answer A wrong because CacheHit caching.
+Answer B correct because IntegrationLatency backend.
 Answer C wrong because CacheMiss caching.
-Answer D correct because Latency total time.
+Answer D correct because Latency total.
 Answer E wrong because Count requests.
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 
-286.Explain
-Answer A correct because CloudFront signed URLs secure cheap.
+269.Explain
+Answer A correct because CloudFront signed cheap.
 Answer B wrong because per customer costly.
 Answer C wrong because Lambda@Edge custom.
 Answer D wrong because API/Lambda overhead.
 link ref: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-signed-urls.html
 
-287.Explain
-Answer A correct because backoff handles throttling.
-Answer B wrong because SQS bus adds layer.
-Answer C wrong because API Gateway throttles more.
-Answer D wrong because Firehose for streams.
+270.Explain
+Answer A correct because backoff throttling.
+Answer B wrong because SQS bus layer.
+Answer C wrong because Gateway throttles more.
+Answer D wrong because Firehose streams.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html
 
-288.Explain
-Answer A correct because ElastiCache shared sessions fault-tolerant.
-Answer B wrong because CloudFront CDN.
-Answer C wrong because S3 not low latency.
-Answer D wrong because sticky not fault-tolerant.
+271.Explain
+Answer A wrong because immutable full.
+Answer B wrong because rolling capacity.
+Answer C wrong because all once down.
+Answer D correct because rolling batch capacity min cost.
+link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html
+
+272.Explain
+Answer A wrong because single no independent.
+Answer B correct because separate independent.
+Answer C wrong because multiple HTTP one background.
+Answer D wrong because multiple background one HTTP.
+link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.environments.html
+
+273.Explain
+Answer A correct because changesets preview.
+Answer B wrong because policies prevent.
+Answer C wrong because Metadata info.
+Answer D wrong because Resources define.
+link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html
+
+274.Explain
+Answer A wrong because functions management.
+Answer B wrong because stages versions aliases no endpoint.
+Answer C correct because aliases versions no API.
+Answer D wrong because tags no routing.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html
+
+275.Explain
+Answer A wrong because certs incoming.
+Answer B wrong because allows need deny.
+Answer C wrong because HTTPS redirect incoming.
+Answer D correct because deny non-secure HTTPS.
+link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html
+
+276.Explain
+Answer A wrong because SQS/SNS messaging.
+Answer B correct because ELB EC2 REST.
+Answer C wrong because ElastiCache/Elasticsearch storage/search.
+Answer D correct because Gateway Lambda serverless REST.
+Answer E wrong because S3/CloudFront static.
+link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html
+
+277.Explain
+Answer A correct because /tmp local temp.
+Answer B wrong because EFS persistent slow.
+Answer C wrong because EBS block.
+Answer D wrong because S3 latency.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html
+
+278.Explain
+Answer A wrong because EC2 NoSQL self.
+Answer B correct because ElastiCache cache-aside profiles.
+Answer C wrong because RDS write-through relational.
+Answer D wrong because write-through populates cache-aside reads.
 link ref: https://aws.amazon.com/elasticache/
 
-289.Explain
-Answer A wrong because intrinsic for functions.
-Answer B wrong because express framework.
-Answer C correct because SAM model for serverless.
-Answer D wrong because plugin not.
-link ref: https://aws.amazon.com/serverless/sam/
+279.Explain
+Answer A wrong because VM Import self.
+Answer B wrong because Lightsail simple no dynamic.
+Answer C correct because Beanstalk manages.
+Answer D wrong because S3/CloudFront static.
+link ref: https://aws.amazon.com/elasticbeanstalk/
 
-290.Explain
-Answer A wrong because pessimistic DynamoDB no.
-Answer B wrong because CloudFront/ASG not session.
-Answer C wrong because WAF security.
-Answer D correct because DynamoDB external sessions.
-Answer E correct because ELB/ASG for elasticity.
-link ref: https://aws.amazon.com/elasticloadbalancing/
+280.Explain
+Answer A correct because context request ID.
+Answer B wrong because event no ID file less.
+Answer C wrong because event ID console standard.
+Answer D wrong because context ID file less.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html
 
-291.Explain
-Answer A wrong because logging basic.
-Answer B wrong because CloudTrail API.
-Answer C correct because X-Ray traces distributed.
-Answer D wrong because Inspector security.
+281.Explain
+Answer A correct because EC2 assume AccessPII.
+Answer B wrong because direct no.
+Answer C wrong because AWS API temp.
+Answer D correct because AssumeRole temp.
+Answer E wrong because GetSessionToken users.
+link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
+
+282.Explain
+Answer A wrong because event source no trace API.
+Answer B wrong because ALB no DynamoDB.
+Answer C wrong because limit no timing.
+Answer D correct because X-Ray traces.
 link ref: https://aws.amazon.com/xray/
 
-292.Explain
-Answer A wrong because no VPC endpoint for logs.
-Answer B correct because filters apply forward.
-Answer C wrong because no ES needed.
-Answer D wrong because no export needed.
-link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html
-
-293.Explain
-Answer A wrong because Conditions optional.
-Answer B wrong because Globals optional.
-Answer C correct because Transform for SAM.
-Answer D wrong because Properties per resource.
-link ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html
-
-294.Explain
+283.Explain
 Answer A wrong because Multi-AZ HA.
-Answer B wrong because SQS messaging.
-Answer C correct because ElastiCache caches queries.
-Answer D wrong because replica scales reads.
-link ref: https://aws.amazon.com/elasticache/
+Answer B correct because replica offload reads.
+Answer C wrong because ElastiCache buffers writes reads issue.
+Answer D wrong because DynamoDB overkill.
+link ref: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html
 
-295.Explain
-Answer A wrong because concurrent account limit.
-Answer B wrong because stage for API.
-Answer C correct because function reserved concurrency limits.
-Answer D wrong because reduce throttling worsens.
-link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html
+284.Explain
+Answer A wrong because BatchWriteItem no transactional.
+Answer B correct because TransactWriteItems all-nothing.
+Answer C wrong because SQS messaging.
+Answer D wrong because Aurora sync complex.
+link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html
 
-296.Explain
-Answer A correct because Redis cluster shared fault-tolerant.
-Answer B wrong because EBS not shared easily.
-Answer C wrong because disk local.
-Answer D wrong because dedicated instance not shared.
+285.Explain
+Answer A wrong because S3 Lambda indirect.
+Answer B wrong because Kinesis Lambda overkill.
+Answer C wrong because API role no creds.
+Answer D correct because PutMetricData IAM EC2.
+link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
+
+286.Explain
+Answer A wrong because CLI no large.
+Answer B correct because Extended Library S3 >256KB.
+Answer C wrong because EBS block.
+Answer D wrong because EFS file CLI no.
+link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-s3-messages.html
+
+287.Explain
+Answer A wrong because X-Ray no metrics graph.
+Answer B correct because custom PutMetricData graph.
+Answer C wrong because S3 Kinesis complex.
+Answer D wrong because DynamoDB CloudFront mismatch.
+link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
+
+288.Explain
+Answer A correct because package modules reduce cold.
+Answer B wrong because DynamoDB RDS bottleneck.
+Answer C correct because connection outside reuse.
+Answer D wrong because custom unnecessary.
+Answer E wrong because local no connection.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html
+
+289.Explain
+Answer A wrong because SES email metric SNS.
+Answer B wrong because API-error built-in custom SNS.
+Answer C wrong because SES no alert.
+Answer D correct because custom CloudWatch SNS.
+link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html
+
+290.Explain
+Answer A wrong because multiple complex.
+Answer B correct because approval pauses.
+Answer C wrong because disable manual.
+Answer D wrong because disable no workflow.
+link ref: https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html
+
+291.Explain
+Answer A correct because Redis Cluster HA.
+Answer B wrong because EC2 self uptime.
+Answer C wrong because Memcached no persistence.
+Answer D wrong because Redshift analytics.
 link ref: https://aws.amazon.com/elasticache/redis/
 
+292.Explain
+Answer A wrong because memory no time.
+Answer B wrong because same bucket possible.
+Answer C correct because timeout 15min 500s >3s.
+Answer D wrong because Java fine.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html
+
+293.Explain
+Answer A wrong because SSL transit.
+Answer B wrong because KCL no encrypt.
+Answer C wrong because Lambda after rest.
+Answer D correct because server-side Kinesis rest.
+link ref: https://docs.aws.amazon.com/streams/latest/dev/server-side-encryption.html
+
+294.Explain
+Answer A wrong because Lambda compute.
+Answer B correct because Cognito SAML mobile.
+Answer C wrong because IAM internal.
+Answer D wrong because EC2 server.
+link ref: https://aws.amazon.com/cognito/
+
+295.Explain
+Answer A wrong because SNS notification.
+Answer B wrong because NetworkIn bytes.
+Answer C wrong because CloudFront CDN.
+Answer D correct because custom users scaling.
+link ref: https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html
+
+296.Explain
+Answer A wrong because API manual.
+Answer B wrong because standard CloudFormation Lambda.
+Answer C correct because SAM simplifies serverless.
+Answer D wrong because bash no automated.
+link ref: https://aws.amazon.com/serverless/sam/
+
 297.Explain
-Answer A wrong because YAML ok.
-Answer B correct because .config extension for ebextensions.
-Answer C wrong because resources for declare.
-Answer D wrong because namespace custom unnecessary.
-link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html
+Answer A wrong because encryption no restrict.
+Answer B correct because item-level key conditions.
+Answer C wrong because SQS complexity.
+Answer D wrong because client discard inefficient.
+link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html
 
 298.Explain
-Answer A wrong because instance size not for Lambda.
-Answer B wrong because time increase not compute.
-Answer C wrong because call-time specify not possible.
-Answer D correct because more memory increases CPU proportionally.
-link ref: https://docs.aws.amazon.com/lambda/latest/dg/resource-model.html
+Answer A wrong because STS temp no guest.
+Answer B wrong because Directory AD.
+Answer C correct because Cognito unauth guest.
+Answer D wrong because SAML federated.
+link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html
 
 299.Explain
-Answer A wrong because async Lambda still waits for login.
-Answer B correct because Memcached caches user data, speeding login.
-Answer C wrong because ALB balances, but bottleneck is DB.
-Answer D correct because async DB call doesn't block.
-Answer E wrong because batch increases latency.
-link ref: https://aws.amazon.com/elasticache/memcached/
+Answer A wrong because no compile.
+Answer B correct because package S3 modifies.
+Answer C wrong because zip template no.
+Answer D wrong because no command.
+link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-cli-package.html
 
 300.Explain
-Answer A wrong because identity pools for auth.
-Answer B wrong because user pool for auth.
-Answer C correct because Cognito Sync for cross-device data.
-Answer D wrong because events for triggers.
-link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-sync.html
+Answer A wrong because unzip no.
+Answer B wrong because compression no unzip.
+Answer C correct because smaller functions size.
+Answer D wrong because double no.
+link ref: https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
 
 301.Explain
-Answer A wrong because deployment for stages.
-Answer B wrong because authorizer for auth.
-Answer C wrong because import for keys, but need plan association.
-Answer D correct because usage plan key associates key to plan.
+Answer A wrong because createDeployment redeploys the API but does not associate new keys with usage plans; redeployment propagates changes to stages, but new keys need plan linking for validation.
+Answer B wrong because updateAuthorizer updates auth logic, but API key validation is native, not authorizer-based; issue is key-plan association, not authorizer.
+Answer C wrong because importApiKeys imports from CSV, not for newly created keys; doesn't link to plans.
+Answer D correct because createUsagePlanKey associates the API key with a usage plan, granting access to APIs under that plan after creation.
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html
 
 302.Explain
-Answer A correct because Cognito web federation for social logins.
-Answer B wrong because SAML for enterprise.
-Answer C wrong because keys in code insecure.
-Answer D wrong because STS assume for roles.
-link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-amazon-cognito-with-web-and-mobile-apps.html
+Answer A correct because web identity federation in Cognito allows login with Amazon, Facebook, Google, providing temp creds for S3 access.
+Answer B wrong because SAML is enterprise federation (e.g., AD), not social providers like Facebook/Google.
+Answer C wrong because IAM keys in code are insecure, hard-coded, and not for mobile user auth.
+Answer D wrong because STS AssumeRole requires role assumption, not direct social login integration.
+link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/external-identity-providers.html
 
 303.Explain
-Answer A wrong because GetMetricData for metrics, not logs.
-Answer B wrong because CloudTrail for API calls.
-Answer C wrong because CloudWatch Events for triggers.
-Answer D correct because CloudWatch Logs agent collects EC2 logs.
+Answer A wrong because GetMetricData retrieves metrics, not logs; logs need agent for collection.
+Answer B wrong because CloudTrail audits API calls, not app logs from EC2.
+Answer C wrong because CloudWatch Events triggers actions, not collects logs; app installation unrelated.
+Answer D correct because CloudWatch Logs agent on EC2 pushes instance logs to CloudWatch for monitoring.
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/QuickStartEC2Instance.html
 
 304.Explain
-Answer A wrong because DeleteItem conditional slow for millions.
-Answer B wrong because BatchWriteItem limited.
-Answer C wrong because recursive slow.
-Answer D correct because recreate table daily efficient for temp data.
-link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.CreateTable.html
+Answer A wrong because DeleteItem with condition scans/deletes individually, costly for millions.
+Answer B wrong because BatchWriteItem deletes in batches (up to 25), still provision-heavy for millions.
+Answer C wrong because recursive scan/DeleteItem inefficient, consumes throughput.
+Answer D correct because deleting/recreating table clears data cost-effectively; no provisioned throughput during idle.
+link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.DeleteTable.html
 
 305.Explain
-Answer A wrong because bucket name not cause duplicates.
-Answer B correct because Lambda retries on failure, causing duplicates.
-Answer C wrong because no S3 outage mentioned.
-Answer D wrong because intermittent stop not cause log duplicates.
+Answer A wrong because bucket name correct; duplicates from retries, not name.
+Answer B correct because Lambda retries failed invocations (e.g., errors/timeouts) with delay, causing duplicate processing if not idempotent.
+Answer C wrong because S3 outage would cause failures, not duplicates; logs indicate success with duplicates.
+Answer D wrong because app resume might cause reprocessing, but logs show request ID duplicates from retries.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/invocation-retries.html
 
 306.Explain
-Answer A wrong because Lambda is compute.
-Answer B wrong because X-Ray tracing.
-Answer C wrong because SQS messaging.
-Answer D correct because API Gateway centralizes microservices.
+Answer A wrong because Lambda serverless compute, not interface management.
+Answer B wrong because X-Ray traces performance, not manages services.
+Answer C wrong because SQS queues messages, not provides REST interface.
+Answer D correct because API Gateway centralizes microservices exposure, simplifying consumer access/scaling.
 link ref: https://aws.amazon.com/api-gateway/
 
 307.Explain
-Answer A correct because S3 with CloudFront for static content.
-Answer B wrong because EC2 self-managed.
-Answer C wrong because ECS/Redis container/dynamic.
-Answer D wrong because Lambda/API for dynamic.
+Answer A correct because S3 hosts static files (HTML/JS/images/videos), CloudFront distributes globally with caching.
+Answer B wrong because EC2/ElastiCache for dynamic, but site is static.
+Answer C wrong because ECS/Redis containerized caching, overkill for static.
+Answer D wrong because Lambda/API for dynamic APIs, not static content.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
 
 308.Explain
-Answer A wrong because namespace for grouping.
-Answer B correct because dimension for filtering metrics per app.
-Answer C wrong because event for triggers.
-Answer D wrong because alarm on metrics.
-link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html
+Answer A correct because custom namespace groups metrics by app, allowing dashboard view of unique metrics per app.
+Answer B wrong because dimensions filter within metrics, not create unique names.
+Answer C wrong because events trigger actions, not represent metrics.
+Answer D wrong because alarms act on metrics, not create them.
+link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
 
 309.Explain
-Answer A wrong because STS temp, but user pools for passwords.
-Answer B wrong because IAM not for password reset.
-Answer C wrong because KMS encryption.
-Answer D correct because user pools handle sign-up and reset.
+Answer A wrong because identity pools map to creds, but no self-reset.
+Answer B wrong because IAM pools no password reset.
+Answer C wrong because KMS encrypts, no users.
+Answer D correct because user pools manage sign-up/reset, identity pools creds.
 link ref: https://aws.amazon.com/cognito/
 
 310.Explain
-Answer A wrong because CodeCommit multiple repos not for envs.
-Answer B wrong because CodeBuild for builds.
-Answer C wrong because Data Pipeline for data.
-Answer D correct because CodeDeploy groups for envs.
+Answer A wrong because multiple repos no sequential deploy.
+Answer B wrong because CodeBuild multiple builds no env deploy.
+Answer C wrong because Data Pipeline data processing no code deploy.
+Answer D correct because CodeDeploy groups for Dev/QA/Prod sequential.
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-groups.html
 
 311.Explain
-Answer A wrong because new table per date not minimal cost.
-Answer B wrong because increasing units costly during spikes.
-Answer C correct because random suffix even distribution.
-Answer D wrong because GSI for queries, not writes.
+Answer A wrong because per-date tables increase management/cost.
+Answer B wrong because increasing capacity costly during spikes.
+Answer C correct because random suffix distributes writes evenly across partitions.
+Answer D wrong because GSI for reads, not write throttling.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-uniform-load.html
 
 312.Explain
-Answer A wrong because S3 not in-memory.
-Answer B wrong because RDS relational.
-Answer C correct because ElastiCache in-memory for consistent results.
-Answer D wrong because Kinesis streaming.
+Answer A wrong because S3 durable but higher latency for in-memory needs.
+Answer B wrong because RDS relational, not optimized for inconsistent results tolerance.
+Answer C correct because ElastiCache in-memory, scalable for game results with auto-scaling.
+Answer D wrong because Kinesis streaming, not storage for results.
 link ref: https://aws.amazon.com/elasticache/
 
 313.Explain
-Answer A correct because task definition defines port mappings.
-Answer B wrong because cluster is group.
-Answer C wrong because Dockerfile for image.
-Answer D wrong because CLI for management.
+Answer A correct because ECS task definition defines containers/ports/volumes for multi-container.
+Answer B wrong because ECS cluster is infrastructure, not config.
+Answer C wrong because Dockerfile builds images, not environment config.
+Answer D wrong because CLI deploys, not configures.
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html
 
 314.Explain
-Answer A wrong because KMS for keys.
-Answer B correct because instance profiles provide creds securely.
-Answer C wrong because root insecure.
-Answer D wrong because CodeCommit for code.
+Answer A wrong because KMS encrypts, not provides access.
+Answer B correct because instance profiles auto-provide rotating creds with policies.
+Answer C wrong because root user insecure.
+Answer D wrong because CodeCommit code storage, not creds.
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
 315.Explain
-Answer A wrong because RDS queryable but not for metrics.
-Answer B wrong because X-Ray with Lambda for tracing.
-Answer C wrong because Kinesis/DynamoDB complex.
-Answer D correct because CloudWatch custom metrics with alarms cost-effective.
-link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
+Answer A wrong because alarm on CPUUtilization to SNS.
+Answer B wrong because CloudTrail no CPU metrics.
+Answer C wrong because cron on instance manual.
+Answer D wrong because Lambda on CloudTrail mismatch.
+link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html
 
 316.Explain
 Answer A wrong because all at once outage.
 Answer B wrong because rolling outage.
 Answer C wrong because snapshots backup.
-Answer D correct because immutable no outage, quick rollback.
+Answer D correct because immutable no outage quick rollback.
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html
 
 317.Explain
 Answer A wrong because S3 cache manual.
-Answer B wrong because RDS not origin for CloudFront.
-Answer C wrong because EC2 local not scalable.
+Answer B wrong because RDS no origin for CloudFront.
+Answer C wrong because EC2 local no scalable.
 Answer D correct because ElastiCache fronts RDS for reads.
 link ref: https://aws.amazon.com/elasticache/
 
@@ -2317,8 +2292,8 @@ Answer E wrong because env var not for access.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html
 
 323.Explain
-Answer A wrong because same key no update detection.
-Answer B correct because update stack properties to new S3 version.
+Answer A wrong because update stack properties to new S3 version.
+Answer B correct because update stack to new S3 version.
 Answer C wrong because base64 not for code.
 Answer D wrong because role for access, but update needed.
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
@@ -2361,18 +2336,18 @@ Answer D wrong because disable propagates old.
 link ref: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html
 
 329.Explain
-Answer A wrong because CodeCommit for code, but reference in template.
-Answer B correct because inline code in template.
-Answer C correct because S3 zip reference in template.
-Answer D wrong because zip to CloudFormation not standard.
-Answer E wrong because Git private not direct.
+Answer A correct because inline code in template.
+Answer B correct because S3 zip reference in template.
+Answer C wrong because zip to CloudFormation not standard.
+Answer D wrong because Git private not direct.
+Answer E wrong because S3 bucket for large numbers of environment variables not.
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
 
 330.Explain
-Answer A wrong because S3 for storage.
-Answer B wrong because zip local not for libs.
-Answer C wrong because blueprint templates.
-Answer D wrong because runtime fixed.
+Answer A wrong because zip local not for libs.
+Answer B wrong because blueprint templates.
+Answer C wrong because runtime fixed.
+Answer D wrong because zip with all libs.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
 
 331.Explain
@@ -2384,15 +2359,15 @@ Answer E correct because termination on ELB offloads.
 link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-create-https-ssl-load-balancer.html
 
 332.Explain
-Answer A correct because zip with all libs.
-Answer B wrong because runtime script increases time.
+Answer A wrong because runtime script increases time.
+Answer B correct because zip with all libs.
 Answer C wrong because S3 env var for path, but not standard.
 Answer D wrong because buildspec for CodeBuild.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
 
 333.Explain
 Answer A wrong because sticky for same instance.
-Answer B wrong because SQS not for sessions.
+Answer B wrong because SQS no sessions.
 Answer C correct because DynamoDB scalable for sessions.
 Answer D wrong because draining for termination.
 link ref: https://aws.amazon.com/blogs/aws/elastic-load-balancer-support-for-amazon-dynamodb/
@@ -2428,13 +2403,11 @@ link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.h
 338.Explain
 Answer A wrong because provider for auth.
 Answer B wrong because Lambda user creation complex.
-Answer C wrong because KMS for encryption.
+Answer C wrong because KMS encryption.
 Answer D correct because Cognito unauth roles for limited access.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/iam-roles.html
 
 339.Explain
-Answer A correct because bucket policy grants key access? Wait, no - for SSE-KMS, role needs KMS access.
-Wait, correction based on standard: 
 Answer A wrong because bucket policy for S3, but KMS for decrypt.
 Answer B correct because IAM role on EC2 needs KMS decrypt permission.
 Answer C wrong because key policy enables, but instance needs access.
@@ -2450,9 +2423,9 @@ Answer D wrong because delete delay not exist.
 link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-delay-queues.html
 
 341.Explain
-Answer A wrong because S3 direct not for concurrent.
-Answer B wrong because FTP central, not AWS.
-Answer C correct because CodeCommit with direct deploy minimizes time.
+Answer A wrong because S3 direct no concurrent.
+Answer B wrong because FTP central no AWS.
+Answer C correct because CodeCommit direct deploy minimal.
 Answer D wrong because EC2 repo central bottleneck.
 link ref: https://aws.amazon.com/codecommit/
 
@@ -2464,70 +2437,70 @@ Answer D wrong because CloudFront CDN.
 link ref: https://aws.amazon.com/dynamodb/dax/
 
 343.Explain
-Answer A wrong because default SSE-S3 not client-side.
-Answer B wrong because Cognito auth, not encryption.
-Answer C wrong because Lambda for processing.
-Answer D correct because client-side with KMS secure transmission/storage.
+Answer A wrong because default SSE-S3 no client-side.
+Answer B wrong because Cognito auth no encryption.
+Answer C wrong because Lambda processing.
+Answer D correct because client-side KMS secure transmission/storage.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingClientSideEncryption.html
 
 344.Explain
-Answer A wrong because role AROA... is assumed role.
+Answer A wrong because role AROA assumed role.
 Answer B wrong because default role not used.
-Answer C correct because ASge... is access key of principal.
+Answer C correct because ASge access key principal.
 Answer D wrong because account owns service.
 link ref: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html
 
 345.Explain
-Answer A correct because pagination handles large lists.
-Answer B wrong because shorthand syntax for input.
-Answer C wrong because parameters for commands.
-Answer D wrong because quoting for args.
+Answer A correct because pagination large lists.
+Answer B wrong because shorthand syntax input.
+Answer C wrong because parameters commands.
+Answer D wrong because quoting args.
 link ref: https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
 
 346.Explain
-Answer A wrong because security groups for network.
-Answer B wrong because ECR for images.
+Answer A wrong because security groups network.
+Answer B wrong because ECR images.
 Answer C wrong because agent runs containers.
-Answer D correct because task definition defines ports.
+Answer D correct because task definition ports.
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html
 
 347.Explain
-Answer A correct because DynamoDB NoSQL for metadata indexing.
-Answer B wrong because EC2 not storage.
+Answer A correct because DynamoDB NoSQL metadata indexing.
+Answer B wrong because EC2 storage no.
 Answer C wrong because Lambda compute.
-Answer D wrong because RDS relational slower for indexing.
+Answer D wrong because RDS relational slower indexing.
 link ref: https://aws.amazon.com/dynamodb/
 
 348.Explain
-Answer A wrong because VPC Flow for network.
-Answer B correct because CloudWatch Logs for app logs.
-Answer C wrong because CloudSearch for search.
-Answer D wrong because CloudTrail for API.
+Answer A wrong because VPC Flow network.
+Answer B correct because CloudWatch Logs app logs.
+Answer C wrong because CloudSearch search.
+Answer D wrong because CloudTrail API.
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
 
 349.Explain
-Answer A wrong because KPL for producers.
+Answer A wrong because KPL producers.
 Answer B wrong because reduce retention less data.
-Answer C correct because UpdateShardCount increases capacity.
+Answer C correct because UpdateShardCount capacity.
 Answer D wrong because PutRecords batches puts, but for high throughput shards needed.
 link ref: https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-kpl.html
 
 350.Explain
-Answer A correct because nested for reusable patterns.
+Answer A correct because nested reusable patterns.
 Answer B wrong because credentials insecure.
-Answer C wrong because remove mappings reduces flexibility.
-Answer D wrong because Include for snippets, but public risky.
+Answer C wrong because remove mappings flexibility.
+Answer D wrong because Include snippets, but public risky.
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/best-practices.html
 
 351.Explain
-Answer A correct because backoffs for rate limits.
-Answer B wrong because load balance not for API.
-Answer C wrong because EC2 not help.
+Answer A correct because backoffs rate limits.
+Answer B wrong because load balance no API.
+Answer C wrong because EC2 no help.
 Answer D wrong because delay worsens.
 link ref: https://docs.aws.amazon.com/general/latest/gr/api-retries.html
 
 352.Explain
-Answer A wrong because script with cron managed.
+Answer A wrong because script cron managed.
 Answer B correct because TTL auto-deletes old items.
 Answer C wrong because new table daily costly.
 Answer D wrong because ItemExpiration not standard; use TTL.
@@ -2543,12 +2516,12 @@ link ref: https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html
 354.Explain
 Answer A correct because multi-part for large objects.
 Answer B wrong because Direct Connect network, not size.
-Answer C wrong because no support contact for size.
-Answer D wrong because region not issue.
+Answer C wrong because no support for size.
+Answer D wrong because region no issue.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
 
 355.Explain
-Answer A wrong because docker pull direct not auth.
+Answer A wrong because docker pull direct no auth.
 Answer B correct because get-login for docker login, then pull.
 Answer C wrong because get-login output to run.
 Answer D wrong because get-download for layers, not pull.
@@ -2569,7 +2542,7 @@ Answer D wrong because managed policy too broad.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html
 
 358.Explain
-Answer A wrong because KMS not for traffic.
+Answer A wrong because KMS for encryption.
 Answer B correct because Origin Protocol HTTPS only.
 Answer C wrong because port 443 for origin.
 Answer D correct because Viewer Policy HTTPS or redirect.
@@ -2579,7 +2552,7 @@ link ref: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/usi
 359.Explain
 Answer A wrong because 50 for eventual.
 Answer B wrong because 100 for eventual 100 items.
-Answer C correct because strong consistent 2x RCU, 100 items * 5KB /4KB *2 =200.
+Answer C correct because strong 2x RCU, 100 items * 5KB /4KB *2 =200.
 Answer D wrong because 500 too much.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ProvisionedThroughput.html
 
@@ -2599,7 +2572,7 @@ link ref: https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html
 
 362.Explain
 Answer A wrong because CloudFormation templates.
-Answer B correct because Beanstalk deploys Tomcat easily.
+Answer B correct because Beanstalk manages Tomcat.
 Answer C wrong because S3 static.
 Answer D wrong because CodePipeline CI/CD.
 link ref: https://aws.amazon.com/elasticbeanstalk/
@@ -2620,11 +2593,11 @@ Answer E wrong because ElastiCache caching.
 link ref: https://aws.amazon.com/sqs/
 
 365.Explain
-Answer A wrong because same key consistency bad.
-Answer B correct because delete root keys secure.
-Answer C wrong because unused keys risk.
-Answer D wrong because embed insecure.
-Answer E correct because roles least privilege.
+Answer A correct because delete root keys secure.
+Answer B wrong because unused keys risk.
+Answer C wrong because embed insecure.
+Answer D correct because roles least privilege.
+Answer E wrong because same key consistency bad.
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 366.Explain
@@ -2657,7 +2630,7 @@ Answer E wrong because permissions ok assumed.
 link ref: https://docs.aws.amazon.com/codepipeline/latest/userguide/troubleshooting.html
 
 370.Explain
-Answer A wrong because user pool not for notifications.
+Answer A wrong because user pool no notifications.
 Answer B wrong because SyncCallback not exist.
 Answer C wrong because stream for analysis.
 Answer D correct because push sync with role notifies devices.
@@ -2728,7 +2701,7 @@ Answer D wrong because EMR big data.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html
 
 380.Explain
-Answer A wrong because Swagger with Beanstalk not serverless.
+Answer A wrong because Swagger Beanstalk not serverless.
 Answer B wrong because CodeDeploy not serverless.
 Answer C correct because SAM inline Swagger.
 Answer D correct because SAM references Swagger file.
@@ -2736,14 +2709,14 @@ Answer E wrong because inline in Lambda not API.
 link ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html
 
 381.Explain
-Answer A wrong because change existing creates thumbnails but impacts upload time.
-Answer B wrong because async invoke still on upload path.
-Answer C correct because S3 event triggers separate thumbnail Lambda, no impact.
+Answer A wrong because change existing thumbnails upload time.
+Answer B wrong because async invoke upload path.
+Answer C correct because S3 event separate thumbnail no impact.
 Answer D wrong because SQS scheduled complex.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
 
 382.Explain
-Answer A wrong because update function URL changes endpoint.
+Answer A wrong because update function URL change endpoint.
 Answer B wrong because phased not in API Gateway.
 Answer C correct because new stage v2 keeps old clients on v1.
 Answer D wrong because CloudFront for CDN.
