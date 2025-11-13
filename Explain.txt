@@ -2497,11 +2497,11 @@ Answer D wrong because CloudTrail for API.
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
 
 349.Explain
-Answer A wrong because KPL for producers.
-Answer B wrong because reduce retention less data.
-Answer C correct because UpdateShardCount increases capacity.
-Answer D wrong because PutRecords batches puts, but for high throughput shards needed.
-link ref: https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-kpl.html
+Answer A wrong because KPL improves producer performance by batching and retrying, but does **not** increase stream capacity.
+Answer B wrong because reducing retention frees storage, not ingestion throughput.
+Answer C correct because each shard supports 1 MB/s write (1,000 records/s). `UpdateShardCount` increases shards → scales write capacity to handle peak load.
+Answer D wrong because `PutRecords` batches records efficiently (max 500), but total throughput is still limited by shard count.
+link ref: https://docs.aws.amazon.com/streams/latest/dev/amazon-kinesis-streams.html
 
 350.Explain
 Answer A correct because nested for reusable patterns.
