@@ -17,6 +17,7 @@ db.defaults({ history: [] }).write();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const EXAM_QUESTION_LIMIT = 65; // Giới hạn số câu hỏi trong bài thi
 
 // Middleware
 app.set('view engine', 'ejs');
@@ -60,20 +61,16 @@ function shuffleArray(array) {
 // 3. Hàm phân tích file giải thích
 function parseExplanations(rawContent) {
   const explanations = {};
-  // Tách nội dung theo cú pháp [số].Explain và giữ lại delimiter (header)
   const parts = rawContent.split(/(\d+\.Explain)/).filter(p => p.trim() !== '');
 
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
-    
-    // Kiểm tra nếu là header: X.Explain
     if (part.match(/^\d+\.Explain$/)) {
       const qNumMatch = part.match(/(\d+)/);
       if (qNumMatch && i + 1 < parts.length) {
         const qNum = qNumMatch[1];
-        // Phần tử tiếp theo (i+1) là nội dung giải thích cho header này
         explanations[qNum] = parts[i+1].trim();
-        i++; // Bỏ qua phần tử nội dung vì đã xử lý
+        i++;
       }
     }
   }
@@ -91,6 +88,22 @@ function loadExplanations() {
     }
 }
 
+// 5. Hàm định dạng thời gian (THE FIX)
+function formatTimestamp(timestamp) {
+    if (!timestamp) return 'N/A';
+    const date = new Date(timestamp);
+    try {
+        const datePart = date.toLocaleDateString('vi-VN');
+        const timePart = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return timePart + ' ' + datePart;
+    } catch (e) {
+        return date.toLocaleString();
+    }
+}
+
+// === FIX: GẮN HÀM VÀO app.locals ĐỂ EJS CÓ THỂ GỌI ===
+app.locals.formatTimestamp = formatTimestamp;
+
 
 // ----------------------------------------------------------------------
 // ROUTES
@@ -101,27 +114,23 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-const EXAM_QUESTION_LIMIT = 65;
-// 2. Route Bắt đầu bài thi (Bốc thăm ngẫu nhiên và Ánh xạ)
+// 2. Route Bắt đầu bài thi (Bốc thăm ngẫu nhiên, giới hạn 65 câu và Ánh xạ)
 app.post('/start', (req, res) => {
   const questionsRaw = loadQuestions();
 
-  // 1. Xáo trộn toàn bộ câu hỏi trong pool
   let randomizedQuestions = [...questionsRaw];
   shuffleArray(randomizedQuestions);
 
-  // 2. GIỚI HẠN số lượng câu hỏi cho bài thi (SỬA LỖI 2)
+  // GIỚI HẠN số lượng câu hỏi cho bài thi
   const questionsToUse = randomizedQuestions.slice(0, EXAM_QUESTION_LIMIT);
 
-  // 3. Tạo Question Map và đánh số lại cho Exam
+  // Tạo Question Map và đánh số lại cho Exam
   const questionMap = {};
   const questionsForExam = [];
   
-  questionsToUse.forEach((q, index) => { // Dùng questionsToUse
-    // Lưu mapping: Exam Q num (1-based) -> Pool Q num (q.id)
+  questionsToUse.forEach((q, index) => {
     questionMap[index + 1] = q.id; 
     
-    // Gán lại ID theo thứ tự trong bài thi (Exam Q num)
     questionsForExam.push({
         ...q,
         id: index + 1
@@ -135,8 +144,7 @@ app.post('/start', (req, res) => {
     totalQuestions: questionsForExam.length,
     userAnswers: {},
     startTime: Date.now(),
-    
-    timeLimit: 180 * 60
+    timeLimit: 180 * 60  
   };
 
   res.redirect('/exam/1');
@@ -182,7 +190,6 @@ app.get('/exam/:qNum', (req, res) => {
   const qNum = parseInt(req.params.qNum);
   const { questions, totalQuestions, userAnswers, startTime, timeLimit } = req.session.exam;
   
-  // Tìm câu hỏi theo Exam Q num (ID mới)
   const question = questions.find(q => q.id === qNum); 
 
   if (!question) {
@@ -209,16 +216,11 @@ app.get('/results', (req, res) => {
     return res.redirect('/');
   }
 
-  // Lấy dữ liệu cần thiết từ session
   const { questions, userAnswers, totalQuestions, questionMap } = req.session.exam;
   
-  // TÍNH ĐIỂM VÀ LƯU ÁNH XẠ POOL
   const results = questions.map(q => {
-    
-    // LẤY MAPPING: Exam Q num (q.id) -> Pool Q num (Pool Q num)
     const poolQNum = questionMap[q.id]; 
 
-    // Logic tính toán đáp án đúng
     const correctOptions = q.options
       .map((opt, index) => opt.isCorrect ? (index + 1).toString() : null)
       .filter(id => id !== null);
@@ -229,8 +231,8 @@ app.get('/results', (req, res) => {
                       userAns.every(ans => correctOptions.includes(ans));
                       
     return {
-      qNum: q.id, // Exam Q num
-      poolQNum: poolQNum, // Pool Q num (NEW: Dùng cho Giải thích)
+      qNum: q.id,
+      poolQNum: poolQNum,
       question: q,
       userAns: userAns,
       correctOptions: correctOptions,
@@ -241,21 +243,18 @@ app.get('/results', (req, res) => {
   const score = results.filter(r => r.isCorrect).length;
   const totalScore = (score / totalQuestions) * 100;
   
-  // Tải giải thích
   const questionExplanations = loadExplanations(); 
   
-  // Lưu vào lịch sử
   db.get('history')
     .push({
       id: Date.now().toString(),
       timestamp: Date.now(),
       score: totalScore.toFixed(2),
       results: results,
-      questionMap: questionMap // LƯU MAPPING VÀO LỊCH SỬ
+      questionMap: questionMap
     })
     .write();
 
-  // Xóa session thi
   req.session.exam = null;
 
   res.render('results', {
@@ -265,14 +264,16 @@ app.get('/results', (req, res) => {
     totalQuestions: totalQuestions,
     userAnswers: userAnswers,
     explanations: questionExplanations,
-    questionMap: questionMap // TRUYỀN MAPPING
+    questionMap: questionMap
   });
 });
 
 // 6. Trang lịch sử
 app.get('/history', (req, res) => {
   const history = db.get('history').orderBy('timestamp', 'desc').value();
-  res.render('history', { history: history });
+  res.render('history', { 
+    history: history
+  });
 });
 
 // 7. Xem lại một bài thi cũ
@@ -282,7 +283,6 @@ app.get('/history/:id', (req, res) => {
     return res.redirect('/history');
   }
 
-  // Tải giải thích
   const questionExplanations = loadExplanations();
 
   res.render('results', {
@@ -295,8 +295,14 @@ app.get('/history/:id', (req, res) => {
       return acc;
     }, {}),
     explanations: questionExplanations,
-    questionMap: entry.questionMap // LẤY MAPPING TỪ LỊCH SỬ
+    questionMap: entry.questionMap
   });
+});
+
+// 8. Route Xóa lịch sử
+app.post('/history/clear', (req, res) => {
+  db.set('history', []).write();
+  res.redirect('/history');
 });
 
 
