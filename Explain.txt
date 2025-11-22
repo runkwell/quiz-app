@@ -1941,10 +1941,11 @@ Answer D wrong because plugins SDK.
 link ref: https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-annotations
 
 271.Explain
-Answer A wrong because no direct select type in deployment.
-Answer B correct because new env with ALB, swap CNAME.
-Answer C correct because clone change type, swap.
-Answer D wrong because edit not change LB type.
+Answer A wrong Elastic Beanstalk does not allow you to change the load balancer type (CLB, ALB, or NLB) of an existing environment. A new environment must be created.
+Answer B correct If we clone we also clone the type of load balancer. If we want an Application Load Balancer, we have to create a new environmment with the same configurations,
+deploy the application that is current running on the classic load balancer then use swap-environment-cnames action to point the same url to the new ALB
+Answer C wrong cloning an existing environment in the AWS Elastic Beanstalk console doesn't allow you to directly select or change the load balancer type—cloning copies the source environment's configuration, including sticking with the Classic Load Balancer if that's what the original uses.
+Answer D wrong Directly editing the load balancer type configuration of an existing environment is not supported. Elastic Beanstalk requires the environment to be rebuilt (or cloned) when making changes to core infrastructure components like the load balancer type. Rebuilding an environment takes the application offline, which is undesirable for production migrations.
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.elb.html
 
 272.Explain
