@@ -695,7 +695,7 @@ Answer D wrong because local no AWS env.
 link ref: https://docs.aws.amazon.com/codebuild/latest/userguide/view-build-details.html
 
 98.Explain
-Answer A wrong because order incorrect.
+Answer A wrong because order not true.
 Answer B correct because in-place stop before after start.
 Answer C wrong because validate after.
 Answer D wrong because validate no order.
@@ -2236,7 +2236,7 @@ link ref: https://aws.amazon.com/cognito/
 310.Explain
 Answer A wrong because **AWS CodeCommit** is a source control service (Git repository); it stores code but does not manage the deployment workflow.
 Answer B wrong because **AWS CodeBuild** is a continuous integration service that compiles code and runs tests; it's a *step* in the deployment process but not the orchestration mechanism for sequencing deployments across environments.
-Answer C wrong because **AWS Data Pipeline** is used for automating the movement and transformation of data, not for code deployment and application lifecycle management. This choice is conceptually incorrect for this scenario.
+Answer C wrong because **AWS Data Pipeline** is used for automating the movement and transformation of data, not for code deployment and application lifecycle management. This choice is conceptually wrong for this scenario.
 Answer D correct because **AWS CodeDeploy** is a fully managed deployment service. To meet the requirement of a phased, sequential rollout:
     1. A developer creates a single **CodeDeploy Application**.
     2. Within that application, they define three separate **Deployment Groups** (e.g., Development, QA, Production), each pointing to the instances/environments for that stage.
@@ -2297,7 +2297,7 @@ link ref: https://aws.amazon.com/elasticache/
 Answer A wrong because 3 RCU for 3 items, but strong consistent 2x.
 Answer B correct because 3 items * 5KB = 15KB, strong read 2 RCU per 4KB, so 6 RCU.
 Answer C wrong because write 70 for 10 items * 7KB.
-Answer D wrong because read 3, write 10 incorrect.
+Answer D wrong because read 3, write 10 is wrong.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ProvisionedThroughput.html
 
 319.Explain
@@ -2805,3 +2805,17 @@ Answer B wrong because timestamps sequential hotspots.
 Answer C wrong because file hashes for files, but folders for prefixes.
 Answer D correct because hex hashes on folders distribute PUT requests.
 link ref: https://aws.amazon.com/premiumsupport/knowledge-center/s3-request-limit-avoid/
+
+388.Explain
+Answer A correct If the application needs to list the bucket (or otherwise perform actions that require ListBucket) and the role lacks that permission, the app will fail. In any case, ensure the role has s3:GetObject (and s3:ListBucket if the app lists objects).
+Answer B wrong s3:ListParts is required for resuming a multipart upload or retrieving metadata about an incomplete upload. It is not a necessary permission for simply retrieving or getting an existing object (s3:GetObject).
+Answer C wrong kms:ListKeys is an administrative permission used to list all CMKs in an account. It is not required for cryptographic operations like decryption. Only kms:Decrypt and kms:GenerateDataKey are relevant for S3 data access.
+Answer D correct Objects encrypted with a customer-managed CMK require the principal (the EC2 instance role) to be allowed to use the key (kms:Decrypt / kms:GenerateDataKey) — either via the key policy or via an IAM policy and a permissive key policy. If the key policy blocks the role, S3 cannot return decrypted object bytes to the app.
+Answer E correct When you restrict access (for example to a VPC endpoint), the bucket policy must explicitly allow requests coming from that endpoint (commonly using the aws:sourceVpce condition) or the endpoint policy must permit it. Without that, requests from the VPC via the gateway endpoint will be denied.
+Answer F wrong The traffic from the EC2 instance to S3 via a Gateway Endpoint is outbound. Furthermore, a Gateway VPC Endpoint is a route target, not a network interface, and does not rely on security group rules on the EC2 instance itself for outbound traffic to S3.
+
+389.Explain
+Answer A wrong Not required; this permission is about modifying bucket encryption settings, not uploading objects.
+Answer B wrong The user can already call s3:PutObject; the failure is due to KMS, not S3 bucket policy.
+Answer C correct During server side encryption S3 will try to generate a unique key from KMS and will not work if the requester IAM role does not have KMS access permissions
+Answer D wrong Bucket ACLs are outdated and unnecessary here; permissions already work through IAM + KMS. ACLs would not solve the SSE-KMS failure.
