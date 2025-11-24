@@ -3612,8 +3612,7 @@ access to the stream? (Choose two.)
 --------------------------------------------------
 
 391. A developer wants to modify the following AWS Cloud Formation template to embed another CloudFormation stack:
-Which syntax should the developer add to the blank line of the CloudFormation template to meet this requirement?
-![Question 391](images/question391.jpg)
+Which syntax should the developer add to the blank line of the CloudFormation template to meet this requirement? ![Question 391](images/question391.jpg)
 
 - [x] "Type" : "AWS::CloudFormation::Stack",
 
