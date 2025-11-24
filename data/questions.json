@@ -11192,7 +11192,7 @@
   },
   {
     "id": 388,
-    "questionText": "A company has an application that needs to get objects from an Amazon S3 bucket. The application runs on Amazon EC2 instances.",
+    "questionText": "A company has an application that needs to get objects from an Amazon S3 bucket. The application runs on Amazon EC2 instances. All the objects in the S3 bucket are encrypted with an AWS Key Management Service (AWS KMS) customer managed key. The resources in the VPC do not have access to the internet and use a gateway VPC endpoint to access Amazon S3. The company discovers that the application is unable to get objects from the S3 bucket. Which factors could cause this issue? (Choose three.)",
     "questionImage": null,
     "options": [
       {
@@ -11230,7 +11230,7 @@
   },
   {
     "id": 389,
-    "questionText": "A developer has created a new IAM user that has the s3:PutObject permission to write to a specific Amazon S3 bucket. The S3 bucket uses server-side encryption with AWS KMS managed keys (SSE-KMS) as the default encryption. When an application uses the access key and secret key of the IAM user to call the PutObject API operation, the application",
+    "questionText": "A developer has created a new IAM user that has the s3:PutObject permission to write to a specific Amazon S3 bucket. The S3 bucket uses server-side encryption with AWS KMS managed keys (SSE-KMS) as the default encryption. When an application uses the access key and secret key of the IAM user to call the PutObject API operation, the application receives an access denied error. What should the developer do to resolve this error?",
     "questionImage": null,
     "options": [
       {
@@ -11258,7 +11258,7 @@
   },
   {
     "id": 390,
-    "questionText": "A developer is deploying an application on Amazon EC2 instances that run",
+    "questionText": "A developer is deploying an application on Amazon EC2 instances that run in Account A. The application needs to read data from an existing Amazon Kinesis data stream in Account B. Which actions should the developer take to provide the application with access to the stream? (Choose two.)",
     "questionImage": null,
     "options": [
       {
@@ -11291,26 +11291,26 @@
   },
   {
     "id": 391,
-    "questionText": "A developer wants to modify the following AWS Cloud Formation template to embed another CloudFormation stack:",
-    "questionImage": null,
+    "questionText": "A developer wants to modify the following AWS Cloud Formation template to embed another CloudFormation stack (image). Which syntax should the developer add to the blank line of the CloudFormation template to meet this requirement?",
+    "questionImage": "images/question391.jpg",
     "options": [
       {
-        "text": "\"Type\" : \"AWS::CloudFormation::Stack\",",
+        "text": "\"Type\" : \"AWS::CloudFormation::Stack\"",
         "image": null,
         "isCorrect": true
       },
       {
-        "text": "\"Mapping\" : \"AWS::CloudFormation::NestedStack\",",
+        "text": "\"Mapping\" : \"AWS::CloudFormation::NestedStack\"",
         "image": null,
         "isCorrect": false
       },
       {
-        "text": "\"Type\" : \"AWS;:CloudFcrmation::NestedStack\",",
+        "text": "\"Type\" : \"AWS;:CloudFcrmation::NestedStack\"",
         "image": null,
         "isCorrect": false
       },
       {
-        "text": "\"Mapping\" : \"AWS::CloudFormation::Stack\",",
+        "text": "\"Mapping\" : \"AWS::CloudFormation::Stack\"",
         "image": null,
         "isCorrect": false
       }
@@ -11319,7 +11319,7 @@
   },
   {
     "id": 392,
-    "questionText": "A company is implementing an application on Amazon EC2 instances. The application needs to process incoming transactions. When the application detects a transaction that is not valid, the application must send a chat message to the company's support team. To send the message, the application needs to retrieve the access token to authenticate by using the chat API.",
+    "questionText": "A company is implementing an application on Amazon EC2 instances. The application needs to process incoming transactions. When the application detects a transaction that is not valid, the application must send a chat message to the company's support team. To send the message, the application needs to retrieve the access token to authenticate by using the chat API. A developer needs to implement a solution to store the access token. The access token must be encrypted at rest and in transit. The access token must also be accessible from other AWS accounts. Which solution will meet these requirements with the LEAST management overhead?",
     "questionImage": null,
     "options": [
       {
@@ -11347,7 +11347,7 @@
   },
   {
     "id": 393,
-    "questionText": "A company is running Amazon EC2 instances in multiple AWS accounts. A developer needs to implement an application that collects all the lifecycle events of the EC2 instances. The application needs to store the lifecycle events in a single Amazon Simple Queue Service (Amazon SQS) queue in the company's main AWS account for further processing.",
+    "questionText": "A company is running Amazon EC2 instances in multiple AWS accounts. A developer needs to implement an application that collects all the lifecycle events of the EC2 instances. The application needs to store the lifecycle events in a single Amazon Simple Queue Service (Amazon SQS) queue in the company's main AWS account for further processing. Which solution will meet these requirements?",
     "questionImage": null,
     "options": [
       {
@@ -11375,7 +11375,7 @@
   },
   {
     "id": 394,
-    "questionText": "An application is using Amazon Cognito user pools and identity pools for secure access. A developer wants to integrate the user-specific file upload and download features in the application with Amazon S3. The developer must ensure that the files are saved and retrieved in a secure manner and that users can access only their own files. The file sizes range from 3 KB to 300 MB.",
+    "questionText": "An application is using Amazon Cognito user pools and identity pools for secure access. A developer wants to integrate the user-specific file upload and download features in the application with Amazon S3. The developer must ensure that the files are saved and retrieved in a secure manner and that users can access only their own files. The file sizes range from 3 KB to 300 MB. Which option will meet these requirements with the HIGHEST level of security?",
     "questionImage": null,
     "options": [
       {
@@ -11396,14 +11396,14 @@
       {
         "text": "Use an IAM policy within the Amazon Cognito identity prefix to restrict users to use their own folders in Amazon S3.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       }
     ],
     "isMultipleChoice": false
   },
   {
     "id": 395,
-    "questionText": "A company is building a scalable data management solution by using AWS services to improve the speed and agility of development. The solution will ingest large volumes of data from various sources and will process this data through multiple business rules and transformations.",
+    "questionText": "A company is building a scalable data management solution by using AWS services to improve the speed and agility of development. The solution will ingest large volumes of data from various sources and will process this data through multiple business rules and transformations. The solution requires business rules to run in sequence and to handle reprocessing of data if errors occur when the business rules run. The company needs the solution to be scalable and to require the least possible maintenance. Which AWS service should the company use to manage and automate the orchestration of the data flows to meet these requirements?",
     "questionImage": null,
     "options": [
       {
@@ -11414,7 +11414,7 @@
       {
         "text": "AWS Step Functions",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "AWS Glue",
@@ -11431,7 +11431,7 @@
   },
   {
     "id": 396,
-    "questionText": "A developer has created an AWS Lambda function that is written in Python. The Lambda function reads data from objects in Amazon S3 and writes data to an Amazon DynamoDB table. The function is successfully invoked from an S3 event notification when an object is created. However, the function fails when it attempts to write to the DynamoDB table.",
+    "questionText": "A developer has created an AWS Lambda function that is written in Python. The Lambda function reads data from objects in Amazon S3 and writes data to an Amazon DynamoDB table. The function is successfully invoked from an S3 event notification when an object is created. However, the function fails when it attempts to write to the DynamoDB table.What is the MOST likely cause of this issue?",
     "questionImage": null,
     "options": [
       {
@@ -11447,7 +11447,7 @@
       {
         "text": "The Lambda function does not have IAM permissions to write to DynamoDB",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "The DynamoDB table is not running in the same Availability Zone as the Lambda Function.",
@@ -11459,7 +11459,7 @@
   },
   {
     "id": 397,
-    "questionText": "A developer is creating an AWS CloudFormation template to deploy Amazon EC2 instances across multiple AWS accounts. The developer must choose the EC2 instances from a list of approved instance types.",
+    "questionText": "A developer is creating an AWS CloudFormation template to deploy Amazon EC2 instances across multiple AWS accounts. The developer must choose the EC2 instances from a list of approved instance types. How can the developer incorporate the list of approved instance types in the CloudFormation template?",
     "questionImage": null,
     "options": [
       {
@@ -11480,14 +11480,14 @@
       {
         "text": "In the CloudFormation template, create a parameter with the list of EC2 instance types as AllowedValues.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       }
     ],
     "isMultipleChoice": false
   },
   {
     "id": 398,
-    "questionText": "A developer has an application that makes batch requests directly to Amazon DynamoDB by using the BatchGetItem low-level API operation. The responses frequently return values in the UnprocessedKeys element.",
+    "questionText": "A developer has an application that makes batch requests directly to Amazon DynamoDB by using the BatchGetItem low-level API operation. The responses frequently return values in the UnprocessedKeys element. Which actions should the developer take to increase the resiliency of the application when the batch response includes values in UnprocessedKeys? (Choose two.)",
     "questionImage": null,
     "options": [
       {
@@ -11498,7 +11498,7 @@
       {
         "text": "Retry the batch operation with exponential backoff and randomized delay.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Update the application to use an AWS software development kit (AWS SDK) to make the requests.",
@@ -11508,7 +11508,7 @@
       {
         "text": "Increase the provisioned read capacity of the DynamoDB tables that the operation accesses.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Increase the provisioned write capacity of the DynamoDB tables that the operation accesses.",
@@ -11516,11 +11516,11 @@
         "isCorrect": false
       }
     ],
-    "isMultipleChoice": false
+    "isMultipleChoice": true
   },
   {
     "id": 399,
-    "questionText": "A company is running a custom application on a set of on-premises Linux servers that are accessed using Amazon API Gateway. AWS X-Ray tracing has been enabled on the API test stage.",
+    "questionText": "A company is running a custom application on a set of on-premises Linux servers that are accessed using Amazon API Gateway. AWS X-Ray tracing has been enabled on the API test stage. How can a developer enable X-Ray tracing on the on-premises servers with the LEAST amount of configuration?",
     "questionImage": null,
     "options": [
       {
@@ -11531,7 +11531,7 @@
       {
         "text": "Install and run the X-Ray daemon on the on-premises servers to capture and relay the data to the X-Ray service.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Capture incoming requests on-premises and configure an AWS Lambda function to pull, process, and relay relevant data to X-Ray using the PutTraceSegments API call.",
@@ -11548,13 +11548,13 @@
   },
   {
     "id": 400,
-    "questionText": "A company wants to share information with a third party. The third party has an HTTP API endpoint that the company can use to share the information. The company has the required API key to access the HTTP API.",
+    "questionText": "A company wants to share information with a third party. The third party has an HTTP API endpoint that the company can use to share the information. The company has the required API key to access the HTTP API. The company needs a way to manage the API key by using code. The integration of the API key with the application code cannot affect application performance. Which solution will meet these requirements MOST securely?",
     "questionImage": null,
     "options": [
       {
         "text": "Store the API credentials in AWS Secrets Manager. Retrieve the API credentials at runtime by using the AWS SDK. Use the credentials to make the API call.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Store the API credentials in a local code variable. Push the code to a secure Git repository. Use the local code variable at runtime to make the API call.",
@@ -11576,13 +11576,13 @@
   },
   {
     "id": 401,
-    "questionText": "A developer is deploying a new application to Amazon Elastic Container Service (Amazon ECS). The developer needs to securely store and retrieve different types of variables. These variables include authentication information for a remote API, the URL for the API, and credentials. The authentication information and API URL must be available to all current and future deployed versions of the application across development, testing, and production environments.",
+    "questionText": "A developer is deploying a new application to Amazon Elastic Container Service (Amazon ECS). The developer needs to securely store and retrieve different types of variables. These variables include authentication information for a remote API, the URL for the API, and credentials. The authentication information and API URL must be available to all current and future deployed versions of the application across development, testing, and production environments. How should the developer retrieve the variables with the FEWEST application changes?",
     "questionImage": null,
     "options": [
       {
         "text": "Update the application to retrieve the variables from AWS Systems Manager Parameter Store. Use unique paths in Parameter Store for each variable in each environment. Store the credentials in AWS Secrets Manager in each environment.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Update the application to retrieve the variables from AWS Key Management Service (AWS KMS). Store the API URL and credentials as unique keys for each environment.",
