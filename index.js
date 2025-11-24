@@ -310,3 +310,34 @@ app.post('/history/clear', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
 });
+
+//  Route Chức năng Học bài
+app.get('/study', (req, res) => {
+    // Tải toàn bộ câu hỏi gốc từ pool
+    const questions = loadQuestions(); 
+    
+    // Tải toàn bộ lời giải thích
+    const explanations = loadExplanations();
+
+    // Sắp xếp câu hỏi theo ID gốc để hiển thị theo thứ tự
+    questions.sort((a, b) => a.id - b.id);
+    
+    // Tạo mảng kết quả để render
+    const studyItems = questions.map(q => {
+        // Tìm đáp án đúng để hiển thị
+        const correctOptions = q.options
+            .map((opt, index) => opt.isCorrect ? (index + 1).toString() : null)
+            .filter(id => id !== null);
+
+        return {
+            qNum: q.id, // ID gốc trong pool
+            question: q,
+            correctOptions: correctOptions,
+            explanation: explanations[q.id] || "Không có giải thích chi tiết."
+        };
+    });
+
+    res.render('study', {
+        studyItems: studyItems
+    });
+});

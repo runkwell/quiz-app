@@ -638,11 +638,11 @@ Answer D wrong because roles/policies access no encrypt.
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/services-s3.html
 
 90.Explain
-Answer A wrong because CLI group no.
-Answer B wrong because metadata roles no policies.
-Answer C wrong because STS token describe no Kinesis.
-Answer D correct because --dry-run simulates get.
-Answer E correct because simulator tests policy.
+Answer A wrong The AWS CLI command to retrieve IAM group information (e.g., aws iam get-group) applies only to IAM users, not IAM roles attached to EC2 instances. IAM roles do not belong to IAM groups, and retrieving group details does not help verify specific access to Kinesis Streams (such as the GetRecords action). This is not directly relevant to checking Kinesis permissions.
+Answer B wrong The EC2 instance metadata service (accessed via http://169.254.169.254/latest/meta-data/iam/) provides details like the IAM role name, ARN, and temporary credentials, but it does not provide inline policy details or attached policies. To view policies, you'd need to call IAM APIs (e.g., get-role-policy), which requires separate IAM permissions and does not directly verify access for the GetRecords action on Kinesis. It only identifies the role, not specific permissions.
+Answer C wrong AWS STS (Security Token Service) is used to request temporary tokens (e.g., via AssumeRole), but on an EC2 instance with an IAM role, tokens are automatically provided via metadata without needing STS calls. Performing a "describe action" (e.g., DescribeStream on Kinesis) might check permissions for descriptive actions, but it is not specific to GetRecords and could still have minor impacts (e.g., logging). It's not the standard way to simulate or verify permissions without execution.
+Answer D correct The --dry-run parameter in the AWS CLI (e.g., aws kinesis get-records --shard-iterator <shard-iterator> --dry-run) simulates the GetRecords action without actually retrieving data from Kinesis Streams. If the IAM permissions allow it, the CLI succeeds; otherwise, it returns "AccessDenied." This is an efficient way to verify permissions from the EC2 instance without real impact.
+Answer E correct The IAM Policy Simulator (available in the AWS Management Console or via API) allows simulation of the IAM role's policies for specific actions like kinesis:GetRecords, resources (Kinesis stream ARN), and context (EC2 instance). It clearly shows whether permissions are allowed or denied, making it a safe way to verify without executing the actual action. This is AWS's official tool for testing IAM policies.
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_testing.html
 
 91.Explain
@@ -2819,3 +2819,149 @@ Answer A wrong Not required; this permission is about modifying bucket encryptio
 Answer B wrong The user can already call s3:PutObject; the failure is due to KMS, not S3 bucket policy.
 Answer C correct During server side encryption S3 will try to generate a unique key from KMS and will not work if the requester IAM role does not have KMS access permissions
 Answer D wrong Bucket ACLs are outdated and unnecessary here; permissions already work through IAM + KMS. ACLs would not solve the SSE-KMS failure.
+
+390.Explain
+An EC2 instance in Account A needs to read from a Kinesis stream located in Account B.
+To enable secure cross-account access, the standard pattern is:
+
+1️⃣ In Account B
+
+Create an IAM role that has the required Kinesis read permissions (e.g., kinesis:GetRecords, kinesis:GetShardIterator, etc.).
+
+2️⃣ Trust relationship
+
+Modify the trust policy of that role so that it can be assumed by the instance profile role in Account A.
+
+Then the application running on EC2 (Account A) assumes the role in Account B and reads the stream.
+
+Answer A correct This grants the EC2 instance profile role (IAM role attached to the instances) the necessary IAM permissions (e.g., kinesis:GetRecords, kinesis:DescribeStream) to perform read actions on the Kinesis stream ARN in Account B. Without these permissions in the policy attached to the role, the application cannot attempt the actions even if cross-account access is allowed.
+Answer B wrong This would be part of an assume-role setup (where Account A's role assumes a role in B for access), but the question focuses on direct access via resource policies, and this step alone doesn't enable cross-account assumption or direct reads.
+Answer C wrong Trust policies are only added to the role being assumed (in Account B) to allow principals from Account A to assume it. The instance profile role in Account A needs a permissions policy (not a trust policy) for sts:AssumeRole. Adding a trust policy to the instance profile role doesn't make sense here.
+Answer D wrong Trust policies control who can assume a role (for delegation), not direct read permissions on resources like streams. Read access is handled via IAM permissions policies or resource-based policies, not trusts.
+Answer E correct Kinesis Data Streams supports resource-based policies (introduced in late 2023), which act like bucket policies for S3. The stream owner in Account B attaches a policy to the stream resource, specifying the instance profile role ARN from Account A as the principal and allowing the read actions. This enables direct cross-account access without needing to assume a role.
+
+391.Explain
+Answer A correct To embed (or nest) another CloudFormation stack within a parent template, define a resource in the Resources section of the parent template using the logical ID for the nested stack, followed by the "Type" property set to "AWS::CloudFormation::Stack". This resource type creates the nested stack and allows you to reference its outputs or parameters.
+Resources:
+  MyNestedStack:
+    Type: AWS::CloudFormation::Stack  # Add this line
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/my-bucket/my-nested-template.yaml'
+      Parameters:
+        Key1: Value1
+Answer B wrong "Mapping" is used in the Mappings section for key-value lookups (e.g., region-specific configs), not for resources. There's no "AWS::CloudFormation::NestedStack" type.
+Answer C wrong due to typos (semicolon, misspelled "CloudFormation", and invalid type name). No such type exists.due to typos (semicolon, misspelled "CloudFormation", and invalid type name). No such type exists.
+Answer D wrong Again, "Mapping" is for static mappings, not dynamic resources like stacks.
+
+392.Explain
+Answer A wrong Uses AWS managed KMS key, which does not support cross-account decryption (cannot grant external principals). SSM Parameter Store requires a customer managed key for shared SecureStrings, making this invalid. Even if fixed, retrieval needs explicit Decrypt=True. Medium (manual decrypt flag; key sharing steps if corrected).
+Answer B wrong DynamoDB requires manual encryption/decryption on EC2 (via KMS calls), adding code complexity. Cross-account access uses identity-based IAM policies on the table (no native resource policies), needing more configuration. Not optimized for secrets. High (app-level decrypt; IAM policy management).
+Answer C correct AWS Secrets Manager is purpose-built for securely storing and retrieving sensitive data like access tokens. It automatically encrypts secrets at rest using the specified KMS key and ensures encryption in transit via HTTPS. For cross-account access, attach a resource-based policy to the secret ARN, specifying the external account's IAM role as the principal with actions like secretsmanager:GetSecretValue. The EC2 instance's IAM role needs secretsmanager:GetSecretValue permission on the secret ARN. Retrieval via the AWS SDK/CLI (e.g., GetSecretValue) returns the decrypted value directly, minimizing code complexity.
+A customer managed KMS key is required for cross-account decryption (AWS managed keys do not support external principals in their key policies). Grant the external role kms:Decrypt on the key via its key policy.
+Answer D wrong Uses AWS managed KMS key, preventing cross-account decryption. S3 requires manual retrieval and decryption on EC2, plus bucket policy for access. S3 is for objects, not secrets, increasing error risk. High (manual decrypt; object handling).
+
+393.Explain
+Answer A wrong Vague / incomplete: it implies sending events to the main bus but does not mention the required permission configuration on the main event bus to accept cross-account events. The explicit permission and sender rule are needed (covered by D).
+Answer B wrong Pushing events directly from each account to the SQS queue using SQS resource policies is possible but more error-prone and harder to manage at scale (you must maintain SQS policies for each account and configure each rule to target the cross-account SQS). Centralizing via the main event bus is cleaner.
+Answer C wrong Polling by a Lambda that scans all accounts is inefficient, slower, and less reliable than event-driven delivery. It adds unnecessary cost and complexity.
+Answer D correct The recommended, scalable pattern is to centralize events in a main account EventBridge event bus.
+
+To implement this you:
+
+Give the main-account event bus permissions (resource policy) to accept events from the other accounts.
+
+Create an EventBridge rule in each source account that matches EC2 instance lifecycle events and sends (puts) those events to the main account event bus (via PutEvents specifying the main bus ARN).
+
+Create an EventBridge rule on the main account event bus that matches EC2 lifecycle events and adds the single SQS queue in the main account as the rule target.
+
+This approach is efficient, low-latency, and keeps event routing centralized and auditable.
+
+394.Explain
+Answer A wrong Event notifications are for reacting to events after they occur; they cannot prevent unauthorized access or enforce per-user access at request time.
+Answer B wrong Filtering in the UI is only a client-side control and is not secure. A malicious user could bypass it and directly call S3 if S3 access is not enforced.
+Answer C wrong This can be secure, but it introduces unnecessary complexity and cost and may hit payload limits (API Gateway/Lambda are not ideal for direct transfer of large objects up to 300 MB). It also creates a proxy that you must scale and manage.
+Answer D correct Enforcement happens server-side (by S3 + IAM) rather than trusting the client or UI — users cannot access others’ files even if they tamper with the client.
+
+It scales and supports large files (300 MB) because clients can upload/download directly to S3 (for example using pre-signed URLs) — no API Gateway/Lambda payload limits or extra data-path proxying.
+
+You can combine this with best-practices for additional security: enforce TLS, enable SSE (KMS) for at-rest encryption, use S3 Block Public Access, and restrict access via bucket policy / VPC endpoint if needed.
+
+Minimal management overhead while giving strong, auditable access control.
+
+395.Explain
+Answer A wrong Optimized for batch jobs (e.g., HPC workloads) with queuing and compute management, but lacks native sequential orchestration or built-in error/retry logic for data flows—requires custom scripting for reprocessing. Higher maintenance for workflow coordination.
+Answer B correct AWS Step Functions is a serverless orchestration service designed for coordinating distributed applications and microservices, including data processing workflows. It excels at managing sequential execution of tasks (e.g., business rules and transformations), with built-in support for error handling, retries, and reprocessing via states like Catch, Retry, and Choice. For scalability, it automatically handles high volumes of data flows without provisioning infrastructure, integrating seamlessly with services like AWS Lambda (for custom rules), AWS Glue (for ETL transformations), Amazon Kinesis or S3 (for ingestion), and more. This minimizes maintenance, as Step Functions manages state tracking, execution history, and fault tolerance natively—no servers to manage or custom retry logic to code.
+Answer C wrong Great for serverless ETL (e.g., Spark jobs on ingested data) and data catalogs, but orchestration is limited to job dependencies via triggers/workflows, not flexible sequential business rules or custom error handling. Better as a Step Functions integration point.
+Answer D wrong Provides scalable compute for individual rules/transformations, but sequencing and error orchestration would need manual implementation (e.g., via callbacks or external state), increasing complexity and maintenance. Not a dedicated orchestrator.
+
+396.Explain
+Answer A wrong Would prevent invocation, not allow reading from S3 but fail only when writing to DynamoDB.
+Answer B wrong GSIs are optional and unrelated to inserting records; tables do not require a GSI for writes.
+Answer C correct The Lambda function is triggered successfully by an S3 event (indicating proper invocation and S3 read permissions via IAM actions like s3:GetObject), but execution fails specifically during the DynamoDB write operation. This points to missing IAM permissions on the Lambda execution role, such as dynamodb:PutItem, dynamodb:UpdateItem, or dynamodb:BatchWriteItem on the target table ARN. AWS Lambda uses its execution role for service integrations, and without these, API calls to DynamoDB will return an AccessDeniedException.
+Answer D wrong DynamoDB is a regional service — not tied to Availability Zones. Lambda can write to it from anywhere in the region.
+
+397.Explain
+Answer A wrong Causes template sprawl and is hard to manage — not scalable.
+Answer B wrong Would deploy multiple EC2 instances, not restrict instance selection.
+Answer C wrong Inefficient; users could still pick one and you still need validation logic.
+Answer D correct To restrict EC2 instances to a list of approved instance types, the recommended CloudFormation approach is to:
+
+Define a parameter for the instance type (e.g., InstanceType)
+
+Use the AllowedValues property to limit the choices to the approved list
+
+Example:
+
+Parameters:
+  InstanceType:
+    Type: String
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - m5.large
+      - c5.xlarge
+    Description: Choose an approved EC2 instance type
+
+398.Explain
+The BatchGetItem API returns UnprocessedKeys when requests exceed limits like 16 MB response size, 1 MB per partition, or provisioned throughput (causing throttling). These are not errors but partial results requiring handling for resiliency.
+Answer A wrong Immediate retries ignore backoff, worsening throttling and reducing resiliency.
+Answer B correct AWS recommends retrying only the unprocessed keys with exponential backoff (e.g., doubling wait time per attempt, up to a max like 30s) and jitter (randomized delay) to avoid thundering herd issues and respect capacity. Immediate retries can exacerbate throttling. Implement via a loop in code, e.g., in Python (Boto3)
+Answer C wrong AWS SDKs (e.g., Boto3, Java SDK) expose UnprocessedKeys but do not auto-retry them—you must implement logic manually, just like with low-level APIs.
+Answer D correct Boosting read capacity units (RCUs) reduces throttling frequency, as BatchGetItem consumes ~1 RCU per 4 KB read (eventually consistent). Monitor via CloudWatch (ThrottledRequests metric) and scale proactively.
+Answer E wrong Irrelevant, as BatchGetItem is read-only; writes use BatchWriteItem.
+
+399.Explain
+Answer A wrong The SDK generates segments, but you still need the X-Ray daemon to relay data to AWS. SDK alone is not sufficient.
+
+Answer B correct The AWS X-Ray daemon is a standalone process designed for on-premises environments, including Linux servers. It listens for trace data (e.g., UDP on port 2000) from instrumented applications and relays segments directly to the X-Ray service using IAM credentials (e.g., via environment variables or IAM role if applicable). Download the daemon binary from AWS (e.g., S3), make it executable, and run it with minimal flags like ./xray -n us-east-1 -r us-east-1 for region and configuration. This setup requires no code changes beyond basic SDK integration (if not already present) and propagates traces from API Gateway via HTTP headers automatically.
+Since API Gateway tracing is enabled, it injects the X-Amzn-Trace-Id header into downstream requests, allowing the daemon to handle relay with low overhead—no custom logic or additional services needed.
+The daemon handles:
+Sampling
+Buffering
+Retrying
+Network communication with AWS X-Ray
+
+Answer C wrong Overly complex and not needed; traces should be sent directly via daemon.
+
+Answer D wrong Same as C; too much configuration and intended for internal telemetry, not standard tracing flow.
+
+400.Explain
+Answer A correct AWS Secrets Manager is the recommended service for securely storing, retrieving, and managing sensitive data like third-party API keys. It provides automatic encryption at rest (using AWS KMS) and in transit, fine-grained access control via IAM policies, auditing through CloudTrail, and optional rotation. Retrieval via the AWS SDK (e.g., GetSecretValue in Boto3) is asynchronous and cached in memory for subsequent calls, ensuring no performance impact after the initial fetch (typically <100 ms latency). This integrates seamlessly with code without embedding secrets.
+It provides:
+
+✔ Automatic encryption of secrets
+✔ Fine-grained IAM access control
+✔ Automatic secret rotation (if needed)
+✔ Low-latency retrieval that does not impact application performance
+✔ Versioning and auditing
+
+Answer B wrong Storing secrets in code or repositories is insecure and a top security risk.
+Answer C wrong More secure than option B, but S3 is not a secrets store. Requires extra management and is less secure than Secrets Manager.
+Answer D wrong Similar issue as C — DynamoDB is not designed for secret storage and requires custom management logic.
+
+401.Explain
+Answer A correct This minimizes code changes as the retrieval method remains consistent across environments; only the Parameter Store paths need updating. Secrets Manager securely stores sensitive credentials.
+Answer B wrong It cannot directly store variables such as the API URL or credentials
+Answer C wrong Storing variables in encrypted files adds operational overhead. Managing separate files for each environment can quickly become cumbersome.
+Answer D wrong Storing sensitive information like credentials directly in ECS task definitions is not secure
+

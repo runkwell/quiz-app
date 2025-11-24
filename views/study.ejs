@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chế độ Học Bài (Study Mode)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top">
+    <div class="container-fluid">
+      <a href="/" class="btn btn-secondary">Trang chủ</a>
+      <h2 class="h5 mb-0 ms-3">📚 Chế độ Học Bài: Toàn bộ <%= studyItems.length %> Câu hỏi</h2>
+    </div>
+  </header>
+  
+  <main class="container mt-4">
+    <div class="alert alert-info" role="alert">
+        Đây là chế độ học tập. Các câu hỏi được sắp xếp theo thứ tự ID gốc trong Pool.
+    </div>
+
+    <% studyItems.forEach((item, index) => { %>
+      <div class="card mb-4 border-light bg-body-secondary" id="q-<%= item.qNum %>">
+        <div class="card-header">
+          <h4 class="h6 mb-0 text-primary">Câu <%= item.qNum %> (Pool ID)</h4>
+        </div>
+        <div class="card-body">
+          
+          <% if (item.question.questionText) { %><p class="fw-bold"><%= item.question.questionText %></p><% } %>
+          <% if (item.question.questionImage) { %><img src="/<%= item.question.questionImage %>" alt="Hình ảnh câu hỏi" class="img-fluid rounded mb-3"><% } %>
+          
+          <div class="options-container list-group mb-3">
+            <% item.question.options.forEach((opt, optIndex) => { %>
+              <% const optionValue = (optIndex + 1).toString(); %>
+              <% const isCorrectOption = item.correctOptions.includes(optionValue); %>
+              
+              <div class="list-group-item <%= isCorrectOption ? 'list-group-item-success' : '' %> d-flex gap-3">
+                <input 
+                  class="form-check-input flex-shrink-0"
+                  type="<%= item.question.isMultipleChoice ? 'checkbox' : 'radio' %>" 
+                  disabled
+                  <%= isCorrectOption ? 'checked' : '' %>>
+                
+                <span class="pt-0">
+                  <% if (opt.text) { %><span><%= opt.text %></span><% } %>
+                  <% if (opt.image) { %><img src="/<%= opt.image %>" alt="Hình ảnh lựa chọn" class="img-fluid rounded mt-2"><% } %>
+                </span>
+              </div>
+            <% }); %>
+          </div>
+
+          <% if (item.explanation) { %>
+            <%
+              // Sử dụng hàm tô màu đã fix
+              let coloredExplanation = item.explanation
+                .replace(/correct/g, '<span class="correct">correct</span>')
+                .replace(/wrong/g, '<span class="wrong">wrong</span>')
+                .replace(/Correct/g, '<span class="correct">Correct</span>')
+                .replace(/Wrong/g, '<span class="wrong">Wrong</span>');
+            %>
+            <div class="explanation-container mt-4 p-3 border border-primary rounded">
+              <h6 class="text-warning">✅ Giải thích chi tiết:</h6>
+              <pre class="mb-0 text-white-75"><%- coloredExplanation %></pre> 
+            </div>
+          <% } %>
+          
+        </div>
+      </div>
+    <% }); %>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

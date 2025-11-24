@@ -5738,22 +5738,22 @@
     "questionImage": null,
     "options": [
       {
-        "text": "`dynamodb:DeleteItem dynamodb:GetItem dynamodb:PutItem`.",
+        "text": "`dynamodb:DeleteItem | dynamodb:GetItem | dynamodb:PutItem`.",
         "image": null,
         "isCorrect": false
       },
       {
-        "text": "`dynamodb:UpdateItem dynamodb:GetItem dynamodb:DescribeTable`.",
+        "text": "`dynamodb:UpdateItem | dynamodb:GetItem | dynamodb:DescribeTable`.",
         "image": null,
         "isCorrect": false
       },
       {
-        "text": "`dynamodb:GetRecords dynamodb:PutItem dynamodb:UpdateTable`.",
+        "text": "`dynamodb:GetRecords | dynamodb:PutItem | dynamodb:UpdateTable`.",
         "image": null,
         "isCorrect": false
       },
       {
-        "text": "`dynamodb:UpdateItem dynamodb:GetItem dynamodb:PutItem`.",
+        "text": "`dynamodb:UpdateItem | dynamodb:GetItem | dynamodb:PutItem`.",
         "image": null,
         "isCorrect": true
       }
@@ -6290,7 +6290,7 @@
         "isCorrect": false
       },
       {
-        "text": "1,000,000 per account.",
+        "text": "1,000 per account.",
         "image": null,
         "isCorrect": true
       },
@@ -7842,12 +7842,12 @@
       {
         "text": "1. Update the application code in the existing deployment. 2. Select a new load balancer type before running the deployment. 3. Deploy the new version of the application code to the environment.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "1. Create a new environment with the same configurations except for the load balancer type. 2. Deploy the same application version as used in the original environment. 3. Run the `swap-environment-cnames` action.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "1. Clone the existing environment, changing the associated load balancer type. 2. Deploy the same application version as used in the original environment. 3. Run the `swap-environment-cnames` action.",
@@ -8964,12 +8964,12 @@
       {
         "text": "Use AWS Data Pipeline to create multiple data pipeline provisions to deploy the application.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "Use AWS CodeDeploy to create multiple deployment groups.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       }
     ],
     "isMultipleChoice": false
@@ -9791,7 +9791,7 @@
       {
         "text": "Write an S3 bucket policy that grants the bucket access to the key.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "Grant access to the key in the IAM EC2 role attached to the application's EC2 instances.",
@@ -9801,7 +9801,7 @@
       {
         "text": "Write a key policy that enables IAM policies to grant access to the key.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Grant access to the key in the S3 bucket's ACL.",
@@ -10076,7 +10076,7 @@
       {
         "text": "Install the Kinesis Producer Library (KPL) for ingesting data into the stream.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "Reduce the data retention period to allow for more data ingestion using `DecreaseStreamRetentionPeriod`.",
@@ -10086,7 +10086,7 @@
       {
         "text": "Increase the shard count of the stream using `UpdateShardCount`.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Ingest multiple records into the stream in a single call using `PutRecords`.",
@@ -11186,6 +11186,418 @@
         "text": "Prefix folder names with random hex hashes; for example, `s3://BUCKET/23a6-FOLDERNAME/FILENAME.zip`.",
         "image": null,
         "isCorrect": true
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 388,
+    "questionText": "A company has an application that needs to get objects from an Amazon S3 bucket. The application runs on Amazon EC2 instances.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "The IAM instance profile that is attached to the EC2 instances does not allow the s3:ListBucket action for the S3 bucket.",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "The IAM instance profile that is attached to the EC2 instances does not allow the s3:ListParts action for the S3 bucket.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "The KMS key policy that encrypts the objects in the S3 bucket does not allow the kms:ListKeys action to the EC2 instance profile ARN.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "The KMS key policy that encrypts the objects in the S3 bucket does not allow the kms:Decrypt action to the EC2 instance profile ARN.",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "The S3 bucket policy does not allow access from the gateway VPC endpoint.",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "The security group that is attached to the EC2 instances is missing an inbound rule from the S3 managed prefix list over port 443.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": true
+  },
+  {
+    "id": 389,
+    "questionText": "A developer has created a new IAM user that has the s3:PutObject permission to write to a specific Amazon S3 bucket. The S3 bucket uses server-side encryption with AWS KMS managed keys (SSE-KMS) as the default encryption. When an application uses the access key and secret key of the IAM user to call the PutObject API operation, the application",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Update the policy of the IAM user to allow the s3:EncryptionConfiguration action.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Update the bucket policy of the S3 bucket to allow the IAM user to upload objects.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Update the policy of the IAM user to allow the kms:GenerateDataKey action.",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "Update the ACL of the S3 bucket to allow the IAM user to upload objects.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 390,
+    "questionText": "A developer is deploying an application on Amazon EC2 instances that run",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Update the instance profile role in Account A with stream read permissions.",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "Create an IAM role with stream read permissions in Account B.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Add a trust policy to the instance profile role and IAM role in Account B to allow the instance profile role to assume the IAM role.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Add a trust policy to the instance profile role and IAM role in Account B to allow reads from the stream.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Add a resource-based policy in Account B to allow read access from the instance profile role.",
+        "image": null,
+        "isCorrect": true
+      }
+    ],
+    "isMultipleChoice": true
+  },
+  {
+    "id": 391,
+    "questionText": "A developer wants to modify the following AWS Cloud Formation template to embed another CloudFormation stack:",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "\"Type\" : \"AWS::CloudFormation::Stack\",",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "\"Mapping\" : \"AWS::CloudFormation::NestedStack\",",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "\"Type\" : \"AWS;:CloudFcrmation::NestedStack\",",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "\"Mapping\" : \"AWS::CloudFormation::Stack\",",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 392,
+    "questionText": "A company is implementing an application on Amazon EC2 instances. The application needs to process incoming transactions. When the application detects a transaction that is not valid, the application must send a chat message to the company's support team. To send the message, the application needs to retrieve the access token to authenticate by using the chat API.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Use an AWS Systems Manager Parameter Store SecureString parameter that uses an AWS Key Management Service (AWS KMS) AWS managed key to store the access token. Add a resource-based policy to the parameter to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Parameter Store. Retrieve the token from Parameter Store with the decrypt flag enabled. Use the decrypted access token to send the message to the chat.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Encrypt the access token by using an AWS Key Management Service (AWS KMS) customer managed key. Store the access token in an Amazon DynamoDB table. Update the IAM role of the EC2 instances with permissions to access DynamoDB and AWS KMS. Retrieve the token from DynamoDDecrypt the token by using AWS KMS on the EC2 instances. Use the decrypted access token to send the message to the chat.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Use AWS Secrets Manager with an AWS Key Management Service (AWS KMS) customer managed key to store the access token. Add a resource-based policy to the secret to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Secrets Manager. Retrieve the token from Secrets Manager. Use the decrypted access token to send the message to the chat.",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "Encrypt the access token by using an AWS Key Management Service (AWS KMS) AWS managed key. Store the access token in an Amazon S3 bucket. Add a bucket policy to the S3 bucket to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Amazon S3 and AWS KMS. Retrieve the token from the S3 bucket. Decrypt the token by using AWS KMS on the EC2 instances. Use the decrypted access token to send the massage to the chat.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 393,
+    "questionText": "A company is running Amazon EC2 instances in multiple AWS accounts. A developer needs to implement an application that collects all the lifecycle events of the EC2 instances. The application needs to store the lifecycle events in a single Amazon Simple Queue Service (Amazon SQS) queue in the company's main AWS account for further processing.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Configure Amazon EC2 to deliver the EC2 instance lifecycle events from all accounts to the Amazon EventBridge event bus of the main account. Add an EventBridge rule to the event bus of the main account that matches all EC2 instance lifecycle events. Add the SQS queue as a target of the rule.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Use the resource policies of the SQS queue in the main account to give each account permissions to write to that SQS queue. Add to the Amazon EventBridge event bus of each account an EventBridge rule that matches all EC2 instance lifecycle events. Add the SQS queue in the main account as a target of the rule.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Write an AWS Lambda function that scans through all EC2 instances in the company accounts to detect EC2 instance lifecycle changes. Configure the Lambda function to write a notification message to the SQS queue in the main account if the function detects an EC2 instance lifecycle change. Add an Amazon EventBridge scheduled rule that invokes the Lambda function every minute.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Configure the permissions on the main account event bus to receive events from all accounts. Create an Amazon EventBridge rule in each account to send all the EC2 instance lifecycle events to the main account event bus. Add an EventBridge rule to the main account event bus that matches all EC2 instance lifecycle events. Set the SQS queue as a target for the rule.",
+        "image": null,
+        "isCorrect": true
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 394,
+    "questionText": "An application is using Amazon Cognito user pools and identity pools for secure access. A developer wants to integrate the user-specific file upload and download features in the application with Amazon S3. The developer must ensure that the files are saved and retrieved in a secure manner and that users can access only their own files. The file sizes range from 3 KB to 300 MB.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Use S3 Event Notifications to validate the file upload and download requests and update the user interface (UI).",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Save the details of the uploaded files in a separate Amazon DynamoDB table. Filter the list of files in the user interface (UI) by comparing the current user ID with the user ID associated with the file in the table.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Use Amazon API Gateway and an AWS Lambda function to upload and download files. Validate each request in the Lambda function before performing the requested operation.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Use an IAM policy within the Amazon Cognito identity prefix to restrict users to use their own folders in Amazon S3.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 395,
+    "questionText": "A company is building a scalable data management solution by using AWS services to improve the speed and agility of development. The solution will ingest large volumes of data from various sources and will process this data through multiple business rules and transformations.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "AWS Batch",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "AWS Step Functions",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "AWS Glue",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "AWS Lambda",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 396,
+    "questionText": "A developer has created an AWS Lambda function that is written in Python. The Lambda function reads data from objects in Amazon S3 and writes data to an Amazon DynamoDB table. The function is successfully invoked from an S3 event notification when an object is created. However, the function fails when it attempts to write to the DynamoDB table.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "The Lambda function's concurrency limit has been exceeded.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "DynamoDB table requires a global secondary index (GSI) to support writes.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "The Lambda function does not have IAM permissions to write to DynamoDB",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "The DynamoDB table is not running in the same Availability Zone as the Lambda Function.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 397,
+    "questionText": "A developer is creating an AWS CloudFormation template to deploy Amazon EC2 instances across multiple AWS accounts. The developer must choose the EC2 instances from a list of approved instance types.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Create a separate CloudFormation template for each EC2 instance type in the list.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "In the Resources section of the CloudFormation template, create resources for each EC2 instance type in the list.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "In the CloudFormation template, create a separate parameter for each EC2 instance type in the list.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "In the CloudFormation template, create a parameter with the list of EC2 instance types as AllowedValues.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 398,
+    "questionText": "A developer has an application that makes batch requests directly to Amazon DynamoDB by using the BatchGetItem low-level API operation. The responses frequently return values in the UnprocessedKeys element.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Retry the batch operation immediately.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Retry the batch operation with exponential backoff and randomized delay.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Update the application to use an AWS software development kit (AWS SDK) to make the requests.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Increase the provisioned read capacity of the DynamoDB tables that the operation accesses.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Increase the provisioned write capacity of the DynamoDB tables that the operation accesses.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 399,
+    "questionText": "A company is running a custom application on a set of on-premises Linux servers that are accessed using Amazon API Gateway. AWS X-Ray tracing has been enabled on the API test stage.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Install and run the X-Ray SDK on the on-premises servers to capture and relay the data to the X-Ray service.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Install and run the X-Ray daemon on the on-premises servers to capture and relay the data to the X-Ray service.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Capture incoming requests on-premises and configure an AWS Lambda function to pull, process, and relay relevant data to X-Ray using the PutTraceSegments API call.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Capture incoming requests on-premises and configure an AWS Lambda function to pull, process, and relay relevant data to X-Ray using the PutTelemetryRecords API call.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 400,
+    "questionText": "A company wants to share information with a third party. The third party has an HTTP API endpoint that the company can use to share the information. The company has the required API key to access the HTTP API.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Store the API credentials in AWS Secrets Manager. Retrieve the API credentials at runtime by using the AWS SDK. Use the credentials to make the API call.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Store the API credentials in a local code variable. Push the code to a secure Git repository. Use the local code variable at runtime to make the API call.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Store the API credentials as an object in a private Amazon S3 bucket. Restrict access to the S3 object by using IAM policies. Retrieve the API credentials at runtime by using the AWS SDK. Use the credentials to make the API call.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Store the API credentials in an Amazon DynamoDB table. Restrict access to the table by using resource-based policies. Retrieve the API credentials at runtime by using the AWS SDK. Use the credentials to make the API call.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 401,
+    "questionText": "A developer is deploying a new application to Amazon Elastic Container Service (Amazon ECS). The developer needs to securely store and retrieve different types of variables. These variables include authentication information for a remote API, the URL for the API, and credentials. The authentication information and API URL must be available to all current and future deployed versions of the application across development, testing, and production environments.",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Update the application to retrieve the variables from AWS Systems Manager Parameter Store. Use unique paths in Parameter Store for each variable in each environment. Store the credentials in AWS Secrets Manager in each environment.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Update the application to retrieve the variables from AWS Key Management Service (AWS KMS). Store the API URL and credentials as unique keys for each environment.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Update the application to retrieve the variables from an encrypted file that is stored with the application. Store the API URL and credentials in unique files for each environment.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Update the application to retrieve the variables from each of the deployed environments. Define the authentication information and API URL in the ECS task definition as unique names during the deployment process.",
+        "image": null,
+        "isCorrect": false
       }
     ],
     "isMultipleChoice": false
