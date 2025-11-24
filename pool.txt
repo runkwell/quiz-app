@@ -2016,7 +2016,7 @@ dynamodb:PutItem`.
 
 - [ ] 100 per region.
 - [ ] there is no limit.
-- [x] 1,000,000 per account.
+- [x] 1,000 per account.
 - [ ] 500 per account.
 - [ ] 100 per IAM user.
 

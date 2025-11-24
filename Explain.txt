@@ -1571,11 +1571,14 @@ Answer D wrong because no limit.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Introduction.html#ConsistencyModel
 
 221.Explain
-Answer A wrong because 100 region.
+Answer A wrong because 100 region. The limit is global per account.
 Answer B wrong because limit.
-Answer C wrong because no 1M.
+Answer C correct because The limit for the number of Amazon S3 buckets that can be created per AWS account is determined by two values:
+1.  **Default Soft Limit:** The starting limit is **100 buckets** per AWS account.
+2.  **Maximum Achievable Limit:** This limit can be increased by submitting a service limit increase request to AWS Support, up to a maximum of **1,000 buckets** per AWS account.
+Since the options include 1,000, it represents the maximum capacity available to a single account.
 Answer D wrong because 500 no.
-Answer E wrong because 100 IAM no.
+Answer E wrong because 100 IAM no. The limit applies to the AWS account.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html
 
 222.Explain
@@ -2380,10 +2383,11 @@ Answer E wrong Similar to CodeCommit, CloudFormation cannot directly pull code f
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
 
 330.Explain
-Answer A wrong because S3 for storage.
-Answer B wrong because zip local not for libs.
-Answer C wrong because blueprint templates.
-Answer D wrong because runtime fixed.
+When deploying an AWS Lambda function, the execution environment needs access to all required code and dependencies.
+Answer A wrong because Lambda functions cannot directly reference and load code or libraries hosted externally on Amazon S3 during execution time; the necessary code must be included in the deployment package or a Lambda Layer.
+Answer B correct because For custom libraries and dependencies (especially those not available in the standard runtime environment), the developer must **install them locally** (e.g., using `npm install` or `pip install` with a local target directory) and then **bundle the entire folder structure** (including the function code and the library files) into a **$\text{ZIP}$ file** for upload. When the function executes, the runtime environment finds the library within the deployed package.
+Answer C wrong because Lambda blueprints are starter templates and do not automatically include custom, proprietary, or specific third-party libraries.
+Answer D wrong because You cannot modify the core function runtime (e.g., Python, Node.js) provided by AWS to include custom libraries; you must package the libraries with your code or use Lambda Layers.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
 
 331.Explain
