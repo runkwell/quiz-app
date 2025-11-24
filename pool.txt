@@ -3555,4 +3555,39 @@
 
 --------------------------------------------------
 
+388. A company has an application that needs to get objects from an Amazon S3 bucket. The application runs on Amazon EC2 instances.
 
+All the objects in the S3 bucket are encrypted with an AWS Key Management Service (AWS KMS) customer managed key. The resources in the VPC do not have access to the internet and use a gateway VPC endpoint to access Amazon S3.
+
+The company discovers that the application is unable to get objects from the S3 bucket.
+
+Which factors could cause this issue? (Choose three.)
+
+- [x] The IAM instance profile that is attached to the EC2 instances does not allow the s3:ListBucket action for the S3 bucket.
+
+- [ ] The IAM instance profile that is attached to the EC2 instances does not allow the s3:ListParts action for the S3 bucket.
+
+- [ ] The KMS key policy that encrypts the objects in the S3 bucket does not allow the kms:ListKeys action to the EC2 instance profile ARN.
+
+- [x] The KMS key policy that encrypts the objects in the S3 bucket does not allow the kms:Decrypt action to the EC2 instance profile ARN.
+
+- [x] The S3 bucket policy does not allow access from the gateway VPC endpoint.
+
+- [ ] The security group that is attached to the EC2 instances is missing an inbound rule from the S3 managed prefix list over port 443.
+
+--------------------------------------------------
+
+389. A developer has created a new IAM user that has the s3:PutObject permission to write to a specific Amazon S3 bucket. The S3 bucket uses server-side encryption with AWS KMS managed keys (SSE-KMS) as the default encryption. When an application uses the access key and secret key of the IAM user to call the PutObject API operation, the application
+receives an access denied error.
+
+What should the developer do to resolve this error?
+
+- [ ] Update the policy of the IAM user to allow the s3:EncryptionConfiguration action.
+
+- [ ] Update the bucket policy of the S3 bucket to allow the IAM user to upload objects.
+
+- [x] Update the policy of the IAM user to allow the kms:GenerateDataKey action.
+
+- [ ] Update the ACL of the S3 bucket to allow the IAM user to upload objects.
+
+--------------------------------------------------
