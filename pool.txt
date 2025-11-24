@@ -1832,10 +1832,19 @@
 
 202. A Developer is working on an AWS Lambda function that accesses Amazon DynamoDB. The Lambda function must retrieve an item and update some of its attributes, or create the item if it does not exist. The Lambda function has access to the primary key. Which IAM permissions should the Developer request for the Lambda function to achieve this functionality?
 
-- [ ] `dynamodb:DeleteItem dynamodb:GetItem dynamodb:PutItem`.
-- [ ] `dynamodb:UpdateItem dynamodb:GetItem dynamodb:DescribeTable`.
-- [ ] `dynamodb:GetRecords dynamodb:PutItem dynamodb:UpdateTable`.
-- [x] `dynamodb:UpdateItem dynamodb:GetItem dynamodb:PutItem`.
+- [ ] `dynamodb:DeleteItem 
+dynamodb:GetItem 
+dynamodb:PutItem`.
+- [ ] `dynamodb:UpdateItem 
+dynamodb:GetItem
+dynamodb:DescribeTable`.
+- [ ] `dynamodb:GetRecords 
+dynamodb:PutItem 
+dynamodb:UpdateTable`.
+- [x] `dynamodb:UpdateItem 
+dynamodb:GetItem 
+dynamodb:PutItem`.
+
 
 --------------------------------------------------
 
