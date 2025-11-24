@@ -1451,10 +1451,14 @@ Answer E correct because S3 stores static files durably/scalably; pair with Clou
 link ref: https://aws.amazon.com/cloudfront/
 
 205.Explain
-Answer A wrong because presigned URLs expire; saving invalidates over time.
-Answer B correct because S3 key in DynamoDB persists; VPC endpoint secures private access post-login.
-Answer C wrong because base64 bloats data, inefficient for images.
-Answer D wrong because generating presigned on login is per-session overhead.
+Answer A wrong because Generating a **presigned URL when the picture is uploaded** means the URL will eventually **expire** (by default, max 7 days, or less depending on the generating credentials). This is **not a viable long-term solution** for repeatedly displaying the picture every time the employee logs in over months or years.
+Answer B wrong because An **Amazon S3 VPC endpoint** allows **private networking** access to S3 but does **not** handle authentication or authorization for individual users accessing specific private objects from a web browser. The browser (client) still needs authenticated access to the private S3 object.
+Answer C wrong because base64 bloats data, inefficient for images. **Base64 encoding** and saving the string in a database is extremely inefficient and costly, especially since there is **no size limit** for the pictures. Standard relational databases (like RDS) and NoSQL databases (like DynamoDB) are poorly suited for storing large binary objects (BLOBs) and have stringent size limits that would be quickly exceeded.
+Answer D correct This is the standard best practice for providing secure, temporary access to private S3 content:
+    1. **S3 Key Storage:** Save the object's **S3 key** (path) in a database (like DynamoDB or RDS). This is highly efficient.
+    2. **Just-in-Time Access:** When the employee logs in, the application's backend retrieves the key and securely **generates a new presigned URL** with a short expiration time (e.g., 5 minutes) using its **IAM credentials**.
+    3. **Browser Access:** The browser uses the temporary, short-lived presigned URL to securely download the private picture directly from S3. This ensures the picture remains private and secure long-term, and access is always authenticated and temporary.
+Store image key in DB → generate presigned URL at login → send to frontend → browser displays image securely.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/vpc-endpoints.html
 
 206.Explain
@@ -1472,16 +1476,18 @@ Answer D wrong because Lambda routing adds latency/complexity.
 link ref: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToInstance.html
 
 208.Explain
-Answer A correct because target tracking scales ECS on SQS visible messages, handling spikes cost-effectively.
+Answer A correct **Target tracking scaling policy.** This is the most efficient and scalable solution. It allows the developer to set a target for the average SQS queue depth per task (e.g., 5 messages per task). ECS will automatically calculate the exact number of tasks required to maintain that target, **dynamically scaling the worker fleet** up or down based on demand, which improves performance and keeps costs low. 
 Answer B wrong because Swarm is Docker orchestration, not AWS-native.
-Answer C wrong because scheduler manages tasks, not scales on metrics.
-Answer D wrong because step scaling is reactive thresholds, less dynamic than target.
+Answer C wrong because Service scheduler manages task placement, not autoscaling based on SQS metrics.
+Answer D wrong because step scaling is reactive thresholds, less dynamic than target. Step scaling policy requires manual definition of capacity adjustments in fixed steps and is less efficient than target tracking for maintaining a desired metric value (queue depth).
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-auto-scaling.html
 
 209.Explain
 Answer A wrong because IAM is for AWS access, not social/app login.
-Answer B wrong because identity pools map identities to creds, not user registration.
-Answer C correct because user pools handle sign-up, social federation (Google/Facebook).
+Answer B wrong because **Amazon Cognito Identity Pools (Federated Identities)** are used to exchange credentials (from a User Pool, social provider, etc.) for **temporary AWS credentials**. They manage authorization (what resources the user can access) but **do not** handle the registration, storage, or local authentication of users.
+Answer C correct because **Amazon Cognito User Pools** is the service designed for customer-facing application identity. It acts as a user directory that can:
+    1. Handle **New User Registration** (local accounts) and manage their profile data.
+    2. Support **Federation** (Social Login) by integrating with external Identity Providers (like Facebook, Google, Amazon, or SAML/OIDC) to allow users to sign in using their social media credentials.
 Answer D wrong because Directory Service is enterprise AD, not social/mobile.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-social-idp.html
 
@@ -1500,11 +1506,12 @@ Answer D wrong because DecodeAuthorizationMessage decodes errors, no MFA.
 link ref: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
 
 212.Explain
+The error **`ThrottlingException`** from **AWSKMS** means the application is exceeding the transactions per second (TPS) limit for KMS API calls in that region (primarily `Decrypt` calls when reading SSE-KMS objects).
 Answer A correct because KMS throttling (e.g., 10k req/s) requires support increase for high reads.
 Answer B correct because exponential backoff retries throttled requests without overwhelming.
 Answer C wrong because S3 limits separate; error is KMS.
-Answer D wrong because CMK size fixed (256-bit); import no larger.
-Answer E wrong because multiple CMKs distribute but no solve single-key throttling.
+Answer D wrong because The error is explicitly from **AWSKMS**, not S3. Requesting an S3 rate limit increase would not solve the KMS throttling problem.
+Answer E wrong because The size of the CMK (e.g., 256-bit) is irrelevant to the API call transaction limit (TPS).
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/quotas.html
 
 213.Explain
