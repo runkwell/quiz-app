@@ -158,10 +158,11 @@ Answer D correct because Cognito Sync handles device sync without backend.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-sync.html
 
 23.Explain
-Answer A correct because zip upload/deploy via console standard.
-Answer B wrong because tar/console new version, CLI update mismatched.
-Answer C wrong because tar console possible but not selected.
-Answer D correct because zip CLI create/update.
+Answer A correct The standard and simplest method is to **package the application code into a `.zip` file**, upload this source bundle directly via the Elastic Beanstalk console, and then select the option to deploy it to the environment. The console handles the creation of the new application version behind the scenes.
+Answer B wrong Elastic Beanstalk supports `.zip` and `.war` files, but **not typically `.tar` files** as a standard source bundle format for direct upload/deployment. Also, creating the version via the console and updating the environment via CLI mixes methods unnecessarily.
+Answer C wrong Elastic Beanstalk supports `.zip` or `.war` files for most environments, **not `.tar` files**.
+Answer D correct This represents the standard automated/CLI workflow. The developer **packages the code into a `.zip` file**, then uses the **AWS CLI** (or EB CLI) commands to first **create a new application version** referencing the S3 location of the `.zip` file, and then uses the CLI to **update the environment** to use this new version. This is the common practice for CI/CD pipelines.
+Answer C wrong You only need to **update** the environment with a new version; **rebuilding** the environment is an operation used to terminate and recreate all resources, which is generally overkill and time-consuming for a simple code change. Also, `.zip` is the correct package format.
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-sourcebundle.html
 
 24.Explain
@@ -321,10 +322,14 @@ Answer D correct because PutMetricData IAM role EC2.
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
 
 46.Explain
-Answer A wrong because CLI no large.
-Answer B correct because Extended Library S3 >256KB.
-Answer C wrong because EBS block.
-Answer D wrong because EFS file CLI no.
+Answer A wrong While Amazon S3 is used, the standard **Amazon SQS CLI** (or standard SDKs) does not automatically handle the logic for sending and retrieving large payloads stored in S3.
+Answer B correct because Extended Library S3 >256KB. The **Amazon SQS Extended Client Library for Java** (or similar pattern in other languages) is specifically designed to handle large SQS messages by:
+    1. **Sending:** Automatically uploading the message payload (1GB) to **Amazon S3**.
+    2. **Queuing:** Sending a small SQS message that contains a pointer (reference) to the S3 object.
+    3. **Consuming:** When the consumer receives the small SQS message, the library automatically downloads the large payload from S3.
+    This pattern allows SQS to manage the message delivery while leveraging S3 for high-capacity storage.
+Answer C wrong Amazon EBS (Elastic Block Store) is block storage attached to an EC2 instance; it is not suitable for storing transient large payloads referenced by a serverless queue.
+Answer D wrong Amazon EFS (Elastic File System) is file storage; it is also not suitable for storing transient large payloads referenced by SQS messages.
 link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-s3-messages.html
 
 47.Explain
@@ -499,10 +504,10 @@ Answer D correct because Streams multiple consumers sharded cost.
 link ref: https://aws.amazon.com/kinesis/data-streams/
 
 71.Explain
-Answer A correct because appspec root CodeDeploy.
-Answer B wrong because bin binaries.
-Answer C wrong because S3 no structure.
-Answer D wrong because config separate.
+Answer A correct The **`appspec.yml`** file is the configuration file used by **AWS CodeDeploy** to manage a deployment. It must be placed in the **root** of the application source code bundle (ZIP, JAR, or folder) that is registered as the deployment revision. CodeDeploy agent expects to find this file in the root when the deployment bundle is downloaded.
+Answer B wrong because bin binaries. Placing it in a sub-folder like `bin` will prevent the CodeDeploy agent from finding and using the deployment configuration.
+Answer C wrong because S3 no structure. The source code bundle containing the `appspec.yml` file is uploaded to an S3 bucket or GitHub/CodeCommit, but the file itself must be inside the application source structure.
+Answer D wrong because config separate. While it may be logically grouped with config files, CodeDeploy requires it to be at the **root** of the deployment bundle structure, not just any folder.
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html
 
 72.Explain
@@ -1510,10 +1515,10 @@ Answer D wrong because SQS queues for processing, not direct notify.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/services-sns.html
 
 214.Explain
-Answer A wrong because client-side manual rotation.
-Answer B wrong because import custom no auto annual.
-Answer C correct because KMS auto-rotates managed keys annually.
-Answer D wrong because export KMS no encrypt.
+Answer A wrong Encrypting data before sending it (Client-Side Encryption) requires the developer to manage the encryption, decryption, and key rotation logic outside of AWS, which is complex and high effort.
+Answer B wrong Importing a custom key into AWS KMS allows you to manage the key material, but you cannot enable automatic rotation for imported key material. You would have to manually rotate the key material annually.
+Answer C correct **Using AWS KMS (Server-Side Encryption with KMS keys - SSE-KMS)** and enabling the **automatic key rotation feature** is the easiest way. AWS KMS can be configured to automatically rotate the backing key (the cryptographic material) once a year, transparently and without any change to the S3 bucket or application code, while still encrypting the data at rest. 
+Answer D wrong Exporting a key from KMS (a process called CMK export) is not standard practice for SSE-KMS and would lead to manual key management, negating the "easiest way" requirement.
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html
 
 215.Explain
@@ -2041,11 +2046,11 @@ Answer D correct because plaintext data key from KMS.
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys
 
 285.Explain
-Answer A wrong because CacheHit for caching.
-Answer B correct because IntegrationLatency measures backend time.
-Answer C wrong because CacheMiss caching.
-Answer D correct because Latency total time.
-Answer E wrong because Count requests.
+Answer A wrong Eliminated - there is no mention of caching being involved in the problem, this metric is irrelevant for troubleshooting a timeout issue.
+Answer B correct because A high value for IntegrationLatency can indicate that the API Gateway is experiencing delays in receiving responses from Lambda.
+Answer C wrong Eliminated - this metric is related to caching, which is not mentioned as part of the problem.
+Answer D correct because high value for Latency can indicate where delays are occurring overall, including the Lambda function's processing time and any overhead in API Gateway.
+Answer E wrong Eliminated - While this metric provides information about the volume of requests, it does not help identify the cause of a timeout or latency issues.
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 
 286.Explain
@@ -2156,10 +2161,10 @@ Answer D wrong because events for triggers.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-sync.html
 
 301.Explain
-Answer A wrong because deployment for stages.
-Answer B wrong because authorizer for auth.
-Answer C wrong because import for keys, but need plan association.
-Answer D correct because usage plan key associates key to plan.
+Answer A wrong **`createDeployment`** is used to apply changes to the API configuration (like resources, methods, integrations), not to activate API keys.
+Answer B wrong **`updateAuthorizer`** manages authentication logic (e.g., Lambda Authorizers, Cognito User Pools), but API key validation is separate from authorization.
+Answer C wrong **`importApiKeys`** is used for bulk importing keys, not for activating a single key in a Usage Plan.
+Answer D correct The **`createUsagePlanKey`** method is necessary to link the new API key to the active **Usage Plan**. Once linked, the key is recognized by the API stage and allowed to access the service, resolving the `403 Forbidden` error.
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html
 
 302.Explain
@@ -2219,10 +2224,14 @@ Answer D correct because user pools handle sign-up and reset.
 link ref: https://aws.amazon.com/cognito/
 
 310.Explain
-Answer A wrong because CodeCommit multiple repos not for envs.
-Answer B wrong because CodeBuild for builds.
-Answer C wrong because Data Pipeline for data.
-Answer D correct because CodeDeploy groups for envs.
+Answer A wrong because **AWS CodeCommit** is a source control service (Git repository); it stores code but does not manage the deployment workflow.
+Answer B wrong because **AWS CodeBuild** is a continuous integration service that compiles code and runs tests; it's a *step* in the deployment process but not the orchestration mechanism for sequencing deployments across environments.
+Answer C wrong because **AWS Data Pipeline** is used for automating the movement and transformation of data, not for code deployment and application lifecycle management. This choice is conceptually incorrect for this scenario.
+Answer D correct because **AWS CodeDeploy** is a fully managed deployment service. To meet the requirement of a phased, sequential rollout:
+    1. A developer creates a single **CodeDeploy Application**.
+    2. Within that application, they define three separate **Deployment Groups** (e.g., Development, QA, Production), each pointing to the instances/environments for that stage.
+    3. The overall workflow (the sequence of deploying to Development -> QA -> Production) is then managed by an orchestration tool like **AWS CodePipeline**, which integrates CodeDeploy. However, among the choices provided, **CodeDeploy** is the service that contains the necessary organizational structure (Deployment Groups) to define these distinct targets.
+    *Self-Correction/Clarification*: While **AWS CodePipeline** is the ultimate orchestrator for the entire CI/CD sequence, among the choices given, **CodeDeploy** provides the direct mechanism to target the different environments (Deployment Groups) in the sequence specified by the CI/CD pipeline.
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-groups.html
 
 311.Explain
@@ -2289,10 +2298,10 @@ Answer D wrong because keeping up not issue.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html
 
 320.Explain
-Answer A wrong because role for DB access direct insecure.
-Answer B correct because Parameter Store SecureString with rotation.
-Answer C wrong because S3 metadata not secure.
-Answer D wrong because hardcode no rotation.
+Answer A wrong Associating an IAM role provides authorization to *AWS services*, but it does not provide the *credentials* (username/password) required to connect to a traditional database running on EC2.
+Answer B correct **AWS Systems Manager Parameter Store** is a managed service designed for secure configuration and secret management. Using the **SecureString** data type ensures the secret is encrypted using KMS. When the secret is rotated in Parameter Store, the application retrieves the new value via the Parameter Store API. Since the application code only calls the API, there are **no required code changes** when the secret value changes, and the secrets are **never stored plaintext** on the instance or in the code, making this the **SAFEST** approach.
+Answer C wrong Storing secrets in S3 object metadata is not a secure or recommended practice for database credentials and lacks native rotation features.
+Answer D wrong Hardcoding secrets is the **least safe** method and requires a code change and full redeployment every time the secret is rotated, violating the requirement.
 link ref: https://aws.amazon.com/systems-manager/parameter-store/
 
 321.Explain
@@ -2311,20 +2320,21 @@ Answer E wrong because env var not for access.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html
 
 323.Explain
-Answer A wrong because same key no update detection.
-Answer B correct because update stack properties to new S3 version.
-Answer C wrong because base64 not for code.
-Answer D wrong because role for access, but update needed.
+Answer A wrong Deleting and re-uploading the ZIP file to S3 with a different object key would require updating the CloudFormation template/stack, making this approach overly complex. If the developer overwrote the existing ZIP file on S3, Lambda would still be pointing to the previous state unless instructed to update.
+Answer B correct When a Lambda function is managed by an **AWS CloudFormation stack**, the stack explicitly defines the source code location using the `Code` property, which includes `S3Bucket`, `S3Key`, and optionally `S3ObjectVersion`. Even if the developer **manually overwrites** the `.ZIP` file in S3, **CloudFormation does not automatically know** that the code has changed. To deploy the new code, the developer must trigger a stack update, typically by updating one of these properties. The simplest way to force CloudFormation to recognize the change (if the `S3Key` hasn't changed) is to update the **`S3ObjectVersion`** property or change the `S3Key` itself (often done automatically via the `aws cloudformation package` or `sam package` commands, but required manually in this scenario). This update tells CloudFormation to trigger the Lambda update process.
+Answer C wrong The deployment package (`.ZIP` file) is uploaded directly to S3; it does not need to be base64-encoded
+Answer D wrong The function's execution role already has permissions to *read* the code during the initial deployment. If the function could be invoked but the code was old, the issue is with the deployment trigger, not the role's S3 read permissions.
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
 
 324.Explain
-Answer A correct because Docker image with daemon.
-Answer B correct because instrument code.
-Answer C wrong because daemon not on EC2 for ECS.
-Answer D wrong because instance role for EC2, not tasks.
+Answer A correct In Amazon ECS, the most common and robust pattern is to use the **sidecar container model**. This means deploying a separate **Docker image that runs the X-Ray daemon** alongside your application container within the same ECS Task Definition. This container collects trace data and relays it to the X-Ray service. 
+Answer B correct For X-Ray to track calls and services, the application code itself must be modified. This involves **adding instrumentation** (using the **X-Ray SDK**) to record metadata about incoming requests and outgoing calls (to AWS services, external APIs, etc.) and send trace data to the X-Ray daemon.
+Answer C wrong While possible, installing the daemon directly on the underlying EC2 instance is the older, less flexible pattern for ECS; the sidecar container (Option A) is the modern best practice.
+Answer D wrong While an EC2 instance role is needed for *classic* EC2-based IAM access, the **Task IAM Role (Option F)** is the correct and more granular method for granting permissions to containers in ECS.
 Answer E wrong because register app not needed.
-Answer F correct because task role for permissions.
-link ref: https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-docker.html
+Answer F correct The X-Ray daemon container needs permissions to communicate with the X-Ray service. The daemon runs within the context of the ECS Task, so the **IAM role for tasks** (Task IAM Role) must be configured with the necessary permissions (specifically `xray:PutTraceSegments` and `xray:PutTelemetryRecords`) to allow the daemon to upload trace data to AWS X-Ray.
+link ref: https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon-ecs.html
+https://docs.aws.amazon.com/xray/latest/devguide/scorekeep-ecs.html
 
 325.Explain
 Answer A wrong because acl condition not for encryption.
@@ -2355,11 +2365,11 @@ Answer D wrong because disable propagates old.
 link ref: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html
 
 329.Explain
-Answer A wrong because CodeCommit for code, but reference in template.
-Answer B correct because inline code in template.
-Answer C correct because S3 zip reference in template.
-Answer D wrong because zip to CloudFormation not standard.
-Answer E wrong because Git private not direct.
+Answer A wrong AWS CloudFormation cannot directly pull code from an AWS CodeCommit repository during stack creation for an `AWS::Lambda::Function` resource. This would require an intermediary like CodePipeline or CodeBuild.
+Answer B correct The `AWS::Lambda::Function` resource supports an inline code property, `ZipFile`, where you can **write the function code directly inside the CloudFormation template**. This method is suitable for small, simple functions.
+Answer C correct This is the standard and most common method for deploying larger Lambda functions. The **deployment package (.ZIP file)** containing the function code and dependencies is **uploaded to an Amazon S3 bucket**. The `AWS::Lambda::Function` resource in the CloudFormation template then references the code location using the **`S3Bucket` and `S3Key`** properties. Tools like AWS SAM or `aws cloudformation package` automate this process.
+Answer D wrong You upload the `.ZIP` file to **Amazon S3** (Option C), not directly to AWS CloudFormation. CloudFormation uses S3 as the source repository for deployment artifacts.
+Answer E wrong Similar to CodeCommit, CloudFormation cannot directly pull code from an external private Git repository for the Lambda function resource.
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
 
 330.Explain
@@ -2427,11 +2437,16 @@ Answer D correct because Cognito unauth roles for limited access.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/iam-roles.html
 
 339.Explain
-Answer A correct because an S3 bucket policy can explicitly grant s3:GetObject and s3:ListBucket to the EC2 role, but for SSE-KMS objects, the bucket policy must also allow kms:Decrypt on the CMK by including a Condition that permits the key usage when the request comes from the bucket. This is required when the key policy alone doesn’t grant access.
-Answer B correct because the IAM role attached to the EC2 instance must include kms:Decrypt (and kms:GenerateDataKey if writing) on the CMK to decrypt SSE-KMS objects. This is the primary mechanism for granting application access.
-Answer C wrong because the key policy must allow IAM policies to grant access—this is default for customer-managed CMKs unless explicitly denied. But this alone is not sufficient; explicit IAM or bucket policy grants are still needed.
-Answer D wrong because S3 ACLs control object-level permissions but do not grant KMS key access—KMS permissions are separate.
-Answer E wrong because Systems Manager Parameter Store stores values, not grants KMS permissions.
+To allow an application on an EC2 instance to read objects encrypted with **SSE-KMS**, the application's identity must be granted permission on both the identity level (IAM) and the resource level (KMS Key Policy).
+
+1.  **IAM Policy (Identity):** The application runs with the permissions defined in the **IAM role** attached to the EC2 instance. This IAM role must have a policy that explicitly grants the actions **`kms:Decrypt`** and **`kms:GenerateDataKey`** on the target KMS key.
+2.  **KMS Key Policy (Resource):** The KMS **Key Policy** must allow the IAM role (or the root account that manages the role) to be granted these permissions. This is the master access control list for the key. Both policies must explicitly allow the action for the request to succeed.
+
+Answer A wrong An **S3 bucket policy** controls access to the S3 data, but it does not grant the EC2 instance's IAM role the permission to use the KMS key, which is the missing cryptographic permission.
+Answer B correct **Grant access to the key in the IAM EC2 role attached to the application's EC2 instances.** This provides the necessary **`kms:Decrypt`** permission at the identity level.
+Answer C correct **Write a key policy that enables IAM policies to grant access to the key.** This ensures the KMS key's resource policy permits the role (from Option B) to use the key.
+Answer D wrong S3 ACLs are for basic object/bucket permissions and cannot be used for KMS authorization.
+Answer E wrong Parameter Store is for secure storage; it does not grant permissions to use a key.
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/iam-policies.html#iam-policy-example-s3
 
 340.Explain
@@ -2661,7 +2676,7 @@ Answer B wrong because Lambda Dynamo serverless.
 Answer C correct because EC2 with Aurora for LAMP.
 Answer D wrong because Cognito RDS auth + DB.
 Answer E wrong because ECS EBS container.
-link ref: https://aws.amazon.com/ec2/
+link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/php-ha-tutorial.html?%20icmpid=docs_tutorial_projects
 
 372.Explain
 Answer A correct because long polling reduces empty responses, minimal delay.
@@ -2692,10 +2707,14 @@ Answer D wrong because script mode unrelated.
 link ref: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
 
 376.Explain
-Answer A wrong because fleet fixed, not auto-scale.
-Answer B correct because Auto Scaling with queue depth scales fleet.
-Answer C wrong because Kinesis with Lambda batch, but not for fraud time.
-Answer D wrong because DynamoDB Streams with Lambda, but not for long process.
+The key requirements are:
+1. **Asynchronous Processing:** The fraud detection takes 10 to 30 minutes, which is too long for a synchronous web request. A queuing system is required.
+2. **High Scalability:** The system must handle **100 orders per minute** peak load.
+3. **Dynamic Scaling:** The fraud detection fleet needs to scale based on the **backlog** (queue depth) to ensure orders don't pile up during peak times, especially since processing time is long (up to 30 minutes).
+Answer A wrong Using a **fixed fleet of 10 EC2 instances** (`min-size=10, max-size=10`) is not scalable. If the processing rate of 10 instances is exceeded, the queue will grow indefinitely, leading to high latency and failure to meet demand.
+Answer B correct **Amazon SQS** provides the necessary **asynchronous buffer**. Configuring an **Auto Scaling Group** to use the **SQS Queue Depth metric** (the number of messages visible) as its scaling policy allows the system to be **dynamically sized**. When the load increases (queue depth grows), the ASG automatically launches more EC2 instances (workers) to process the backlog, achieving high scalability and resilience.
+Answer C wrong **Amazon Kinesis Stream** and **Lambda** are typically used for real-time, low-latency processing, often measured in seconds or less. The Lambda execution environment has a maximum timeout of 15 minutes, which is **insufficient** for the 30-minute fraud detection task.
+Answer D wrong This approach uses **DynamoDB Streams** (for capturing changes) and subscribes a **Lambda function** to read the stream. As with Option C, the 15-minute Lambda timeout **violates** the 30-minute processing time requirement.
 link ref: https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-using-sqs-queue.html
 
 377.Explain
