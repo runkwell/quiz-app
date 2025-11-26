@@ -3292,7 +3292,7 @@
       {
         "text": "When the Lambda function starts, use the Git CLI to clone the repository. Check the new file into the cloned repository and push the change.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "After the new file is created in Lambda, use cURL to invoke the CodeCommit API. Send the file to the repository.",
@@ -3302,7 +3302,7 @@
       {
         "text": "Use an AWS SDK to instantiate a CodeCommit client. Invoke the `put_file` method to add the file to the repository.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Upload the new to an Amazon S3 bucket. Create an AWS Step Function to accept S3 events. In the Step Function, add the new file to the repository.",
@@ -4623,12 +4623,12 @@
       {
         "text": "Amazon DynamoDB.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "Amazon S3.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Amazon RDS (with a MySQL engine).",

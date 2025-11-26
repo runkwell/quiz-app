@@ -85,3 +85,10 @@ main {
     color: var(--bs-danger) !important; /* In Đỏ */
     font-weight: bold;
 }
+
+.stats-container > div {
+    margin-right: 60px !important; 
+}
+.stats-container {
+    padding-bottom: 10px; /* Tránh nội dung bị cắt khi cuộn ngang */
+}

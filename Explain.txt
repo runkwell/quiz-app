@@ -357,10 +357,14 @@ Answer E wrong because local caching no connection.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html
 
 49.Explain
-Answer A wrong because SES email, metric SNS alert.
-Answer B wrong because API-error built-in, custom SNS.
-Answer C wrong because SES no alert.
-Answer D correct because custom metric CloudWatch SNS.
+Answer A wrong because While publishing a custom metric is correct for monitoring third-party errors (as AWS does not provide default metrics for external APIs), Amazon SES is a bulk email sending service, not a CloudWatch Alarm action.
+
+Answer B wrong because CloudWatch API-error metrics are specific to AWS Service APIs (e.g., Lambda, DynamoDB, S3) and do not automatically track errors from third-party services called by the application code.
+
+Answer C wrong because This fails on both counts: CloudWatch does not automatically track the third-party API errors, and SES cannot be directly triggered by a CloudWatch Alarm.
+
+Answer D correct because The developer must instrument the code to call PutMetricData and publish a custom metric (e.g., ThirdPartyApiErrorCount). A CloudWatch Alarm then monitors this custom metric and triggers an Amazon SNS Topic when the threshold is crossed. SNS, being a general-purpose pub/sub service, integrates directly with CloudWatch Alarms and can deliver the notification via email, SMS, or other endpoints.
+
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html
 
 50.Explain
@@ -700,10 +704,14 @@ Answer D wrong because IA moves no grow.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerLogs.html
 
 96.Explain
-Answer A correct because ECS task role secure creds.
-Answer B wrong because AssumeRole instance complex.
-Answer C wrong because env vars insecure.
-Answer D wrong because file insecure.
+Answer A correct The Task IAM Role grants permissions directly to the running container, providing temporary, frequently rotated credentials via the ECS task metadata service. The AWS SDK automatically finds and uses these temporary credentials, eliminating the need to store static keys.
+
+Answer B wrong because AssumeRole instance complex. While technically secure, this is overly complex. The AssumeRole logic is meant for cross-account access or environments without direct task roles. Task IAM Roles handle the assumption process automatically and natively, requiring no changes to the application's AWS SDK code.
+
+Answer C wrong because This is a major security anti-pattern for production environments. If the container or its logs are compromised, the permanent keys are exposed, leading to a high-risk security incident. The best practice is to never store long-lived credentials on a compute resource.
+
+Answer D wrong because Similar to environment variables, storing a static credentials file within the container or on the host is a critical security risk. It requires manual rotation and fails to leverage AWS's temporary credential mechanism.
+
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html
 
 97.Explain
@@ -879,10 +887,17 @@ Answer E wrong because Redshift is analytics, limited transaction support.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html
 
 116.Explain
-Answer A correct because Git CLI clone/commit/push in Lambda for CodeCommit integration.
-Answer B wrong because SDK put_file direct, but Lambda runtime limits.
-Answer C wrong because SDK no full Git ops.
-Answer D wrong because API direct no Git.
+Answer A wrong because The Git CLI is not included in Lambda's runtime, requiring a custom Layer. Cloning the full repository consumes excessive time, memory, and disk space, violating serverless efficiency.
+
+Answer B wrong because Direct API calls via cURL require the developer to manually implement AWS SigV4 cryptographic signing for authentication. This is complex, time-consuming, and error-prone.
+
+Answer C correct API-Native Commit (PutFile): The PutFile API action (available through the AWS SDKs, e.g., put_file in Boto3) is designed to commit a single file directly to a repository without needing to clone the entire history. The Lambda function sends the file's binary content and metadata (commit message, author) directly to the CodeCommit service.
+
+Efficiency: It consumes minimal resources, avoiding the heavy I/O, disk space usage, and latency associated with cloning a potentially large repository into Lambda's limited /tmp directory.
+
+Security & Authentication: The AWS SDK automatically handles the cryptographic signing of the API request using the Lambda function's IAM Execution Role, making credential management simple and secure.
+
+Answer D wrong because Introduces S3 and AWS Step Functions as unnecessary intermediaries. This adds complexity, cost, and latency to a task that can be completed in a single direct step from the Lambda function.
 link ref: https://docs.aws.amazon.com/codecommit/latest/userguide/how-to-migrate-repository.html
 
 117.Explain
@@ -1001,11 +1016,16 @@ Answer D wrong because transactions consistency.
 link ref: https://aws.amazon.com/dynamodb/dax/
 
 133.Explain
-Answer A correct because cloudformation package/deploy SAM.
-Answer B correct because sam package/deploy.
-Answer C wrong because s3/lambda no SAM.
-Answer D wrong because serverlessrepo sharing.
-Answer E wrong because zip/cloudformation no SAM.
+Answer A correct because This is the modern, recommended approach. sam package prepares the template by uploading local assets (like Lambda code ZIPs or static assets) to an S3 bucket and replacing the local paths in the template with S3 URLs. sam deploy then uses that processed template to create or update the CloudFormation stack.
+
+Answer B correct because This is the low-level, direct approach. aws cloudformation package performs the exact same asset uploading and template processing as sam package. aws cloudformation deploy (which is newer and preferred over create-stack/update-stack) performs the deployment. This confirms that the SAM CLI commands are syntactic sugar for the CloudFormation commands.
+
+Answer C wrong because update-function-code only updates an existing Lambda function's code. It does not create the full application stack (IAM roles, API Gateway, S3 buckets, etc.) defined in the SAM template.
+
+Answer D wrong because SAR is used for sharing and consuming pre-built applications, not for deploying a custom application from a local SAM template. The deployment process is different and intended for public sharing.
+
+Answer E wrong because AWS SAM templates need a packaging step (sam package or aws cloudformation package) to replace local references to code/assets (e.g., CodeUri: build/app.zip) with the actual S3 locations before create-stack can be called. Uploading the template alone is insufficient.
+
 link ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html
 
 134.Explain
@@ -1213,10 +1233,14 @@ Answer D wrong because testing branch CodeCommit no integrate pipeline.
 link ref: https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
 
 163.Explain
-Answer A correct because DynamoDB key/value eventual consistency TB scale seconds latency.
-Answer B wrong because S3 object per-message size ok but latency minute no.
-Answer C wrong because RDS relational consistency latency no scale TB cost.
-Answer D wrong because ElastiCache memory size limited TB no cost-effective large.
+Answer A wrong because DynamoDB has a maximum item size of 400 KB. It cannot store 100 MB messages. Storing thousands of terabytes would also be prohibitively expensive compared to S3.
+
+Answer B correct S3 is designed for high throughput with acceptable read latency in seconds.practically unlimited and cost-effective at PB scale. supports objects up to 5 TB. S3 is an object store with key-based retrieval and eventual consistency for overwrite/delete. Cheaper than DynamoDB/RDS/ElastiCache at massive scale.
+
+Answer C wrong because RDS is designed for relational data. Scaling an RDBMS to thousands of terabytes is operationally complex and extremely costly. It is not cost-effective for simple key/value storage at this scale.
+
+Answer D wrong because ElastiCache is an in-memory caching service. It is not persistent (data loss on failure) and storing thousands of terabytes in RAM would be astronomically expensive, violating the cost-effective requirement entirely.
+
 link ref: https://aws.amazon.com/dynamodb/
 
 164.Explain
@@ -2792,7 +2816,7 @@ link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/x-
 Answer A wrong because CLI disassociate not exist.
 Answer B wrong because AWS CLI no disassociate.
 Answer C wrong because policy not for disassociate.
-Answer D correct because recreate without RDS.
+Answer D correct Most Comprehensive Solution. The complete process involves creating a new environment (Green) that connects to the existing RDS instance (which must first be set to Retain), swapping the URLs, and then terminating the old environment.
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.db.html
 
 369.Explain
@@ -2892,10 +2916,14 @@ Answer E wrong because inline in Lambda not API.
 link ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html
 
 381.Explain
-Answer A wrong because change existing creates thumbnails but impacts upload time.
-Answer B wrong because async invoke still on upload path.
-Answer C correct because S3 event triggers separate thumbnail Lambda, no impact.
-Answer D wrong because SQS scheduled complex.
+Answer A wrong because Adding the thumbnail generation logic directly into the original function would increase its execution time, thus impacting the user's perceived upload time.
+
+Answer B wrong because This requires the developer to modify the existing, stable Lambda code to add the lambda:Invoke API call, violating the requirement to minimize changes to existing code.
+
+Answer C correct This creates a separate, asynchronous workflow that is triggered after the original file is successfully written to S3. The existing Lambda function is not changed and its execution time remains unaffected, meeting both constraints.
+
+Answer D wrong because This adds an unnecessary SQS Queue and requires the new Lambda function to be scheduled to poll the queue. S3 can notify Lambda directly, making the SQS/scheduler layer redundant for this simple asynchronous task.
+
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
 
 382.Explain

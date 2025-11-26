@@ -101,6 +101,45 @@ function formatTimestamp(timestamp) {
     }
 }
 
+// 6. HÀM MỚI: TÍNH TOÁN THỐNG KÊ CÂU HỎI
+function getQuestionStats() {
+    const questionsRaw = loadQuestions();
+    const history = db.get('history').value();
+    const totalQuestionCount = questionsRaw.length;
+
+    // Khởi tạo bộ đếm cho tất cả câu hỏi trong Pool
+    const stats = {};
+    for (let i = 1; i <= totalQuestionCount; i++) {
+        stats[i] = 0;
+    }
+
+    // Tổng hợp số lần xuất hiện từ lịch sử
+    history.forEach(entry => {
+        // entry.results chứa poolQNum (ID gốc trong Pool)
+        entry.results.forEach(result => {
+            const poolID = result.poolQNum;
+            if (stats.hasOwnProperty(poolID)) {
+                stats[poolID]++;
+            }
+        });
+    });
+
+    // Chuyển đổi sang mảng để render
+    const statsArray = [];
+    for (let i = 1; i <= totalQuestionCount; i++) {
+        statsArray.push({
+            qNum: i,
+            count: stats[i]
+        });
+    }
+
+    return {
+        stats: statsArray,
+        totalCount: totalQuestionCount
+    };
+}
+
+
 // === FIX: GẮN HÀM VÀO app.locals ĐỂ EJS CÓ THỂ GỌI ===
 app.locals.formatTimestamp = formatTimestamp;
 
@@ -111,7 +150,11 @@ app.locals.formatTimestamp = formatTimestamp;
 
 // 1. Trang chủ
 app.get('/', (req, res) => {
-  res.render('index');
+  const { stats, totalCount } = getQuestionStats();
+  res.render('index', {
+    questionStats: stats,
+    totalPoolQuestions: totalCount
+  });
 });
 
 // 2. Route Bắt đầu bài thi (Bốc thăm ngẫu nhiên, giới hạn 65 câu và Ánh xạ)
