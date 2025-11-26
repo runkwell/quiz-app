@@ -137,8 +137,8 @@ Answer E correct because on-demand auto-scales capacity, avoiding provisioned li
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-ddb-rate-limit.html
 
 20.Explain
-Answer A wrong because SSE-S3 uses AWS keys, no customer control.
-Answer B wrong because SSE-C requires providing keys per request.
+Answer A wrong because SSE-S3 you Zero control. AWS manages the keys completely.
+Answer B wrong because SSE-C Customer generates, provides, and must manage the key for every upload/download request.
 Answer C correct because SSE-KMS uses AWS-managed CMK with customer control/audit.
 Answer D wrong because client-side requires app encryption management.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html
@@ -185,10 +185,14 @@ Answer D wrong because ALB HTTP.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
 
 26.Explain
-Answer A wrong because validation input.
-Answer B wrong because ARN invocation.
-Answer C wrong because integration proxy.
-Answer D correct because mapping template query to args.
+Answer A wrong because (Data Validation) Request validation checks if the incoming request payload (body or parameters) adheres to a defined schema. It does not transform or map the data structure.
+
+Answer B wrong because (Service Identification) The ARN is used to identify the specific Lambda function to be invoked. It is necessary for integration but does not perform data transformation.
+
+Answer C wrong because (Integration Mode) While the integration type (e.g., Lambda Proxy vs. Lambda Custom/Non-Proxy) dictates the default payload structure, converting query strings into a custom, specific JSON structure always requires a mapping template.
+
+Answer D correct because A mapping template, written in Velocity Template Language (VTL), is executed in the Integration Request phase. The developer uses VTL to read the query string parameters (e.g., using $input.params('item')) and map them into the custom JSON structure expected by the Lambda function.
+
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html
 
 27.Explain
@@ -1121,10 +1125,14 @@ Answer D wrong because JWT not direct DynamoDB.
 link ref: https://aws.amazon.com/cognito/
 
 147.Explain
-Answer A wrong because OpsWorks config.
-Answer B wrong because CloudWatch monitoring.
-Answer C wrong because Beanstalk/CodeCommit not IaC.
-Answer D correct because CloudFormation IaC, CodeCommit version.
+Answer A wrong because Neither provides the primary solution for declarative Infrastructure as Code (IaC) or version control needed for infrastructure definitions.
+
+Answer B wrong because These are operational tools used after deployment; they do not define, deploy, or version the infrastructure itself.
+
+Answer C wrong because Suboptimal. Elastic Beanstalk restricts the scope of infrastructure you can manage, failing the general "AWS infrastructure" requirement.
+
+Answer D correct because CloudFormation create IaC, CodeCommit control version.
+
 link ref: https://aws.amazon.com/cloudformation/
 
 148.Explain
@@ -1584,10 +1592,14 @@ Answer D wrong because Directory Service is enterprise AD, not social/mobile.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-social-idp.html
 
 210.Explain
-Answer A correct because Lambda authorizer validates headers against DynamoDB for custom auth.
-Answer B wrong because models define payloads, no auth; access to table unnecessary.
-Answer C wrong because integration requests map, no auth comparison.
-Answer D wrong because Cognito authorizer uses pools, not DynamoDB tables.
+Answer A correct A Lambda Authorizer (or Custom Authorizer) is a separate Lambda function invoked by API Gateway before the main integration logic. It is the only option that allows the developer to write custom code to extract the two headers (Client ID and User ID), perform a lookup in the DynamoDB table using the AWS SDK, and return an IAM policy that either allows or denies the request.
+
+Answer B wrong because A Model is used for validating the structure and format of the request body (payload), not for performing authentication or authorization against a custom database.
+
+Answer C wrong because The Integration Request is used for transforming data after authentication has succeeded. API Gateway's native service integrations (like direct DynamoDB integration) perform simple operations, but they cannot perform complex authentication logic (read key/value, compare multiple headers, and then generate an IAM policy) before executing the main API method.
+
+Answer D wrong because A Cognito User Pool Authorizer is designed to validate a JWT token issued by an Amazon Cognito User Pool. It cannot be directly configured to read arbitrary credentials from two separate headers and query a custom DynamoDB table for verification. This would require custom logic, which means using a Lambda Authorizer (even if Cognito was part of the wider solution).
+
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html
 
 211.Explain
@@ -1959,10 +1971,14 @@ Answer D correct because 4xx client errors.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/CommonErrors.html
 
 257.Explain
-Answer A wrong because visibility after receive.
-Answer B correct because long polling waits 20s reduces empty.
-Answer C wrong because retention for delete.
-Answer D wrong because delay for new messages.
+Answer A wrong because This controls the duration a message remains invisible to other consumers after being received. It prevents duplicate processing and has no effect on reducing the number of empty poll requests.
+
+Answer B correct This enables Long Polling. When a consumer makes a ReceiveMessage request, SQS will hold the connection open for up to the specified time (max 20 seconds) until a message arrives. This significantly reduces the number of empty responses by only returning an empty response when the wait time expires.
+
+Answer C wrong because This defines how long SQS stores messages in the queue (1 minute to 14 days) before automatically deleting them. It affects data durability, but has no effect on reducing empty poll requests.
+
+Answer D wrong because This attribute makes a specific message invisible for a set duration after it is sent to the queue. It controls when a message becomes available for the first time, but has no effect on the frequency of empty poll requests.
+
 link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-long-polling.html
 
 258.Explain
@@ -2003,10 +2019,14 @@ Answer E wrong because no restrict writes.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html#WorkingWithItems.ConditionalUpdate
 
 263.Explain
-Answer A wrong because bulk not for devices.
-Answer B wrong because push service handles, but SNS needs register.
-Answer C wrong because vending for custom.
-Answer D correct because CreatePlatformEndpoint registers tokens.
+Answer A wrong because (Manual and Static) This is a manual, non-programmatic process. It is not suitable for a dynamic mobile application where tokens frequently change (e.g., when an app is reinstalled or the token expires).
+
+Answer B wrong because (Incorrect Responsibility) The third-party Push Notification Service (PNS) like Apple (APNS) or Google (FCM) issues the token to the device, but it is AWS SNS's responsibility to register that token to create an SNS endpoint ARN. The PNS does not call SNS APIs.
+
+Answer C wrong because (Too Generic) A Token Vending Service (TVS) is a pattern often used for issuing temporary security credentials (like STS tokens) or unique IDs, not specifically for registering external device tokens. While a custom backend is required, the term is too general and doesn't specify the necessary SNS API action.
+
+Answer D correct because The mobile application's backend service (or an associated Lambda function) must receive the device token from the mobile app and then call the CreatePlatformEndpoint API function. This registers the unique token under the SNS Platform Application and returns an Endpoint ARN, which is required to send direct notifications to that specific device.
+
 link ref: https://docs.aws.amazon.com/sns/latest/dg/sns-mobile-application-as-subscriber.html
 
 264.Explain
@@ -2244,10 +2264,14 @@ Answer D wrong because replica scales reads.
 link ref: https://aws.amazon.com/elasticache/
 
 295.Explain
-Answer A wrong because concurrent account limit.
-Answer B wrong because stage for API.
-Answer C correct because function reserved concurrency limits.
-Answer D wrong because reduce throttling worsens.
+Answer A wrong because This would penalize all Lambda functions in the account by lowering the total available concurrency pool. It addresses the symptom by lowering the ceiling, but doesn't solve the core problem of Lambda 2 consuming the pool whenever needed.
+
+Answer B wrong because This only addresses load distribution at the API Gateway level. It does not increase the underlying AWS Lambda account concurrency limit or prevent Lambda 2 from monopolizing the existing limit. Lambda 1 would still be throttled.
+
+Answer C correct because This is the correct solution using Reserved Concurrency. By setting a specific, lower limit on Lambda 2, the Developer prevents it from consuming the entire account capacity. This guarantees that the remaining capacity (Unreserved Concurrency) is always available for other functions, including the one backing /MyAPI (Lambda 1).
+
+Answer D wrong because This would cause API Gateway to reject incoming requests before they even get to the Lambda service. While it reduces load, it doesn't fix the root problem of Lambda 2 monopolizing resources and shifts the throttling point to the API Gateway level.
+
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html
 
 296.Explain
@@ -2561,10 +2585,14 @@ Answer D wrong because draining for termination.
 link ref: https://aws.amazon.com/blogs/aws/elastic-load-balancer-support-for-amazon-dynamodb/
 
 334.Explain
-Answer A wrong because Glue ETL not real-time.
-Answer B wrong because ElastiCache not for updates.
-Answer C wrong because Firehose delivery, not updates.
-Answer D correct because Streams capture changes near-real time.
+Answer A wrong because Glue ETL not real-time. Glue ETL jobs are typically run periodically (e.g., hourly or daily) and are better suited for large-scale data warehousing transformations. This approach is not near-real time and adds latency and operational complexity (managing the schedule and job execution).
+
+Answer B wrong data flow and complexity. ElastiCache is a caching service, not a persistent database for a core service like Payments. This pattern introduces significant complexity by requiring custom application logic (triggers) in the Accounts service to manage cache invalidation, which violates the goal of decoupling the services.
+
+Answer C wrong because Firehose delivery, not updates.Kinesis Data Firehose is designed to capture, transform, and load streaming data into destinations like S3 or Redshift for analytics. While you could use it as part of a pipeline, it is less suited than DynamoDB Streams for the primary goal of item-level replication between two DynamoDB tables. DynamoDB Streams is the native, simpler source for this specific task.
+
+Answer D correct because DynamoDB Streams is a built-in feature that captures a time-ordered, guaranteed sequence of item-level modifications (inserts, updates, deletes) in near-real time. You simply enable it on the Accounts table and configure an AWS Lambda function to read the stream and write the relevant changes to the Payments table. This creates a clean, decoupled event-driven architecture.
+
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html
 
 335.Explain
@@ -2927,10 +2955,14 @@ Answer D wrong because This adds an unnecessary SQS Queue and requires the new L
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
 
 382.Explain
-Answer A wrong because update function URL changes endpoint.
-Answer B wrong because phased not in API Gateway.
-Answer C correct because new stage v2 keeps old clients on v1.
-Answer D wrong because CloudFront for CDN.
+Answer A wrong because This breaks the API contract for all existing clients currently using the API Gateway's v1 endpoint. It also bypasses API Gateway's security, throttling, and caching features.
+
+Answer B wrong because API Gateway does not have an automatic client migration feature. Phased deployments (Canary releases) only control traffic split between backend integrations (e.g., Lambda versions) on a single stage, not the public endpoint version clients use for migration.
+
+Answer C correct because This is the standard URI-based versioning strategy. The existing stage (e.g., prod or v1) remains deployed and unchanged, serving the old version for six months. A new stage, /v2, is deployed and points to the Lambda function containing the breaking change. Clients are given the new /v2 endpoint and can gradually migrate without affecting existing traffic on /v1.
+
+Answer D wrong because CloudFront is a Content Delivery Network (CDN) used for caching and global delivery. While it can front API Gateway, it is not the service responsible for managing different API versions side-by-side; that responsibility lies with API Gateway Stages.
+
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/stages.html
 
 383.Explain
