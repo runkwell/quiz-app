@@ -295,11 +295,19 @@ Answer D wrong because context ID file less.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html
 
 41.Explain
-Answer A correct because EC2 role assume AccessPII.
-Answer B wrong because direct no assumption.
-Answer C wrong because AWS API temp.
-Answer D correct because AssumeRole temp.
-Answer E wrong because GetSessionToken users.
+Answer A correct The EC2 instances in Account B are running under a specific EC2 Instance Profile Role. This role must have an IAM policy attached that explicitly allows the sts:AssumeRole action against the ARN of the AccessPII role in Account A. This is the identity-based policy that grants the EC2 instance the ability to make the request.
+
+Answer B wrong because This is insufficient. The PII table resides in Account A. The EC2 role in Account B cannot directly access resources in Account A unless a Resource-Based Policy is attached to the DynamoDB table itself, which is an alternative method not described in the setup steps provided. In the IAM role delegation model, the EC2 role only needs sts:AssumeRole permission.
+
+Answer C wrong because The EC2 role's credentials are automatically provided to the application, but they only grant access to Account B resources and the sts:AssumeRole action. They are not the credentials needed to access the DynamoDB table in Account A.
+
+Answer D correct 
+-The application code running on the EC2 instance must use the AWS SDK to call the AssumeRole operation from the AWS Security Token Service (STS). This call uses the EC2 role's credentials to assume the target role (AccessPII in Account A).
+
+-The successful AssumeRole response returns a set of temporary credentials (Access Key ID, Secret Access Key, and Session Token) which are then used by the application code to create a DynamoDB client object for Account A, allowing access to the PII table.
+
+Answer E wrong because This operation is used to get temporary credentials for an IAM user in the same account. It is not used for cross-account role delegation.
+
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
 42.Explain
@@ -324,10 +332,14 @@ Answer D wrong because Aurora sync complex.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html
 
 45.Explain
-Answer A wrong because S3 Lambda indirect.
-Answer B wrong because Kinesis Lambda overkill.
-Answer C wrong because API role no creds.
-Answer D correct because PutMetricData IAM role EC2.
+Answer A wrong because Inefficient and Overly Complex. This adds unnecessary latency, complexity, and cost (S3 and Lambda execution) to a simple, direct operation.
+
+Answer B wrong because Overkill and Expensive. Kinesis is for high-throughput stream processing and persistence. Using it just to pipe a metric to CloudWatch is inefficient and introduces several unnecessary layers.
+
+Answer C wrong because Major Security Risk. Storing static AWS credentials (access keys/secrets) directly on an EC2 instance is a security anti-pattern. If the instance is compromised, the keys are exposed.
+
+Answer D correct because PutMetricData is the native API for custom metrics. Launching the EC2 instance with an IAM Instance Profile Role grants the application the necessary, frequently rotated temporary credentials automatically. This is secure and requires no static keys on the instance.
+
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
 
 46.Explain
@@ -346,10 +358,14 @@ Answer D wrong Amazon EFS (Elastic File System) is file storage; it is also not 
 link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-s3-messages.html
 
 47.Explain
-Answer A wrong because X-Ray tracing no metrics graph.
-Answer B correct because custom PutMetricData graph CloudWatch.
-Answer C wrong because S3 Kinesis complex.
-Answer D wrong because DynamoDB CloudFront mismatch.
+Answer A wrong because X-Ray is designed to map application components, analyze latency, and trace requests. It is not designed for generic time-series resource utilization metrics like thread count.
+
+Answer B correct because CloudWatch is the dedicated monitoring service. Custom Metrics are explicitly for application-specific data. The PutMetricData API is the simplest and most direct method for the application to push its current thread count to CloudWatch, which then automatically provides graphing and dashboarding capabilities.
+
+Answer C wrong because This introduces unnecessary complexity and cost by chaining three services (S3 for storage, Kinesis for streaming processing, plus a custom dashboard layer) when CloudWatch provides a direct API for ingestion and visualization. It is highly inefficient.
+
+Answer D wrong because This requires the developer to build and maintain a custom web application (using a rendering library like D3.js) to query the DynamoDB data and draw the graph. This is far more complex and less efficient than using the native CloudWatch dashboard.
+
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
 
 48.Explain
@@ -701,10 +717,14 @@ Answer D wrong because strong more RCU.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ProvisionedThroughput.html
 
 95.Explain
-Answer A wrong because compression/versioning no growth.
-Answer B wrong because replication another bucket.
-Answer C correct because logging same bucket loop exponential.
-Answer D wrong because IA moves no grow.
+Answer A wrong because Versioning multiplies storage, but the initial data volume was only 100 KB. It is impossible for 100 KB of data, even versioned, to grow into 50 GB in a few days.
+
+Answer B wrong because Replication copies data to another bucket; it does not explain the origin of the 50 GB of data in the source bucket itself.
+
+Answer C correct because s3://mycoolapp to deliver its access logs to a folder within itself (s3://mycoolapp/logs). Every time a log file is written, that write operation is logged, which triggers another write, which is logged, creating a recursive log storm that consumes massive storage capacity very quickly.
+
+Answer D wrong because A lifecycle policy only changes the storage class of existing objects. It does not create new data or multiply the size of the bucket's contents.
+
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerLogs.html
 
 96.Explain
@@ -1234,10 +1254,14 @@ Answer D wrong because Macie data privacy no performance.
 link ref: https://aws.amazon.com/xray/
 
 162.Explain
-Answer A wrong because separate pipeline complex management.
-Answer B correct because CodeBuild spec phase unit tests build.
-Answer C wrong because CodeDeploy agent deploys no tests.
-Answer D wrong because testing branch CodeCommit no integrate pipeline.
+Answer A wrong because This is possible but overly complex and inefficient. Unit tests are a prerequisite for build artifacts and belong logically within the build stage of the primary pipeline. Running a nested pipeline adds latency and overhead.
+
+Answer B correct The buildspec.yml file used by AWS CodeBuild defines the entire build and testing process. It includes dedicated phases (pre_build, build, post_build) where the developer can execute unit test commands (e.g., npm test, pytest). If the tests fail, CodeBuild fails the action, stopping the pipeline before artifacts are staged.
+
+Answer C wrong because AWS CodeDeploy is an orchestration service for deployment (installing, updating, rolling back applications). It is not designed for running unit tests during the build phase; that is CodeBuild's job.
+
+Answer D wrong because AWS CodeCommit is a Git repository used for storing source code and managing versions. Creating a branch is a source control practice, but it doesn't execute tests; a CI/CD service must be triggered to run the tests on that branch.
+
 link ref: https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
 
 163.Explain
@@ -1322,11 +1346,16 @@ Answer D correct because CodePipeline supports manual approval actions that paus
 link ref: https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html
 
 174.Explain
-Answer A wrong because Lambda@Edge is for edge locations, not REST APIs.
-Answer B correct because API Gateway + Lambda backend is required for serverless REST.
-Answer C correct because GET method must be exposed in API Gateway to accept HTTP GET.
-Answer D wrong because Lambda doesn’t expose HTTP methods—API Gateway does.
-Answer E wrong because Route 53 is DNS, not API routing.
+Answer A wrong because Lambda@Edge is used for running code at CloudFront edge locations, primarily for customizing content delivery and responses, not for defining the primary, regional REST API backend.
+
+Answer B correct The standard pattern for a serverless REST API is to use Amazon API Gateway as the managed HTTP endpoint and connect it to an AWS Lambda function (the backend logic). API Gateway handles the routing, security, and traffic management, while Lambda runs the code.
+
+Answer C correct Within the API Gateway resource definition (e.g., /users), you must explicitly define the GET HTTP method. This method is then configured to be the specific integration point that triggers the Lambda function.
+
+Answer D wrong because The Lambda function itself contains the application logic (the handler), but it doesn't expose the method; it just processes the request event passed to it by the trigger (API Gateway). The method exposure happens entirely within API Gateway.
+
+Answer E wrong because Amazon Route 53 is a Domain Name System (DNS) service. It handles mapping a domain name (like api.example.com) to the API Gateway endpoint but does not define or expose HTTP methods.
+
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html
 
 175.Explain
@@ -1524,10 +1553,14 @@ Answer D correct because UpdateItem modifies existing or creates if absent (with
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html
 
 203.Explain
-Answer A wrong because SSE-S3 uses AWS keys with no user audit trails.
-Answer B correct because SSE-KMS provides CloudTrail-audited key usage for who/when.
-Answer C wrong because SSE-C uses customer keys without AWS auditing.
-Answer D wrong because self-managed keys lack AWS integration/audit.
+Answer A wrong because SSE-S3 uses AWS keys. While S3 automatically encrypts the data, there is no visibility or logging of the S3 master key usage in AWS CloudTrail, as the key is managed internally by AWS.
+
+Answer B correct because SSE-KMS provides CloudTrail-audited key usage for who/when. Every API call made to KMS (such as Decrypt or GenerateDataKey) to access the master key is logged in AWS CloudTrail. This log records the time, the AWS service (S3), and the IAM Principal (who) that requested the key operation, directly meeting the audit requirement.
+
+Answer C wrong because SSE-C uses customer keys without AWS auditing. AWS never stores your master key and only uses it transiently for the request. Key usage is outside of AWS's control, so AWS cannot provide an audit log for its usage.
+
+Answer D wrong because self-managed keys lack AWS integration/audit. This is not a standard S3 server-side encryption option.
+
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html
 
 204.Explain
@@ -1541,7 +1574,7 @@ link ref: https://aws.amazon.com/cloudfront/
 205.Explain
 Answer A wrong because Generating a **presigned URL when the picture is uploaded** means the URL will eventually **expire** (by default, max 7 days, or less depending on the generating credentials). This is **not a viable long-term solution** for repeatedly displaying the picture every time the employee logs in over months or years.
 
-Answer B wrong because An **Amazon S3 VPC endpoint** allows **private networking** access to S3 but does **not** handle authentication or authorization for individual users accessing specific private objects from a web browser. The browser (client) still needs authenticated access to the private S3 object.
+Answer B wrong because An **Amazon S3 VPC endpoint** allows **private networking** (i.e., EC2 instances, Lambda functions) access to S3 but does **not** handle authentication or authorization for individual users accessing specific private objects from a web browser (outside the VPC). The browser (client) still needs authenticated access to the private S3 object. Additional proxying (e.g., via API Gateway) is needed, adding complexity without direct viability.
 
 Answer C wrong because base64 bloats data, inefficient for images. **Base64 encoding** and saving the string in a database is extremely inefficient and costly, especially since there is **no size limit** for the pictures. Standard relational databases (like RDS) and NoSQL databases (like DynamoDB) are poorly suited for storing large binary objects (BLOBs) and have stringent size limits that would be quickly exceeded.
 
@@ -1849,11 +1882,24 @@ Answer F wrong because no EC2.
 link ref: https://aws.amazon.com/swf/
 
 241.Explain
-Answer A wrong because region no help stickiness.
-Answer B correct because re-resolve rotates.
-Answer C correct because global clients distribute.
-Answer D wrong because AZs no.
-Answer E wrong because app cookie no distribution.
+Answer A wrong because While this introduces a different IP address, it is still only one IP address. The ELB would still stick all 40,000 requests to one or two targets in the same manner, but from a different region.
+
+Answer B correct
+This is the most cost-effective solution requiring no infrastructure changes.
+
+By forcing the client (the load-testing software) to re-resolve the ELB's DNS name before each request, the load tester will receive the full list of IP addresses associated with the ELB.
+
+Since the ELB IPs are typically spread across all configured Availability Zones (us-west-2a and us-west-2b), the tester will be directed to different ELB nodes, which, in turn, will distribute traffic more broadly across all four web servers.
+
+Answer C correct
+A globally distributed service uses many different source IP addresses from various regions.
+
+Because the ELB's session stickiness works on a per-client (IP) basis, using thousands of unique client IPs ensures that the traffic is naturally dispersed across all the backend targets, leading to far more even distribution. This effectively simulates real public user traffic.
+
+Answer D wrong because The load balancing configuration is already across two zones (us-west-2a and us-west-2b). Changing the second zone doesn't solve the problem of stickiness and the single client IP.
+
+Answer E wrong because This is only a change in the type of cookie used (Application vs. AWS-generated). The ELB would still see one client and continue to apply stickiness, sending all traffic to the same subset of targets. The problem is the stickiness itself, not the cookie type.
+
 link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-sticky-sessions.html
 
 242.Explain
@@ -1872,11 +1918,16 @@ Answer D correct because S3 URL pointer low.
 link ref: https://aws.amazon.com/dynamodb/
 
 244.Explain
-Answer A wrong because hash no.
-Answer B wrong because storage no.
-Answer C correct because tables.
-Answer D wrong because LSI no.
-Answer E correct because throughput.
+Answer A wrong because Not a Limit. "Hash key" is synonymous with Partition Key. There is no practical limit on the number of unique partition key values you can use across a table or account. The limit applies to the length of the key, not the count.
+
+Answer B wrong because Practically Unlimited. DynamoDB scales automatically to accommodate massive data sizes, and there is no predefined storage limit for the total amount of data you can store in a table or account (Source 1.1).
+
+Answer C correct The default limit is typically 2,500 tables per AWS Region for each account (Source 3.5), but this is a soft limit that can be increased by submitting a service quota increase request to AWS.
+
+Answer D wrong because Hard Limit. There is a hard limit of 5 Local Secondary Indexes (LSIs) per table (Source 1.5, 3.6). Hard limits cannot be raised by AWS support.
+
+Answer E correct This refers to the total number of Read Capacity Units (RCUs) and Write Capacity Units (WCUs) that can be provisioned across all DynamoDB tables in an AWS Region for the account. This is a soft limit that can be increased via AWS Support.
+
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Limits.html
 
 245.Explain
@@ -1989,10 +2040,14 @@ Answer D wrong because no tokyo.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html
 
 259.Explain
-Answer A wrong because single table accumulates.
-Answer B wrong because individual delete costly.
-Answer C correct because delete/create per hour minimal provision.
-Answer D wrong because create without delete accumulates.
+Answer A wrong because The table size would grow by approximately $3.6$ million items (1,000 items/sec * 3,600 sec/hr) every hour, leading to massive storage costs and potential performance degradation.
+
+Answer B wrong because Deleting $3.6$ million items requires $3.6$ million Delete API calls, which directly consumes Write Capacity Units (WCUs) and is billed. This is expensive and wastes provisioned throughput on cleanup.
+
+Answer C correct Deleting an entire DynamoDB table is a single free control-plane operation that removes all items and associated storage instantly (from a billing perspective). This is far more efficient and cheaper than running $3.6$ million individual delete operations. The process would be: Create Table A $\rightarrow$ Write for 1 hour $\rightarrow$ Analyze $\rightarrow$ Create Table B, Delete Table A $\rightarrow$ Write for 1 hour $\rightarrow$ Analyze $\rightarrow$ Create Table C, Delete Table B, etc.
+
+Answer D wrong because This addresses the table creation side but fails to address the deletion and cost-saving side. This would lead to 24 unused tables being retained after a day, wasting storage. (Note: Using Time to Live (TTL) would be the standard DynamoDB approach for item expiration, as it doesn't consume WCUs, but the "delete table" strategy is an even more aggressive form of partition-by-time data management often used for temporary, high-throughput data.)
+
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.DeleteTable.html
 
 260.Explain
@@ -2130,10 +2185,14 @@ Answer D wrong because other table separate.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
 
 277.Explain
-Answer A wrong because concurrent no prevent.
-Answer B correct because conditional prevent overwrite.
-Answer C wrong because atomic per operation.
-Answer D wrong because batch no condition across.
+Answer A wrong because Uncontrolled simultaneous updates. This is the cause of the overwriting problem, as the last write to arrive wins, regardless of the data's state.
+
+Answer B correct because To prevent overwriting, the developer adds an attribute (like a version number) to the item. The update request uses a ConditionExpression to ensure the write only succeeds if the stored version number matches the version the editor originally read. If another editor updated the item in between, the condition fails, and the update is rejected.
+
+Answer C wrong because atomic Ensures an operation on a single item either succeeds entirely or fails entirely. This guarantees item-level integrity but does not check the item's content against a prior state to prevent stale data from overwriting newer changes.
+
+Answer D wrong because batch A convenience feature to combine up to 25 PutItem or DeleteItem requests into a single network call. This is for efficiency , does not offer conditional logic to prevent concurrent overwrites.
+
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html#WorkingWithItems.ConditionalUpdate
 
 278.Explain
@@ -2282,10 +2341,14 @@ Answer D wrong because dedicated instance not shared.
 link ref: https://aws.amazon.com/elasticache/redis/
 
 297.Explain
-Answer A wrong because YAML ok.
-Answer B correct because .config extension for ebextensions.
-Answer C wrong because resources for declare.
-Answer D wrong because namespace custom unnecessary.
+Answer A wrong because JSON is a supported format, but YAML is also fully supported for .ebextensions configuration files. The format is not the primary error; the file name is.
+
+Answer B correct because Elastic Beanstalk only recognizes configuration files located in the .ebextensions directory if they have the file extension .config (e.g., healthcheckurl.config). The current file name, healthcheckurl.yaml, will be ignored, meaning the health check URL option is never applied.
+
+Answer C wrong because The option_settings section is the correct place to set environment and configuration options like the health check URL. The resources section is used to declare and configure AWS resources (like databases or S3 buckets) that the environment needs.
+
+Answer D wrong because The namespace aws:elasticbeanstalk:application is the standard and correct namespace for setting the application-wide health check URL. Changing it to a custom namespace would prevent Elastic Beanstalk from recognizing and applying the setting.
+
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html
 
 298.Explain
@@ -2530,10 +2593,14 @@ Answer D wrong because scan strong more.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html
 
 328.Explain
-Answer A wrong because remove origin resets.
-Answer B wrong because forwarding not for cache.
-Answer C correct because invalidate forces refresh.
-Answer D wrong because disable propagates old.
+Answer A wrong because This forces a configuration update but does not guarantee existing cached objects are immediately removed. It's an unnecessarily destructive and complex action that still relies on the cache's Time-to-Live (TTL) to expire.
+
+Answer B wrong because This changes how content is cached (e.g., whether page.html?v=1 is cached separately from page.html?v=2), but it does not clear the existing stale content that users are currently seeing.
+
+Answer C correct. Invalidation is the explicit mechanism provided by CloudFront to tell the edge locations to immediately delete or mark as expired the specified objects (e.g., /index.html or /* for everything). The next request for those objects will force CloudFront to fetch the newest version from the origin.
+
+Answer D wrong because Disabling and re-enabling a distribution is a lengthy configuration process that causes service downtime and is not the proper way to clear caches. This is inefficient and impacts the user experience severely.
+
 link ref: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html
 
 329.Explain
@@ -2804,10 +2871,14 @@ Answer D wrong because CodePipeline CI/CD.
 link ref: https://aws.amazon.com/elasticbeanstalk/
 
 363.Explain
-Answer A correct because ElastiCache for sessions scalable.
-Answer B wrong because EBS not shared.
-Answer C wrong because Instance Store not persistent.
-Answer D wrong because root not shared.
+Answer A correct ElastiCache (using Redis or Memcached) is a fully managed, high-speed, low-latency in-memory data store specifically designed for use cases like session store. By externalizing the session data here, any EC2 instance can retrieve the session state for any user request, enabling true horizontal scaling and reliability.
+
+Answer B wrong because EBS volumes are block storage attached to a single EC2 instance at a time (unless using Multi-Attach, which is complex and still disk-based). It is too slow (higher latency) for session data and cannot be easily shared by multiple, independent EC2 instances to serve the same session.
+
+Answer C wrong because Instance store is physically attached to the host and is ephemeral (data is lost if the instance is stopped, hibernated, or terminated). This fundamentally violates the reliability requirement for session data.
+
+Answer D wrong because The root filesystem is part of the instance's local storage (either EBS or Instance Store). Writing session data here means it is not shared across the other EC2 instances, forcing you to rely on less effective solutions like ELB sticky sessions, which limit scaling and reliability.
+
 link ref: https://aws.amazon.com/elasticache/
 
 364.Explain
@@ -2834,10 +2905,22 @@ Answer D wrong because params expose keys.
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
 367.Explain
-Answer A wrong because remove ALB loses benefits.
-Answer B wrong because Classic LB no X-Forwarded-For list.
-Answer C correct because app inspects X-Forwarded-For for real IP.
-Answer D wrong because custom header requires client change.
+Answer A wrong because This violates the horizontal scaling requirement. Without the ALB, the application cannot easily scale or benefit from other ALB features (e.g., health checks, SSL termination).
+
+Answer B wrong because This is an infrastructure change that introduces cost without solving the problem, as Classic Load Balancers also rely on the X-Forwarded-For header for HTTP traffic.
+
+Answer C correct 
+Alter the application code to inspect the X-Forwarded-For header.
+
+This is the correct approach because the ALB is already performing the necessary action (injecting the client IP) by default.
+
+The developer simply needs to modify the application logic to read the X-Forwarded-For header instead of the connection's source IP address (which is always the ALB).
+
+The client's true IP is typically the left-most IP address in the comma-separated list within the XFF header.
+
+This solution requires zero infrastructure changes and minimal code modification, making it the most cost-effective option while maintaining horizontal scaling.
+
+Answer D wrong because This is highly impractical, requires client-side changes and maintenance, and is less secure, as clients can easily spoof custom headers. The standard mechanism is already in place.
 link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/x-forwarded-headers.html
 
 368.Explain
@@ -3191,3 +3274,11 @@ Answer B wrong It cannot directly store variables such as the API URL or credent
 Answer C wrong Storing variables in encrypted files adds operational overhead. Managing separate files for each environment can quickly become cumbersome.
 Answer D wrong Storing sensitive information like credentials directly in ECS task definitions is not secure
 
+402.Explain
+Answer A correct Minimal Effort. This requires zero code change to the original Lambda function. You configure the destination directly in the Lambda console or via Infrastructure as Code (e.g., CloudFormation, SAM). The failed payload is automatically passed to the destination function. This is the simplest native mechanism for handling asynchronous invocation failures.
+
+Answer B wrong Low Effort, but More than Destination. While using SQS as a destination is valid, it requires two additional configuration steps: setting up the SQS queue and then setting up the resize Lambda function as a polling event source for that SQS queue.
+
+Answer C wrong High Effort. Step Functions is a complex service designed for orchestrating multi-step workflows. It requires creating and managing a state machine definition (ASL), modifying the original S3 event source to point to EventBridge/Step Functions, and defining the catch/fallback state.
+
+Answer D wrong Low Effort, but More than Destination. This requires two additional configuration steps: creating the SNS topic and then creating the subscription for the resize Lambda function. While the complexity is low, it involves more configuration steps than a direct Lambda-to-Lambda destination.

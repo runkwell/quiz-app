@@ -5834,7 +5834,7 @@
       {
         "text": "Save the picture's S3 key in an Amazon DynamoDB table. Create an Amazon S3 VPC endpoint to allow the employees to download pictures once they log in.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "Encode a picture using base64. Save the base64 string in an Amazon DB table. Allow the browser to retrieve the string and convert it to a picture.",
@@ -5844,7 +5844,7 @@
       {
         "text": "Save the picture's S3 key in an Amazon DynamoDB table. Use a function to generate a presigned URL every time an employee logs in. Return the URL to the browser.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       }
     ],
     "isMultipleChoice": false
@@ -11596,6 +11596,34 @@
       },
       {
         "text": "Update the application to retrieve the variables from each of the deployed environments. Define the authentication information and API URL in the ECS task definition as unique names during the deployment process.",
+        "image": null,
+        "isCorrect": false
+      }
+    ],
+    "isMultipleChoice": false
+  },
+  {
+    "id": 402,
+    "questionText": "A developer is using an AWS Lambda function to generate avatars for profile pictures that are uploaded to an Amazon S3 bucket. The Lambda function is automatically",
+    "questionImage": null,
+    "options": [
+      {
+        "text": "Set the image resize Lambda function as a destination of the avatar generator Lambda function for the events that fail processing.",
+        "image": null,
+        "isCorrect": true
+      },
+      {
+        "text": "Create an Amazon Simple Queue Service (Amazon SQS) queue. Set the SQS queue as a destination with an on failure condition for the avatar generator Lambda function. Configure the image resize Lambda function to poll from the SQS queue.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Create an AWS Step Functions state machine that invokes the avatar generator Lambda function and uses the image resize Lambda function as a fallback. Create an Amazon EventBridge rule that matches events from the S3 bucket to invoke the state machine.",
+        "image": null,
+        "isCorrect": false
+      },
+      {
+        "text": "Create an Amazon Simple Notification Service (Amazon SNS) topic. Set the SNS topic as a destination with an on failure condition for the avatar generator Lambda function. Subscribe the image resize Lambda function to the SNS topic.",
         "image": null,
         "isCorrect": false
       }
