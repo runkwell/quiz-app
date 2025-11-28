@@ -246,26 +246,30 @@ Answer D wrong because not 1.
 link ref: https://docs.aws.amazon.com/streams/latest/dev/amazon-kinesis-using-sdk-java-add-shard.html
 
 22.Explain
-Answer A wrong because Lambda is compute, needs backend.
+Answer A wrong because Lambda is a serverless compute service used to run code. If you use Lambda, you would be required to write and manage the backend application (the logic for receiving data, handling conflicts, and writing to a database), which is what the requirement explicitly seeks to avoid.
+Requires creating a backend application/code.
 
-Answer B wrong because S3 storage, no sync logic.
+Answer B wrong because S3 is object storage for files (like images, videos, documents). While it can store user files, it does not provide a built-in mechanism for cross-device synchronization, conflict resolution, or offline data management for small, frequently changing user data like game progress or settings.
+Not a dedicated synchronization service; requires custom logic.
 
-Answer C wrong because DynamoDB needs backend app.
+Answer C wrong because DynamoDB is a NoSQL database. While it could store the synchronized data, it does not include the client-side libraries necessary to handle offline storage, push updates, or manage conflict resolution across devices automatically. You would still have to create a backend application (e.g., using Lambda/API Gateway) to manage the connection and synchronization logic between the mobile app and the database.
+Requires creating a backend application for sync logic.
 
-Answer D correct because Cognito Sync handles device sync without backend.
+Answer D correct because Amazon Cognito Sync (part of the Cognito Identity Pools) is specifically designed to synchronize application-related user data (like game state or user preferences) across mobile devices (iOS and Android). It stores data in the AWS Cloud and provides client libraries that automatically handle local caching, offline data storage, and synchronization when the device is online, all without requiring the developer to write and manage a custom backend application (Lambda, API Gateway, etc.).
+This is the dedicated, managed, serverless service for cross-device data synchronization, directly matching the requirement.
 
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-sync.html
 
 23.Explain
-Answer A correct The standard and simplest method is to **package the application code into a `.zip` file**, upload this source bundle directly via the Elastic Beanstalk console, and then select the option to deploy it to the environment. The console handles the creation of the new application version behind the scenes.
+Answer A correct The standard and simplest method is to <b>package the application code into a `.zip` file</b>, upload this source bundle directly via the Elastic Beanstalk console, and then select the option to deploy it to the environment. The console handles the creation of the new application version behind the scenes.
 
-Answer B wrong Elastic Beanstalk supports `.zip` and `.war` files, but **not typically `.tar` files** as a standard source bundle format for direct upload/deployment. Also, creating the version via the console and updating the environment via CLI mixes methods unnecessarily.
+Answer B wrong Elastic Beanstalk supports `.zip` and `.war` files, but <b>not typically `.tar` files</b> as a standard source bundle format for direct upload/deployment. Also, creating the version via the console and updating the environment via CLI mixes methods unnecessarily.
 
-Answer C wrong Elastic Beanstalk supports `.zip` or `.war` files for most environments, **not `.tar` files**.
+Answer C wrong Elastic Beanstalk supports `.zip` or `.war` files for most environments, <b>not `.tar` files</b>.
 
-Answer D correct This represents the standard automated/CLI workflow. The developer **packages the code into a `.zip` file**, then uses the **AWS CLI** (or EB CLI) commands to first **create a new application version** referencing the S3 location of the `.zip` file, and then uses the CLI to **update the environment** to use this new version. This is the common practice for CI/CD pipelines.
+Answer D correct This represents the standard automated/CLI workflow. The developer <b>packages the code into a `.zip` file</b>, then uses the <b>AWS CLI</b> (or EB CLI) commands to first <b>create a new application version<b> referencing the S3 location of the `.zip` file, and then uses the CLI to <b>update the environment<b> to use this new version. This is the common practice for CI/CD pipelines.
 
-Answer C wrong You only need to **update** the environment with a new version; **rebuilding** the environment is an operation used to terminate and recreate all resources, which is generally overkill and time-consuming for a simple code change. Also, `.zip` is the correct package format.
+Answer C wrong You only need to <b>update</b> the environment with a new version; <b>rebuilding</b> the environment is an operation used to terminate and recreate all resources, which is generally overkill and time-consuming for a simple code change. Also, `.zip` is the correct package format.
 
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-sourcebundle.html
 
@@ -519,12 +523,12 @@ Answer D correct because PutMetricData is the native API for custom metrics. Lau
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
 
 46.Explain
-Answer A wrong While Amazon S3 is used, the standard **Amazon SQS CLI** (or standard SDKs) does not automatically handle the logic for sending and retrieving large payloads stored in S3.
+Answer A wrong While Amazon S3 is used, the standard <b>Amazon SQS CLI<b> (or standard SDKs) does not automatically handle the logic for sending and retrieving large payloads stored in S3.
 
-Answer B correct because Extended Library S3 >256KB. The **Amazon SQS Extended Client Library for Java** (or similar pattern in other languages) is specifically designed to handle large SQS messages by:
-    1. **Sending:** Automatically uploading the message payload (1GB) to **Amazon S3**.
-    2. **Queuing:** Sending a small SQS message that contains a pointer (reference) to the S3 object.
-    3. **Consuming:** When the consumer receives the small SQS message, the library automatically downloads the large payload from S3.
+Answer B correct because Extended Library S3 >256KB. The <b>Amazon SQS Extended Client Library for Java<b> (or similar pattern in other languages) is specifically designed to handle large SQS messages by:
+    1. <b>Sending:<b> Automatically uploading the message payload (1GB) to <b>Amazon S3<b>.
+    2. <b>Queuing:<b> Sending a small SQS message that contains a pointer (reference) to the S3 object.
+    3. <b>Consuming:<b> When the consumer receives the small SQS message, the library automatically downloads the large payload from S3.
     This pattern allows SQS to manage the message delivery while leveraging S3 for high-capacity storage.
 
 Answer C wrong Amazon EBS (Elastic Block Store) is block storage attached to an EC2 instance; it is not suitable for storing transient large payloads referenced by a serverless queue.
@@ -604,13 +608,19 @@ Fix: Increase memory to ≥1GB (e.g., 1536MB) to reduce runtime <900s.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html
 
 53.Explain
-Answer A wrong because SSL transit.
+Answer A wrong because SSL/TLS encrypts data in transit (between the client and Kinesis service), which is important but does not protect the data while it is stored in the Kinesis stream (data at rest).
 
-Answer B wrong because KCL consumer no encrypt.
+Answer B wrong because The Kinesis Client Library (KCL) is used by consumer applications to simplify reading and processing data from shards. It is a client-side library and does not control the server-side encryption of data at rest within the Kinesis service.
 
-Answer C wrong because Lambda after rest.
+Answer C wrong because The data is already "at rest" in the stream as soon as it's written. A Lambda function can only process data after it's been retrieved from the stream. This would require the developer to implement client-side encryption before writing the data, which is less efficient than using the native SSE feature, or it attempts an impossible operation (encrypting data already stored by the service).
 
-Answer D correct because server-side Kinesis at rest.
+Answer D correct because The question asks specifically about encryption at rest for data stored inside Amazon Kinesis Streams.
+Kinesis supports this directly through server-side encryption (SSE) using AWS KMS-managed keys.
+When SSE is enabled:
+- Data records are encrypted before being written to storage in the stream.
+- Encrypted data remains protected for the full retention period (up to 7 days or extended retention).
+- Decryption is handled transparently when consumers read the records.
+- This is the most secure, simplest, and lowest-maintenance option, requiring no application changes.
 
 link ref: https://docs.aws.amazon.com/streams/latest/dev/server-side-encryption.html
 
@@ -814,13 +824,19 @@ Answer D correct because TTL Number auto-delete cost-free.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-how-to.html
 
 69.Explain
-Answer A wrong because support last.
+Answer A wrong because Not the first recommended action. Retry with exponential backoff should be implemented before requesting a quota increase.
 
-Answer B wrong because CLI no throttling.
+Answer B wrong because Does not fix throttling caused by an application making too many API calls programmatically.
 
-Answer C wrong because analyze no fix.
+Answer C wrong because Removing the API call does not solve throttling — the application likely needs the data.
 
-Answer D correct because backoff standard.
+Answer D correct
+The developer receives intermittent HTTP 400 – ThrottlingException errors when calling the CloudWatch API.
+This means the application is exceeding the allowed API request rate.
+
+The AWS best practice for throttling errors is:
+🔁 Retry the API request using exponential backoff (and optionally jitter)
+Exponential backoff helps prevent repeatedly hammering the API by increasing wait time between retries.
 
 link ref: https://docs.aws.amazon.com/general/latest/gr/api-retries.html
 
@@ -836,13 +852,13 @@ Answer D correct because Streams multiple consumers sharded cost.
 link ref: https://aws.amazon.com/kinesis/data-streams/
 
 71.Explain
-Answer A correct The **`appspec.yml`** file is the configuration file used by **AWS CodeDeploy** to manage a deployment. It must be placed in the **root** of the application source code bundle (ZIP, JAR, or folder) that is registered as the deployment revision. CodeDeploy agent expects to find this file in the root when the deployment bundle is downloaded.
+Answer A correct The <b>`appspec.yml`<b> file is the configuration file used by <b>AWS CodeDeploy<b> to manage a deployment. It must be placed in the <b>root<b> of the application source code bundle (ZIP, JAR, or folder) that is registered as the deployment revision. CodeDeploy agent expects to find this file in the root when the deployment bundle is downloaded.
 
 Answer B wrong because bin binaries. Placing it in a sub-folder like `bin` will prevent the CodeDeploy agent from finding and using the deployment configuration.
 
 Answer C wrong because S3 no structure. The source code bundle containing the `appspec.yml` file is uploaded to an S3 bucket or GitHub/CodeCommit, but the file itself must be inside the application source structure.
 
-Answer D wrong because config separate. While it may be logically grouped with config files, CodeDeploy requires it to be at the **root** of the deployment bundle structure, not just any folder.
+Answer D wrong because config separate. While it may be logically grouped with config files, CodeDeploy requires it to be at the <b>root<b> of the deployment bundle structure, not just any folder.
 
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html
 
@@ -1250,12 +1266,16 @@ link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/developer-au
 
 108.Explain
 Answer A wrong because get-template/execute-change-set is for existing stacks, not launching new templatized serverless apps.
+Missing initial deployment and packaging steps. get-template retrieves an existing template. execute-change-set applies a previously created change set. This sequence is for inspecting and then applying changes to an existing stack, not for the initial deployment of a new serverless application.
 
-Answer B wrong because validate/create-change-set prepares but doesn't deploy/package serverless specifics.
+Answer B wrong because validate/create-change-set prepares but doesn't deploy/package serverless specifics. validate-template only checks the syntax of the template. create-change-set generates a plan of changes without applying them. This is part of a non-destructive update workflow, but it skips the critical packaging step needed for serverless artifacts (like Lambda code) and the final deployment step.
 
-Answer C correct because `package` bundles the template/artifacts to S3, then `deploy` creates the CloudFormation stack for serverless resources.
+Answer C correct 
+This uses the AWS Serverless Application Model (SAM) CLI commands, which are extensions of the AWS CLI specifically designed for serverless applications.
+AWS cloudformation package prepares the SAM template by zipping Lambda code, processing local files (like code or dependencies), and uploading them to an Amazon S3 bucket. aws cloudformation deploy then takes the packaged template (now pointing to the S3 artifacts) and creates or updates the underlying CloudFormation stack to launch the serverless application.
 
-Answer D wrong because create/update-stack assumes template is already packaged; skips bundling step.
+Answer D wrong because create/update-stack assumes template is already packaged; skips bundling step. 
+Create-stack is the classic CloudFormation command for launching a stack. However, it cannot automatically upload artifacts (like Lambda code) to S3, which is required for a templatized serverless application. It is functionally replaced and optimized for serverless deployments by the deploy command after packaging.
 
 link ref: https://docs.aws.amazon.com/cli/latest/reference/cloudformation/package.html
 
@@ -1578,13 +1598,17 @@ Answer D wrong because Even with true, if access is given to the instance profil
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html
 
 136.Explain
-Answer A wrong because CloudWatch custom no trace.
+Answer A wrong because CloudWatch metrics measure aggregate statistics (average duration, error count) and are not designed for granular, per-request timing of internal code sections. While you could technically manually calculate elapsed time and publish it as a custom metric, this is labor-intensive and only provides a single aggregated number, not the detailed trace timeline required to isolate an internal bottleneck.
+- Metrics provide overall health, not deep, per-request performance tracing into code segments.
 
-Answer B wrong because X-Ray trace CloudWatch no.
+Answer B wrong because This confuses the services. The trace data (segments, subsegments, and detailed timing) is stored in and analyzed by the AWS X-Ray service. CloudWatch is for metrics and logs. The detailed timeline needed for bottleneck analysis is not available in the CloudWatch console.
+- You trace with X-Ray but analyze in the X-Ray console, not CloudWatch.
 
-Answer C correct because X-Ray trace/analyze.
+Answer C correct because This approach leverages Distributed Tracing. The X-Ray SDK (for Java) allows the developer to add subsegments around specific sections of the code, external service calls (like DynamoDB or S3), or HTTP requests. The X-Ray console provides a Service Map and detailed Trace Timelines that visually show the time spent in each segment and subsegment, pinpointing the exact bottleneck (e.g., a slow database query or an inefficient calculation).
+- X-Ray is specifically designed to analyze latency and isolate bottlenecks within distributed and microservices architectures like Lambda.
 
-Answer D wrong because CloudWatch timestamps X-Ray no.
+Answer D wrong because This also confuses the services. X-Ray can only analyze data that is provided via the X-Ray SDK/API (trace data). It cannot magically interpret raw timestamps written to the CloudWatch API.
+- X-Ray cannot analyze raw CloudWatch metrics.
 
 link ref: https://aws.amazon.com/xray/
 
@@ -1688,13 +1712,18 @@ Answer D wrong because no LB_LIBRARY_PATH.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
 
 146.Explain
-Answer A correct because identity pools temp creds from JWT.
+Answer A corrected
+A Cognito user pool handles authentication (sign-up / sign-in).
+But to call AWS services like DynamoDB from a front-end app, you must obtain temporary AWS credentials — never expose access or secret keys in the browser.
+To do that securely, you use a Cognito Identity Pool (a.k.a. Federated Identities).
+It exchanges the user pool JWT for temporary IAM credentials via STS.
+These temporary credentials are then used by the AWS SDK for JavaScript to call DynamoDB securely.
 
-Answer B wrong because EC2 role not for web.
+Answer B wrong because The app is a front-end web application, not backend — running in EC2 is unnecessary and would still risk exposing keys if front-end calls are made.
 
-Answer C wrong because hardcore/S3 insecure.
+Answer C wrong because Hardcoding keys is never secure, encryption of S3 objects does not protect exposed keys in code.
 
-Answer D wrong because JWT not direct DynamoDB.
+Answer D wrong because User pool tokens cannot directly authorize DynamoDB — AWS services require IAM credentials, not JWTs.
 
 link ref: https://aws.amazon.com/cognito/
 
@@ -1743,13 +1772,20 @@ Answer D wrong because Auto Scaling throughput.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
 
 151.Explain
-Answer A wrong because alarm not trigger.
+Answer A wrong because CloudWatch alarms are designed to react to metrics breaching a threshold (e.g., the number of objects over time). It is not a direct, real-time trigger for a single object upload and would introduce unnecessary latency and complexity compared to a direct S3 event.
+Higher Latency, Higher Cost (CloudWatch alarm fees).
 
-Answer B correct because S3 event direct low cost.
+Answer B correct This solution leverages a serverless, event-driven architecture, which is the most cost-effective and low-latency approach for this specific scenario.
+You pay only when the function runs, so cost is extremely low when data arrives infrequently.
+Lambda starts running within milliseconds of the S3 upload, so latency is very low.
+AWS handles all scaling and server maintenance — no infrastructure to manage.
+By configuring an S3 event notification, S3 automatically triggers the Lambda function as soon as a new object is uploaded. There is no need for polling, scheduling, or intermediate services.
 
-Answer C wrong because scheduled not event.
+Answer C wrong because A scheduled event (like a cron job) would run periodically (e.g., every 5 minutes) regardless of whether data was delivered. This is a polling mechanism and would be delayed if the data arrived just after the schedule ran, and it runs unnecessarily when no data is present.
+Higher Latency (due to waiting for the next schedule), Higher Cost (paying for unnecessary Lambda executions 24/7).
 
-Answer D wrong because EC2 poll costly.
+Answer D wrong because EC2 is not serverless. You pay for the EC2 instance 24/7 whether it's processing data or not (high cost). The polling mechanism itself is inherently inefficient and introduces latency (you must wait for the next check interval).
+Highest Cost (24/7 compute), Higher Latency (due to polling interval).
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
 
@@ -2301,13 +2337,14 @@ Answer D wrong because CloudTrail logs API calls, not network traffic.
 link ref: https://docs.aws.amazon.com/v Pluto/latest/userguide/flow-logs.html
 
 200.Explain
-Answer A wrong because no s3:EncryptionConfiguration action.
+Answer A wrong because The s3:EncryptionConfiguration action is used for managing the encryption settings on the S3 bucket itself (i.e., changing the default encryption). It is not required for a user to simply upload an object under those existing rules.
 
-Answer B wrong because bucket policy not required if IAM allows PutObject.
+Answer B wrong because The prompt states the user already has s3:putObject permission (likely via the IAM user policy). If the S3 bucket policy were denying the upload, the user wouldn't need to add permission, but check for an explicit deny. The error here points to a missing dependency, not an S3 access issue.
 
 Answer C correct because SSE-KMS requires kms:GenerateDataKey to create data key for encryption.
+Since the IAM user received an Access Denied error despite having s3:PutObject permission, the denial is almost certainly coming from the KMS key policy or the IAM user policy lacking the necessary kms:GenerateDataKey permission. Updating the IAM user policy to include this action allows S3 to successfully encrypt the data using the KMS key, resolving the issue.
 
-Answer D wrong because ACLs don’t affect KMS permissions.
+Answer D wrong because Access Control Lists (ACLs) are a legacy mechanism that only controls bucket/object ownership and specific read/write permissions. They do not control access to the KMS key, which is the source of the access denied error in an SSE-KMS scenario.
 
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/iam-policies.html
 
@@ -2358,16 +2395,16 @@ Answer E correct because S3 stores static files durably/scalably; pair with Clou
 link ref: https://aws.amazon.com/cloudfront/
 
 205.Explain
-Answer A wrong because Generating a **presigned URL when the picture is uploaded** means the URL will eventually **expire** (by default, max 7 days, or less depending on the generating credentials). This is **not a viable long-term solution** for repeatedly displaying the picture every time the employee logs in over months or years.
+Answer A wrong because Generating a <b>presigned URL when the picture is uploaded<b> means the URL will eventually <b>expire<b> (by default, max 7 days, or less depending on the generating credentials). This is <b>not a viable long-term solution<b> for repeatedly displaying the picture every time the employee logs in over months or years.
 
-Answer B wrong because An **Amazon S3 VPC endpoint** allows **private networking** (i.e., EC2 instances, Lambda functions) access to S3 but does **not** handle authentication or authorization for individual users accessing specific private objects from a web browser (outside the VPC). The browser (client) still needs authenticated access to the private S3 object. Additional proxying (e.g., via API Gateway) is needed, adding complexity without direct viability.
+Answer B wrong because An <b>Amazon S3 VPC endpoint<b> allows <b>private networking<b> (i.e., EC2 instances, Lambda functions) access to S3 but does <b>not<b> handle authentication or authorization for individual users accessing specific private objects from a web browser (outside the VPC). The browser (client) still needs authenticated access to the private S3 object. Additional proxying (e.g., via API Gateway) is needed, adding complexity without direct viability.
 
-Answer C wrong because base64 bloats data, inefficient for images. **Base64 encoding** and saving the string in a database is extremely inefficient and costly, especially since there is **no size limit** for the pictures. Standard relational databases (like RDS) and NoSQL databases (like DynamoDB) are poorly suited for storing large binary objects (BLOBs) and have stringent size limits that would be quickly exceeded.
+Answer C wrong because base64 bloats data, inefficient for images. <b>Base64 encoding<b> and saving the string in a database is extremely inefficient and costly, especially since there is <b>no size limit<b> for the pictures. Standard relational databases (like RDS) and NoSQL databases (like DynamoDB) are poorly suited for storing large binary objects (BLOBs) and have stringent size limits that would be quickly exceeded.
 
 Answer D correct This is the standard best practice for providing secure, temporary access to private S3 content:
-    1. **S3 Key Storage:** Save the object's **S3 key** (path) in a database (like DynamoDB or RDS). This is highly efficient.
-    2. **Just-in-Time Access:** When the employee logs in, the application's backend retrieves the key and securely **generates a new presigned URL** with a short expiration time (e.g., 5 minutes) using its **IAM credentials**.
-    3. **Browser Access:** The browser uses the temporary, short-lived presigned URL to securely download the private picture directly from S3. This ensures the picture remains private and secure long-term, and access is always authenticated and temporary.
+    1. <b>S3 Key Storage:<b> Save the object's <b>S3 key<b> (path) in a database (like DynamoDB or RDS). This is highly efficient.
+    2. <b>Just-in-Time Access:<b> When the employee logs in, the application's backend retrieves the key and securely <b>generates a new presigned URL<b> with a short expiration time (e.g., 5 minutes) using its <b>IAM credentials<b>.
+    3. <b>Browser Access:<b> The browser uses the temporary, short-lived presigned URL to securely download the private picture directly from S3. This ensures the picture remains private and secure long-term, and access is always authenticated and temporary.
 Store image key in DB → generate presigned URL at login → send to frontend → browser displays image securely.
 
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/vpc-endpoints.html
@@ -2395,7 +2432,7 @@ Answer D wrong because Lambda routing adds latency/complexity.
 link ref: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToInstance.html
 
 208.Explain
-Answer A correct **Target tracking scaling policy.** This is the most efficient and scalable solution. It allows the developer to set a target for the average SQS queue depth per task (e.g., 5 messages per task). ECS will automatically calculate the exact number of tasks required to maintain that target, **dynamically scaling the worker fleet** up or down based on demand, which improves performance and keeps costs low. 
+Answer A correct <b>Target tracking scaling policy.<b> This is the most efficient and scalable solution. It allows the developer to set a target for the average SQS queue depth per task (e.g., 5 messages per task). ECS will automatically calculate the exact number of tasks required to maintain that target, <b>dynamically scaling the worker fleet<b> up or down based on demand, which improves performance and keeps costs low. 
 
 Answer B wrong because Swarm is Docker orchestration, not AWS-native.
 
@@ -2408,11 +2445,11 @@ link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-au
 209.Explain
 Answer A wrong because IAM is for AWS access, not social/app login.
 
-Answer B wrong because **Amazon Cognito Identity Pools (Federated Identities)** are used to exchange credentials (from a User Pool, social provider, etc.) for **temporary AWS credentials**. They manage authorization (what resources the user can access) but **do not** handle the registration, storage, or local authentication of users.
+Answer B wrong because <b>Amazon Cognito Identity Pools (Federated Identities)<b> are used to exchange credentials (from a User Pool, social provider, etc.) for <b>temporary AWS credentials<b>. They manage authorization (what resources the user can access) but <b>do not<b> handle the registration, storage, or local authentication of users.
 
-Answer C correct because **Amazon Cognito User Pools** is the service designed for customer-facing application identity. It acts as a user directory that can:
-    1. Handle **New User Registration** (local accounts) and manage their profile data.
-    2. Support **Federation** (Social Login) by integrating with external Identity Providers (like Facebook, Google, Amazon, or SAML/OIDC) to allow users to sign in using their social media credentials.
+Answer C correct because <b>Amazon Cognito User Pools<b> is the service designed for customer-facing application identity. It acts as a user directory that can:
+    1. Handle <b>New User Registration<b> (local accounts) and manage their profile data.
+    2. Support <b>Federation<b> (Social Login) by integrating with external Identity Providers (like Facebook, Google, Amazon, or SAML/OIDC) to allow users to sign in using their social media credentials.
 
 Answer D wrong because Directory Service is enterprise AD, not social/mobile.
 
@@ -2441,7 +2478,7 @@ Answer D wrong because DecodeAuthorizationMessage decodes errors, no MFA.
 link ref: https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
 
 212.Explain
-The error **`ThrottlingException`** from **AWSKMS** means the application is exceeding the transactions per second (TPS) limit for KMS API calls in that region (primarily `Decrypt` calls when reading SSE-KMS objects).
+The error <b>`ThrottlingException`<b> from <b>AWSKMS<b> means the application is exceeding the transactions per second (TPS) limit for KMS API calls in that region (primarily `Decrypt` calls when reading SSE-KMS objects).
 
 Answer A correct because KMS throttling (e.g., 10k req/s) requires support increase for high reads.
 
@@ -2449,7 +2486,7 @@ Answer B correct because exponential backoff retries throttled requests without 
 
 Answer C wrong because S3 limits separate; error is KMS.
 
-Answer D wrong because The error is explicitly from **AWSKMS**, not S3. Requesting an S3 rate limit increase would not solve the KMS throttling problem.
+Answer D wrong because The error is explicitly from <b>AWSKMS<b>, not S3. Requesting an S3 rate limit increase would not solve the KMS throttling problem.
 
 Answer E wrong because The size of the CMK (e.g., 256-bit) is irrelevant to the API call transaction limit (TPS).
 
@@ -2471,7 +2508,7 @@ Answer A wrong Encrypting data before sending it (Client-Side Encryption) requir
 
 Answer B wrong Importing a custom key into AWS KMS allows you to manage the key material, but you cannot enable automatic rotation for imported key material. You would have to manually rotate the key material annually.
 
-Answer C correct **Using AWS KMS (Server-Side Encryption with KMS keys - SSE-KMS)** and enabling the **automatic key rotation feature** is the easiest way. AWS KMS can be configured to automatically rotate the backing key (the cryptographic material) once a year, transparently and without any change to the S3 bucket or application code, while still encrypting the data at rest. 
+Answer C correct <b>Using AWS KMS (Server-Side Encryption with KMS keys - SSE-KMS)<b> and enabling the <b>automatic key rotation feature<b> is the easiest way. AWS KMS can be configured to automatically rotate the backing key (the cryptographic material) once a year, transparently and without any change to the S3 bucket or application code, while still encrypting the data at rest. 
 
 Answer D wrong Exporting a key from KMS (a process called CMK export) is not standard practice for SSE-KMS and would lead to manual key management, negating the "easiest way" requirement.
 
@@ -2522,13 +2559,18 @@ Answer D wrong because no GetItemRange.
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchGetItem.html
 
 219.Explain
-Answer A wrong because ENI private no.
+Answer A wrong because While having two interfaces (one public, one private) is a valid design for some advanced routing or firewall scenarios, a basic NAT instance only requires one ENI in the public subnet to receive traffic from the private subnet via the route table and forward it to the Internet Gateway. The issue is with the packet forwarding rule, not the number of interfaces.
 
-Answer B wrong because ENI public no.
+Answer B wrong because Instances in a private subnet should not have direct access to the public subnet via a second ENI. This defeats the purpose of the private subnet and doesn't resolve the core issue of the NAT device dropping forwarded packets.
 
-Answer C correct because disable check NAT.
+Answer C correct 
+1. Default Behavior: By default, every EC2 instance performs a Source/Destination Check. This means the instance verifies that it is either the source or the destination of any traffic it sends or receives. If the traffic's source or destination IP address does not match the instance's own IP, the traffic is dropped.
 
-Answer D wrong because EIP private no.
+2. NAT Function: A NAT device's job is to receive traffic from a private instance (Source IP: Private Instance), translate the private IP to its own public IP, and then send the traffic to the Internet (Source IP: NAT Instance). When the NAT instance receives the traffic from the private subnet, the destination is the internet, and the source is the private instance. When the NAT instance sends the traffic out, the source is its own public IP.
+
+3. The Problem: The NAT instance must accept traffic where the destination is not itself (it's the internet), and it must send traffic where the source is not its original private address. Because the NAT device is forwarding traffic on behalf of other instances, its IP address appears as the source/destination of traffic that it did not originate. To allow this packet forwarding behavior, the Source/Destination Check must be explicitly disabled on the NAT instance.
+
+Answer D wrong because The private instance needs outbound internet access, not its own public IP address. Giving the private instance its own EIP would make it a public instance, negating the need for the NAT device. The NAT device (in the public subnet) must have the EIP.
 
 link ref: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html
 
@@ -2549,8 +2591,8 @@ Answer A wrong because 100 region. The limit is global per account.
 Answer B wrong because limit.
 
 Answer C correct because The limit for the number of Amazon S3 buckets that can be created per AWS account is determined by two values:
-1.  **Default Soft Limit:** The starting limit is **100 buckets** per AWS account.
-2.  **Maximum Achievable Limit:** This limit can be increased by submitting a service limit increase request to AWS Support, up to a maximum of **1,000 buckets** per AWS account.
+1.  <b>Default Soft Limit:<b> The starting limit is <b>100 buckets<b> per AWS account.
+2.  <b>Maximum Achievable Limit:<b> This limit can be increased by submitting a service limit increase request to AWS Support, up to a maximum of <b>1,000 buckets<b> per AWS account.
 Since the options include 1,000, it represents the maximum capacity available to a single account.
 
 Answer D wrong because 500 no.
@@ -2930,16 +2972,22 @@ link ref: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.
 
 250.Explain
 Answer A wrong because S3 costs.
+- You pay for storage (GB-per-month), requests (PUT, GET, LIST), and data transfer out. The Free Tier includes a limited amount of storage and requests.
 
 Answer B wrong because EC2 costs.
+- You pay for instance hours (compute time), storage (EBS volumes), and data transfer. The Free Tier typically includes a limited number of hours on specific instance types (e.g., t2.micro or t3.micro).
 
 Answer C correct because Auto Scaling free.
+- No additional charge for the service. You pay only for the AWS resources (like EC2 instances or CloudWatch monitoring) that Auto Scaling launches and manages.
 
 Answer D wrong because ELB costs.
+- You pay for each Load Balancer hour and the number of Load Balancer Capacity Units (LCUs) consumed, based on traffic and resource utilization. The Free Tier includes a limited number of hours and LCUs.
 
 Answer E correct because CloudFormation free.
+- No additional charge for using CloudFormation with core AWS resources (in the AWS::* namespace). You pay only for the resources it provisions (like EC2, S3, RDS), exactly as if you launched them manually. Note: Charges can apply for third-party resource providers or custom hooks.
 
 Answer F wrong because SWF costs.
+- You pay based on the number of workflow executions and the number of tasks performed during those executions.
 
 link ref: https://aws.amazon.com/pricing/
 
@@ -3537,24 +3585,28 @@ Answer E wrong because batch increases latency.
 link ref: https://aws.amazon.com/elasticache/memcached/
 
 300.Explain
-Answer A wrong because identity pools for auth.
+Answer A wrong because It enables the use of Cognito Sync but is the authorization layer, not the synchronization mechanism itself. Using the Identity Pool alone does not solve the data push requirement.
 
-Answer B wrong because user pool for auth.
+Answer B wrong because It does not offer a built-in mechanism to automatically push updates to all devices after initial sign-in for frequently changing data. While you can update attributes, the push sync feature belongs to Cognito Sync.
 
-Answer C correct because Cognito Sync for cross-device data.
+Answer C correct Amazon Cognito Sync (part of the Identity Pools feature) is a managed AWS service designed specifically for this use case.
+It allows you to store and synchronize application-related user data (like user preferences, game state, or small user-defined profile attributes) as key-value pairs in datasets.
+It provides client libraries that automatically handle local data caching, offline data storage, and synchronization when the device is online.
+Crucially, you can enable Push Synchronization (Push Sync), which uses Amazon SNS to send a silent push notification to all devices associated with the identity whenever the data changes in the cloud, prompting the devices to synchronize the update immediately.
+This is entirely serverless and requires no custom backend (Lambda, API Gateway, etc.) for the synchronization logic.
 
-Answer D wrong because events for triggers.
+Answer D wrong because This requires you to write and manage a custom backend Lambda function to handle the event and potentially notify other services, which contradicts the requirement to "not want to manage a back end."
 
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-sync.html
 
 301.Explain
-Answer A wrong **`createDeployment`** is used to apply changes to the API configuration (like resources, methods, integrations), not to activate API keys.
+Answer A wrong <b>`createDeployment`<b> is used to apply changes to the API configuration (like resources, methods, integrations), not to activate API keys.
 
-Answer B wrong **`updateAuthorizer`** manages authentication logic (e.g., Lambda Authorizers, Cognito User Pools), but API key validation is separate from authorization.
+Answer B wrong <b>`updateAuthorizer`<b> manages authentication logic (e.g., Lambda Authorizers, Cognito User Pools), but API key validation is separate from authorization.
 
-Answer C wrong **`importApiKeys`** is used for bulk importing keys, not for activating a single key in a Usage Plan.
+Answer C wrong <b>`importApiKeys`<b> is used for bulk importing keys, not for activating a single key in a Usage Plan.
 
-Answer D correct The **`createUsagePlanKey`** method is necessary to link the new API key to the active **Usage Plan**. Once linked, the key is recognized by the API stage and allowed to access the service, resolving the `403 Forbidden` error.
+Answer D correct The <b>`createUsagePlanKey`<b> method is necessary to link the new API key to the active <b>Usage Plan<b>. Once linked, the key is recognized by the API stage and allowed to access the service, resolving the `403 Forbidden` error.
 
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html
 
@@ -3665,17 +3717,17 @@ Answer D correct because user pools handle sign-up and reset.
 link ref: https://aws.amazon.com/cognito/
 
 310.Explain
-Answer A wrong because **AWS CodeCommit** is a source control service (Git repository); it stores code but does not manage the deployment workflow.
+Answer A wrong because <b>AWS CodeCommit<b> is a source control service (Git repository); it stores code but does not manage the deployment workflow.
 
-Answer B wrong because **AWS CodeBuild** is a continuous integration service that compiles code and runs tests; it's a *step* in the deployment process but not the orchestration mechanism for sequencing deployments across environments.
+Answer B wrong because <b>AWS CodeBuild<b> is a continuous integration service that compiles code and runs tests; it's a *step* in the deployment process but not the orchestration mechanism for sequencing deployments across environments.
 
-Answer C wrong because **AWS Data Pipeline** is used for automating the movement and transformation of data, not for code deployment and application lifecycle management. This choice is conceptually wrong for this scenario.
+Answer C wrong because <b>AWS Data Pipeline<b> is used for automating the movement and transformation of data, not for code deployment and application lifecycle management. This choice is conceptually wrong for this scenario.
 
-Answer D correct because **AWS CodeDeploy** is a fully managed deployment service. To meet the requirement of a phased, sequential rollout:
-    1. A developer creates a single **CodeDeploy Application**.
-    2. Within that application, they define three separate **Deployment Groups** (e.g., Development, QA, Production), each pointing to the instances/environments for that stage.
-    3. The overall workflow (the sequence of deploying to Development -> QA -> Production) is then managed by an orchestration tool like **AWS CodePipeline**, which integrates CodeDeploy. However, among the choices provided, **CodeDeploy** is the service that contains the necessary organizational structure (Deployment Groups) to define these distinct targets.
-    *Self-Correction/Clarification*: While **AWS CodePipeline** is the ultimate orchestrator for the entire CI/CD sequence, among the choices given, **CodeDeploy** provides the direct mechanism to target the different environments (Deployment Groups) in the sequence specified by the CI/CD pipeline.
+Answer D correct because <b>AWS CodeDeploy<b> is a fully managed deployment service. To meet the requirement of a phased, sequential rollout:
+    1. A developer creates a single <b>CodeDeploy Application<b>.
+    2. Within that application, they define three separate <b>Deployment Groups<b> (e.g., Development, QA, Production), each pointing to the instances/environments for that stage.
+    3. The overall workflow (the sequence of deploying to Development -> QA -> Production) is then managed by an orchestration tool like <b>AWS CodePipeline<b>, which integrates CodeDeploy. However, among the choices provided, <b>CodeDeploy<b> is the service that contains the necessary organizational structure (Deployment Groups) to define these distinct targets.
+    *Self-Correction/Clarification*: While <b>AWS CodePipeline<b> is the ultimate orchestrator for the entire CI/CD sequence, among the choices given, <b>CodeDeploy<b> provides the direct mechanism to target the different environments (Deployment Groups) in the sequence specified by the CI/CD pipeline.
 
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-groups.html
 
@@ -3768,13 +3820,13 @@ Rollback Mechanism: Fast (Traffic is instantly redirected).
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html
 
 317.Explain
-Answer A wrong because S3 cache manual.
+Answer A wrong because S3 is a secure, durable object storage service intended for storing files and objects, not for fast, low-latency key-value or in-memory caching typically required for relational database query results.
 
-Answer B wrong because RDS not origin for CloudFront.
+Answer B wrong because CloudFront is a Content Delivery Network (CDN), primarily used to cache and deliver static and dynamic web content (like HTML, images, API responses) globally from edge locations. It is not designed to directly cache database query results from an RDS instance.
 
-Answer C wrong because EC2 local not scalable.
+Answer C wrong because This involves manual setup and management of a caching solution on each application server (e.g., using a library or an in-memory store like local Redis). This is complex, difficult to scale, and introduces data synchronization challenges between multiple EC2 instances, making it far less efficient than a centralized, managed service like ElastiCache.
 
-Answer D correct because ElastiCache fronts RDS for reads.
+Answer D correct ElastiCache (using Redis or Memcached) is an in-memory caching service specifically designed to handle high volumes of read traffic for frequently accessed data, like repeatedly accessed items. It significantly reduces the load on the primary RDS database, is highly performant, and is fully managed by AWS, making it the most efficient and standard solution for this problem.
 
 link ref: https://aws.amazon.com/elasticache/
 
@@ -3803,11 +3855,11 @@ link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html
 320.Explain
 Answer A wrong Associating an IAM role provides authorization to *AWS services*, but it does not provide the *credentials* (username/password) required to connect to a traditional database running on EC2.
 
-Answer B correct **AWS Systems Manager Parameter Store** is a managed service designed for secure configuration and secret management. Using the **SecureString** data type ensures the secret is encrypted using KMS. When the secret is rotated in Parameter Store, the application retrieves the new value via the Parameter Store API. Since the application code only calls the API, there are **no required code changes** when the secret value changes, and the secrets are **never stored plaintext** on the instance or in the code, making this the **SAFEST** approach.
+Answer B correct <b>AWS Systems Manager Parameter Store<b> is a managed service designed for secure configuration and secret management. Using the <b>SecureString<b> data type ensures the secret is encrypted using KMS. When the secret is rotated in Parameter Store, the application retrieves the new value via the Parameter Store API. Since the application code only calls the API, there are <b>no required code changes<b> when the secret value changes, and the secrets are <b>never stored plaintext<b> on the instance or in the code, making this the <b>SAFEST<b> approach.
 
 Answer C wrong Storing secrets in S3 object metadata is not a secure or recommended practice for database credentials and lacks native rotation features.
 
-Answer D wrong Hardcoding secrets is the **least safe** method and requires a code change and full redeployment every time the secret is rotated, violating the requirement.
+Answer D wrong Hardcoding secrets is the <b>least safe<b> method and requires a code change and full redeployment every time the secret is rotated, violating the requirement.
 
 link ref: https://aws.amazon.com/systems-manager/parameter-store/
 
@@ -3838,7 +3890,7 @@ link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html
 323.Explain
 Answer A wrong Deleting and re-uploading the ZIP file to S3 with a different object key would require updating the CloudFormation template/stack, making this approach overly complex. If the developer overwrote the existing ZIP file on S3, Lambda would still be pointing to the previous state unless instructed to update.
 
-Answer B correct When a Lambda function is managed by an **AWS CloudFormation stack**, the stack explicitly defines the source code location using the `Code` property, which includes `S3Bucket`, `S3Key`, and optionally `S3ObjectVersion`. Even if the developer **manually overwrites** the `.ZIP` file in S3, **CloudFormation does not automatically know** that the code has changed. To deploy the new code, the developer must trigger a stack update, typically by updating one of these properties. The simplest way to force CloudFormation to recognize the change (if the `S3Key` hasn't changed) is to update the **`S3ObjectVersion`** property or change the `S3Key` itself (often done automatically via the `aws cloudformation package` or `sam package` commands, but required manually in this scenario). This update tells CloudFormation to trigger the Lambda update process.
+Answer B correct When a Lambda function is managed by an <b>AWS CloudFormation stack<b>, the stack explicitly defines the source code location using the `Code` property, which includes `S3Bucket`, `S3Key`, and optionally `S3ObjectVersion`. Even if the developer <b>manually overwrites<b> the `.ZIP` file in S3, <b>CloudFormation does not automatically know<b> that the code has changed. To deploy the new code, the developer must trigger a stack update, typically by updating one of these properties. The simplest way to force CloudFormation to recognize the change (if the `S3Key` hasn't changed) is to update the <b>`S3ObjectVersion`<b> property or change the `S3Key` itself (often done automatically via the `aws cloudformation package` or `sam package` commands, but required manually in this scenario). This update tells CloudFormation to trigger the Lambda update process.
 
 Answer C wrong The deployment package (`.ZIP` file) is uploaded directly to S3; it does not need to be base64-encoded
 
@@ -3847,17 +3899,17 @@ Answer D wrong The function's execution role already has permissions to *read* t
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
 
 324.Explain
-Answer A correct In Amazon ECS, the most common and robust pattern is to use the **sidecar container model**. This means deploying a separate **Docker image that runs the X-Ray daemon** alongside your application container within the same ECS Task Definition. This container collects trace data and relays it to the X-Ray service. 
+Answer A correct In Amazon ECS, the most common and robust pattern is to use the <b>sidecar container model<b>. This means deploying a separate <b>Docker image that runs the X-Ray daemon<b> alongside your application container within the same ECS Task Definition. This container collects trace data and relays it to the X-Ray service. 
 
-Answer B correct For X-Ray to track calls and services, the application code itself must be modified. This involves **adding instrumentation** (using the **X-Ray SDK**) to record metadata about incoming requests and outgoing calls (to AWS services, external APIs, etc.) and send trace data to the X-Ray daemon.
+Answer B correct For X-Ray to track calls and services, the application code itself must be modified. This involves <b>adding instrumentation<b> (using the <b>X-Ray SDK<b>) to record metadata about incoming requests and outgoing calls (to AWS services, external APIs, etc.) and send trace data to the X-Ray daemon.
 
 Answer C wrong While possible, installing the daemon directly on the underlying EC2 instance is the older, less flexible pattern for ECS; the sidecar container (Option A) is the modern best practice.
 
-Answer D wrong While an EC2 instance role is needed for *classic* EC2-based IAM access, the **Task IAM Role (Option F)** is the correct and more granular method for granting permissions to containers in ECS.
+Answer D wrong While an EC2 instance role is needed for *classic* EC2-based IAM access, the <b>Task IAM Role (Option F)<b> is the correct and more granular method for granting permissions to containers in ECS.
 
 Answer E wrong because register app not needed.
 
-Answer F correct The X-Ray daemon container needs permissions to communicate with the X-Ray service. The daemon runs within the context of the ECS Task, so the **IAM role for tasks** (Task IAM Role) must be configured with the necessary permissions (specifically `xray:PutTraceSegments` and `xray:PutTelemetryRecords`) to allow the daemon to upload trace data to AWS X-Ray.
+Answer F correct The X-Ray daemon container needs permissions to communicate with the X-Ray service. The daemon runs within the context of the ECS Task, so the <b>IAM role for tasks<b> (Task IAM Role) must be configured with the necessary permissions (specifically `xray:PutTraceSegments` and `xray:PutTelemetryRecords`) to allow the daemon to upload trace data to AWS X-Ray.
 
 link ref: https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon-ecs.html
 https://docs.aws.amazon.com/xray/latest/devguide/scorekeep-ecs.html
@@ -3909,11 +3961,11 @@ link ref: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Inv
 329.Explain
 Answer A wrong AWS CloudFormation cannot directly pull code from an AWS CodeCommit repository during stack creation for an `AWS::Lambda::Function` resource. This would require an intermediary like CodePipeline or CodeBuild.
 
-Answer B correct The `AWS::Lambda::Function` resource supports an inline code property, `ZipFile`, where you can **write the function code directly inside the CloudFormation template**. This method is suitable for small, simple functions.
+Answer B correct The `AWS::Lambda::Function` resource supports an inline code property, `ZipFile`, where you can <b>write the function code directly inside the CloudFormation template<b>. This method is suitable for small, simple functions.
 
-Answer C correct This is the standard and most common method for deploying larger Lambda functions. The **deployment package (.ZIP file)** containing the function code and dependencies is **uploaded to an Amazon S3 bucket**. The `AWS::Lambda::Function` resource in the CloudFormation template then references the code location using the **`S3Bucket` and `S3Key`** properties. Tools like AWS SAM or `aws cloudformation package` automate this process.
+Answer C correct This is the standard and most common method for deploying larger Lambda functions. The <b>deployment package (.ZIP file)<b> containing the function code and dependencies is <b>uploaded to an Amazon S3 bucket<b>. The `AWS::Lambda::Function` resource in the CloudFormation template then references the code location using the <b>`S3Bucket` and `S3Key`<b> properties. Tools like AWS SAM or `aws cloudformation package` automate this process.
 
-Answer D wrong You upload the `.ZIP` file to **Amazon S3** (Option C), not directly to AWS CloudFormation. CloudFormation uses S3 as the source repository for deployment artifacts.
+Answer D wrong You upload the `.ZIP` file to <b>Amazon S3<b> (Option C), not directly to AWS CloudFormation. CloudFormation uses S3 as the source repository for deployment artifacts.
 
 Answer E wrong Similar to CodeCommit, CloudFormation cannot directly pull code from an external private Git repository for the Lambda function resource.
 
@@ -3924,7 +3976,7 @@ When deploying an AWS Lambda function, the execution environment needs access to
 
 Answer A wrong because Lambda functions cannot directly reference and load code or libraries hosted externally on Amazon S3 during execution time; the necessary code must be included in the deployment package or a Lambda Layer.
 
-Answer B correct because For custom libraries and dependencies (especially those not available in the standard runtime environment), the developer must **install them locally** (e.g., using `npm install` or `pip install` with a local target directory) and then **bundle the entire folder structure** (including the function code and the library files) into a **$\text{ZIP}$ file** for upload. When the function executes, the runtime environment finds the library within the deployed package.
+Answer B correct because For custom libraries and dependencies (especially those not available in the standard runtime environment), the developer must <b>install them locally<b> (e.g., using `npm install` or `pip install` with a local target directory) and then <b>bundle the entire folder structure<b> (including the function code and the library files) into a <b>$\text{ZIP}$ file<b> for upload. When the function executes, the runtime environment finds the library within the deployed package.
 
 Answer C wrong because Lambda blueprints are starter templates and do not automatically include custom, proprietary, or specific third-party libraries.
 
@@ -4027,16 +4079,16 @@ Answer D correct because Cognito unauth roles for limited access.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/iam-roles.html
 
 339.Explain
-To allow an application on an EC2 instance to read objects encrypted with **SSE-KMS**, the application's identity must be granted permission on both the identity level (IAM) and the resource level (KMS Key Policy).
+To allow an application on an EC2 instance to read objects encrypted with <b>SSE-KMS<b>, the application's identity must be granted permission on both the identity level (IAM) and the resource level (KMS Key Policy).
 
-1.  **IAM Policy (Identity):** The application runs with the permissions defined in the **IAM role** attached to the EC2 instance. This IAM role must have a policy that explicitly grants the actions **`kms:Decrypt`** and **`kms:GenerateDataKey`** on the target KMS key.
-2.  **KMS Key Policy (Resource):** The KMS **Key Policy** must allow the IAM role (or the root account that manages the role) to be granted these permissions. This is the master access control list for the key. Both policies must explicitly allow the action for the request to succeed.
+1.  <b>IAM Policy (Identity):<b> The application runs with the permissions defined in the <b>IAM role<b> attached to the EC2 instance. This IAM role must have a policy that explicitly grants the actions <b>`kms:Decrypt`<b> and <b>`kms:GenerateDataKey`<b> on the target KMS key.
+2.  <b>KMS Key Policy (Resource):<b> The KMS <b>Key Policy<b> must allow the IAM role (or the root account that manages the role) to be granted these permissions. This is the master access control list for the key. Both policies must explicitly allow the action for the request to succeed.
 
-Answer A wrong An **S3 bucket policy** controls access to the S3 data, but it does not grant the EC2 instance's IAM role the permission to use the KMS key, which is the missing cryptographic permission.
+Answer A wrong An <b>S3 bucket policy<b> controls access to the S3 data, but it does not grant the EC2 instance's IAM role the permission to use the KMS key, which is the missing cryptographic permission.
 
-Answer B correct **Grant access to the key in the IAM EC2 role attached to the application's EC2 instances.** This provides the necessary **`kms:Decrypt`** permission at the identity level.
+Answer B correct <b>Grant access to the key in the IAM EC2 role attached to the application's EC2 instances.<b> This provides the necessary <b>`kms:Decrypt`<b> permission at the identity level.
 
-Answer C correct **Write a key policy that enables IAM policies to grant access to the key.** This ensures the KMS key's resource policy permits the role (from Option B) to use the key.
+Answer C correct <b>Write a key policy that enables IAM policies to grant access to the key.<b> This ensures the KMS key's resource policy permits the role (from Option B) to use the key.
 
 Answer D wrong S3 ACLs are for basic object/bucket permissions and cannot be used for KMS authorization.
 
@@ -4056,13 +4108,23 @@ Answer D wrong because delete delay not exist.
 link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-delay-queues.html
 
 341.Explain
-Answer A wrong because S3 direct not for concurrent.
+Answer A wrong because Developers still must upload the full bundle each time → slow uploads. Requires manual S3 management.
 
-Answer B wrong because FTP central, not AWS.
+Answer B wrong because FTP does not integrate with Elastic Beanstalk, adds administrative overhead, and is not secure or scalable.
 
-Answer C correct because CodeCommit with direct deploy minimizes time.
+Answer C correct
+Elastic Beanstalk deployments can be slow when Developers around the world upload large application bundles directly from their laptops because of:
+Limited and varying internet connectivity
+Uploading the full app bundle every time
 
-Answer D wrong because EC2 repo central bottleneck.
+Using AWS CodeCommit solves this with minimal effort:
+Developers push incremental code changes (fast, small uploads)
+Elastic Beanstalk can deploy directly from CodeCommit
+No need to configure or manage external servers
+No need to repeatedly upload full bundles from slow networks
+This results in faster deployments and lower upload times with least admin overhead.
+
+Answer D wrong because Requires server setup + maintenance + security. Upload still depends on internet speed, and introduces single-point-of-failure.
 
 link ref: https://aws.amazon.com/codecommit/
 
@@ -4144,7 +4206,7 @@ Answer D wrong because CloudTrail for API.
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
 
 349.Explain
-Answer A wrong because KPL improves producer performance by batching and retrying, but does **not** increase stream capacity.
+Answer A wrong because KPL improves producer performance by batching and retrying, but does <b>not<b> increase stream capacity.
 
 Answer B wrong because reducing retention frees storage, not ingestion throughput.
 
@@ -4278,24 +4340,47 @@ Answer D wrong because DynamoDB no logs.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html
 
 361.Explain
-Answer A wrong because EBS persistent.
+Answer A wrong because EBS (Elastic Block Store) is a persistent block storage service, not natively attached to Lambda. Using it requires setting up a separate EC2 instance or complex mounting, which is completely overkill and costly for a temporary 100 MB file.
 
-Answer B wrong because EFS shared.
+Answer B wrong because EFS (Elastic File System) is a scalable, network-attached file system. While it can be mounted to Lambda, accessing it requires a network connection (VPC setup), which adds latency, complexity, and separate costs for storage and data transfer.
 
-Answer C correct because /tmp for temp, auto-cleaned.
+Answer C correct 
+AWS Lambda provides ephemeral storage directly inside the execution environment at:  /tmp
+Default size = 512 MB (can be increased up to 10 GB if configured)
+Fastest storage with no cost
+Automatically removed when the execution environment is recycled
+(but best practice is to delete files when finished)
+Since the application needs only 100 MB temporary files and doesn't need them afterward, /tmp is the most efficient and cheapest option.
 
-Answer D wrong because S3 persistent.
+Answer D wrong because S3 (Simple Storage Service) is object storage accessed over the internet or VPC network. Writing the file requires an API network call, which is slower than writing to local /tmp. While lifecycle policies handle deletion, the initial write and network usage make it less efficient than local storage.
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html
 
 362.Explain
-Answer A wrong because CloudFormation templates.
+Answer A wrong because Automates infrastructure provisioning but does not deploy applications directly or manage Tomcat runtime for you.
 
-Answer B correct because Beanstalk deploys Tomcat easily.
+Answer B correct
+The developer wants to:
+✔ Deploy a web application quickly
+✔ Run it on a Tomcat server
+✔ Avoid managing the underlying infrastructure
 
-Answer C wrong because S3 static.
+Elastic Beanstalk is the perfect solution because:
+It supports Tomcat platform out of the box
+You just upload your WAR or ZIP package
 
-Answer D wrong because CodePipeline CI/CD.
+It automatically handles:
+EC2 instances
+Auto Scaling
+Load Balancing
+Patching
+Monitoring
+
+This makes it the fastest and easiest way to deploy a Java/Tomcat application without worrying about servers.
+
+Answer C wrong because Not a compute platform — cannot run a web app or host Tomcat.
+
+Answer D wrong because CI/CD orchestration tool. Requires a compute platform like Elastic Beanstalk or EC2 to deploy to.
 
 link ref: https://aws.amazon.com/elasticbeanstalk/
 
@@ -4379,26 +4464,34 @@ Answer D correct Most Comprehensive Solution. The complete process involves crea
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.db.html
 
 369.Explain
-Answer A correct because change not in master no trigger.
+Answer A correct because The prompt states the pipeline is triggered by changes to the master branch. If the developer committed the change to a feature branch, a development branch, or any branch other than master, the Source stage of CodePipeline will not detect the change, and the entire pipeline will not start running the updates. Therefore, CodeDeploy will not be executed.
 
-Answer B correct because earlier failure stops pipeline.
+Answer B correct because AWS CodePipeline operates sequentially. The stages are typically: Source -> Build -> Test -> Deploy.
+The stages mentioned are CodeBuild (for test and build) and CodeDeploy (for deployment).
+If the CodeBuild stage fails (e.g., unit tests failed, or the build process encountered an error), CodePipeline will immediately stop the execution, and the pipeline will terminate in a Failed state.
+The subsequent stage, CodeDeploy, will never be reached or executed.
 
-Answer C wrong because CodePipeline not cluster.
+Answer C wrong because CodePipeline itself does not run on a cluster of EC2 instances; it's a managed service. CodeDeploy targets EC2 instances, and while an inactive instance might cause the deployment to fail on that specific instance, it wouldn't stop the CodeDeploy stage from running or prevent the update from being deployed to the other active instances. The issue implies the deployment didn't even start.
 
-Answer D wrong because config correct assumed.
+Answer D wrong because The pipeline has been operating successfully for several months with no modifications. This means the configuration was correct and running previously, making an incorrect configuration an unlikely cause for a recent failure.
 
-Answer E wrong because permissions ok assumed.
+Answer E wrong because Since the pipeline has been running successfully for several months, it must have had the necessary permissions from the start to access the source code. A sudden, un-modified permissions issue is highly improbable.
 
 link ref: https://docs.aws.amazon.com/codepipeline/latest/userguide/troubleshooting.html
 
 370.Explain
-Answer A wrong because user pool not for notifications.
+Answer A wrong because User Pools are for user authentication (sign-up, sign-in, tokens), not for cross-device data synchronization and pushing updates. This feature belongs to Cognito Sync (Identity Pools).
 
-Answer B wrong because SyncCallback not exist.
+Answer B wrong because The SyncCallback interface in the Cognito client SDK is used to manage local synchronization events (like merge conflicts or data deletions) and confirm when the local sync operation has finished. It does not handle the initial, silent push notification from the cloud to the device.
 
-Answer C wrong because stream for analysis.
+Answer C wrong because A Cognito Stream is used to stream synchronized data out to Amazon Kinesis (or Kinesis Firehose) for analysis or backup. It is an output mechanism and does not provide the input for pushing notifications back to the devices.
 
-Answer D correct because push sync with role notifies devices.
+Answer D correct because The requirement is to silently notify devices when data changes in the cloud, allowing the devices to pull the updated profile data. This is achieved using Cognito's Push Synchronization feature.
+- Cognito Sync (part of Identity Pools) is the core service used for cross-device data synchronization.
+- Push Synchronization leverages Amazon Simple Notification Service (SNS) behind the scenes.
+  + When an update is written to the Cognito Sync store, the service sends a silent push notification through SNS to all other devices registered to that specific user identity.
+  + This notification is not visible to the user but serves as a wake-up call for the mobile application to initiate a synchronization (sync) request and pull the latest data.
+- IAM Role: The appropriate IAM role is necessary to grant the Cognito service permission to interact with SNS and send the push notifications.
 
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/push-sync.html
 
@@ -4478,17 +4571,17 @@ link ref: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars
 
 376.Explain
 The key requirements are:
-1. **Asynchronous Processing:** The fraud detection takes 10 to 30 minutes, which is too long for a synchronous web request. A queuing system is required.
-2. **High Scalability:** The system must handle **100 orders per minute** peak load.
-3. **Dynamic Scaling:** The fraud detection fleet needs to scale based on the **backlog** (queue depth) to ensure orders don't pile up during peak times, especially since processing time is long (up to 30 minutes).
+1. <b>Asynchronous Processing:<b> The fraud detection takes 10 to 30 minutes, which is too long for a synchronous web request. A queuing system is required.
+2. <b>High Scalability:<b> The system must handle <b>100 orders per minute<b> peak load.
+3. <b>Dynamic Scaling:<b> The fraud detection fleet needs to scale based on the <b>backlog<b> (queue depth) to ensure orders don't pile up during peak times, especially since processing time is long (up to 30 minutes).
 
-Answer A wrong Using a **fixed fleet of 10 EC2 instances** (`min-size=10, max-size=10`) is not scalable. If the processing rate of 10 instances is exceeded, the queue will grow indefinitely, leading to high latency and failure to meet demand.
+Answer A wrong Using a <b>fixed fleet of 10 EC2 instances<b> (`min-size=10, max-size=10`) is not scalable. If the processing rate of 10 instances is exceeded, the queue will grow indefinitely, leading to high latency and failure to meet demand.
 
-Answer B correct **Amazon SQS** provides the necessary **asynchronous buffer**. Configuring an **Auto Scaling Group** to use the **SQS Queue Depth metric** (the number of messages visible) as its scaling policy allows the system to be **dynamically sized**. When the load increases (queue depth grows), the ASG automatically launches more EC2 instances (workers) to process the backlog, achieving high scalability and resilience.
+Answer B correct <b>Amazon SQS<b> provides the necessary <b>asynchronous buffer<b>. Configuring an <b>Auto Scaling Group<b> to use the <b>SQS Queue Depth metric<b> (the number of messages visible) as its scaling policy allows the system to be <b>dynamically sized<b>. When the load increases (queue depth grows), the ASG automatically launches more EC2 instances (workers) to process the backlog, achieving high scalability and resilience.
 
-Answer C wrong **Amazon Kinesis Stream** and **Lambda** are typically used for real-time, low-latency processing, often measured in seconds or less. The Lambda execution environment has a maximum timeout of 15 minutes, which is **insufficient** for the 30-minute fraud detection task.
+Answer C wrong <b>Amazon Kinesis Stream<b> and <b>Lambda<b> are typically used for real-time, low-latency processing, often measured in seconds or less. The Lambda execution environment has a maximum timeout of 15 minutes, which is <b>insufficient<b> for the 30-minute fraud detection task.
 
-Answer D wrong This approach uses **DynamoDB Streams** (for capturing changes) and subscribes a **Lambda function** to read the stream. As with Option C, the 15-minute Lambda timeout **violates** the 30-minute processing time requirement.
+Answer D wrong This approach uses <b>DynamoDB Streams<b> (for capturing changes) and subscribes a <b>Lambda function<b> to read the stream. As with Option C, the 15-minute Lambda timeout <b>violates<b> the 30-minute processing time requirement.
 
 link ref: https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-using-sqs-queue.html
 
