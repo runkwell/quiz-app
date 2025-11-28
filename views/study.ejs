@@ -27,7 +27,7 @@
         </div>
         <div class="card-body">
           
-          <% if (item.question.questionText) { %><p class="fw-bold"><%= item.question.questionText %></p><% } %>
+          <% if (item.question.questionText) { %><p class="fw-bolder"><%= item.question.questionText %></p><% } %>
           <% if (item.question.questionImage) { %><img src="/<%= item.question.questionImage %>" alt="Hình ảnh câu hỏi" class="img-fluid rounded mb-3"><% } %>
           
           <div class="options-container list-group mb-3">
@@ -54,14 +54,24 @@
             <%
               // Sử dụng hàm tô màu đã fix
               let coloredExplanation = item.explanation
-                .replace(/correct/g, '<span class="correct">correct</span>')
-                .replace(/wrong/g, '<span class="wrong">wrong</span>')
-                .replace(/Correct/g, '<span class="correct">Correct</span>')
-                .replace(/Wrong/g, '<span class="wrong">Wrong</span>');
+                // 1. Tô màu correct/wrong
+                    .replace(/\b(correct|wrong)\b/gi, (match) => 
+                        `<span class="${match.toLowerCase()}">${match}</span>`
+                    )
+                    // 2. Xóa ** và chuyển text thành màu xanh da trời (sky blue) cho từ example
+                    .replace(/\*\*(.*?)\*\*/g, (match, p1) => {
+                        return `<span class="example-text">${p1.trim()}</span>`;
+                    });
+
+
+                    //.replace(/correct/g, '<span class="correct">correct</span>')
+                    //.replace(/wrong/g, '<span class="wrong">wrong</span>')
+                    //.replace(/Correct/g, '<span class="correct">Correct</span>')
+                    //.replace(/Wrong/g, '<span class="wrong">Wrong</span>');
             %>
             <div class="explanation-container mt-4 p-3 border border-primary rounded">
               <h6 class="text-warning">✅ Giải thích chi tiết:</h6>
-              <pre class="mb-0"><%- coloredExplanation %></pre> 
+              <pre class="mb-0 explain-text"><%- coloredExplanation %></pre> 
             </div>
           <% } %>
           

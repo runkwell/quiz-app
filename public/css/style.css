@@ -45,7 +45,7 @@ main {
 
 :root {
   /* Xanh lá tươi và mờ (Success) */
-  --custom-success-bg: rgba(95, 236, 14, 0.692); 
+  --custom-success-bg: rgba(78, 204, 52, 0.856); 
   /* Đỏ tươi và mờ (Danger) */
   --custom-danger-bg: rgba(233, 71, 87, 0.541); 
 }
@@ -78,7 +78,7 @@ main {
 }
 /* Màu chữ cho Correct/Wrong trong phần giải thích */
 .explanation-container .correct {
-    color: var(--bs-success) !important; /* In Xanh lá */
+    color:  rgba(69, 202, 42, 0.856) !important; /* In Xanh lá */
     font-weight: bold;
 }
 .explanation-container .wrong {
@@ -91,4 +91,17 @@ main {
 }
 .stats-container {
     padding-bottom: 10px; /* Tránh nội dung bị cắt khi cuộn ngang */
+}
+
+/* Custom color cho 'example' text trong explanation */
+.explanation-container .example-text {
+    color: #b1d66c !important; /* Sky Blue */
+    font-weight: bold; /* Giữ đậm để dễ thấy */
+}
+
+.explain-text {
+    font-family: Calibri !important;
+    font-size: 1.15em; /* Kích thước font chuẩn */
+    line-height: 1.3; /* Tăng khoảng cách dòng cho dễ đọc */
+    color: var(--bs-list-group-color) !important; /* Màu chữ theo theme */
 }

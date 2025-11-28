@@ -11,7 +11,7 @@
   <header class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top">
     <div class="container-fluid">
       <h2 class="h5 mb-0">Kết quả bài thi</h2>
-      <div class="h4 mb-0 text-success fw-bold">
+      <div class="h4 mb-0 text-success">
         <%= totalScore %>% (<%= score %> / <%= totalQuestions %>)
       </div>
     </div>
@@ -26,7 +26,7 @@
         </div>
         
         <% results.forEach(r => { %>
-          <div class="card mb-3 <%= r.isCorrect ? 'border-success' : 'border-danger' %>" id="q-<%= r.qNum %>">
+          <div class="card mb-4 border-light bg-body-secondary <%= r.isCorrect ? 'border-success' : 'border-danger' %>" id="q-<%= r.qNum %>">
             <div class="card-header <%= r.isCorrect ? 'text-success' : 'text-danger' %>">
               <h4 class="h6 mb-0">
                 Câu <%= r.qNum %>: <%= r.isCorrect ? '(Đúng)' : '(Sai)' %>
@@ -34,7 +34,7 @@
               </h4>
             </div>
             <div class="card-body">
-              <% if (r.question.questionText) { %><p><%= r.question.questionText %></p><% } %>
+              <% if (r.question.questionText) { %><p class="fw-bolder"><%= r.question.questionText %></p><% } %>
               <% if (r.question.questionImage) { %><img src="/<%= r.question.questionImage %>" alt="Hình ảnh câu hỏi" class="img-fluid rounded mb-3"><% } %>
               
               <div class="options-container list-group">
@@ -73,14 +73,24 @@
                 <%
                   // Logic tìm kiếm và thay thế để in màu chữ "correct" và "wrong"
                   let coloredExplanation = explanationText
-                    .replace(/correct/g, '<span class="correct">correct</span>')
-                    .replace(/wrong/g, '<span class="wrong">wrong</span>')
-                    .replace(/Correct/g, '<span class="correct">Correct</span>')
-                    .replace(/Wrong/g, '<span class="wrong">Wrong</span>');
+                    // 1. Tô màu correct/wrong
+                    .replace(/\b(correct|wrong)\b/gi, (match) => 
+                        `<span class="${match.toLowerCase()}">${match}</span>`
+                    )
+                    // 2. Xóa ** và chuyển text thành màu xanh da trời (sky blue) cho từ example
+                    .replace(/\*\*(.*?)\*\*/g, (match, p1) => {
+                        return `<span class="example-text">${p1.trim()}</span>`;
+                    });
+
+
+                    //.replace(/correct/g, '<span class="correct">correct</span>')
+                    //.replace(/wrong/g, '<span class="wrong">wrong</span>')
+                    //.replace(/Correct/g, '<span class="correct">Correct</span>')
+                    //.replace(/Wrong/g, '<span class="wrong">Wrong</span>');
                 %>
                 <div class="explanation-container">
                   <h6 class="text-primary">Giải thích chi tiết:</h6>
-                  <pre class="mb-0"><%- coloredExplanation %></pre> 
+                  <pre class="mb-0  explain-text"><%- coloredExplanation %></pre> 
                 </div>
               <% } %>
               </div>

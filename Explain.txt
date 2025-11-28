@@ -269,7 +269,7 @@ Answer C wrong Elastic Beanstalk supports `.zip` or `.war` files for most enviro
 
 Answer D correct This represents the standard automated/CLI workflow. The developer **packages the code into a `.zip` file**, then uses the **AWS CLI** (or EB CLI) commands to first **create a new application version** referencing the S3 location of the `.zip` file, and then uses the CLI to **update the environment** to use this new version. This is the common practice for CI/CD pipelines.
 
-Answer C wrong You only need to **update</b> the environment with a new version; **rebuilding** the environment is an operation used to terminate and recreate all resources, which is generally overkill and time-consuming for a simple code change. Also, `.zip` is the correct package format.
+Answer C wrong You only need to **update** the environment with a new version; **rebuilding** the environment is an operation used to terminate and recreate all resources, which is generally overkill and time-consuming for a simple code change. Also, `.zip` is the correct package format.
 
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-sourcebundle.html
 
