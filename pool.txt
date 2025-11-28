@@ -1,5 +1,3 @@
-
-
 1. Which of the following are good use cases for how Amazon ElastiCache can help an application? (Select TWO)
 
 - [ ] Improve the performance of S3 PUT operations.
