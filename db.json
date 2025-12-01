@@ -5366,6 +5366,2742 @@
         "64": 205,
         "65": 158
       }
+    },
+    {
+      "id": "1764413225061",
+      "timestamp": 1764413225062,
+      "score": "67.69",
+      "results": [
+        {
+          "qNum": 1,
+          "poolQNum": 119,
+          "question": {
+            "id": 1,
+            "questionText": "A company has 25,000 employees and is growing. The company is creating an application that will be accessible to its employees only. A developer is using Amazon S3 to store images and Amazon RDS to store application data. The company requires that all employee information remain in the legacy Security Assertion Markup Language (SAML) employee directory only and is not interested in mirroring any employee information on AWS. How can the developer provide authorized access for the employees who will be using this application so each employee can access their own application data only?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use Amazon VPC and keep all resources inside the VPC, and use a VPC link for the S3 bucket with the bucket policy.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon Cognito user pools, federate with the SAML provider, and use user pool groups with an IAM policy.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use an Amazon Cognito identity pool, federate with the SAML provider, and use an IAM condition key with a value for the `cognito-identity.amazonaws.com:sub` variable to grant access to the employees.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Create a unique IAM role for each employee and have each employee assume the role to access the application so they can access their personal data only.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 2,
+          "poolQNum": 243,
+          "question": {
+            "id": 2,
+            "questionText": "Company C has recently launched an online commerce site for bicycles on AWS. They have a `Product` DynamoDB table that stores details for each bicycle, such as, manufacturer, color, price, quantity and size to display in the online store. Due to customer demand, they want to include an image for each bicycle along with the existing details. Which approach below provides the least impact to provisioned throughput on the `Product` table?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Serialize the image and store it in multiple DynamoDB tables.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an `Images` DynamoDB table to store the Image with a foreign key constraint to the `Product` table.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add an image data type to the `Product` table to store the images in binary format.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Store the images in Amazon S3 and add an S3 URL pointer to the `Product` table item for each image.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 3,
+          "poolQNum": 377,
+          "question": {
+            "id": 3,
+            "questionText": "When a Developer tries to run an AWS CodeBuild project, it raises an error because the length of all environment variables exceeds the limit for the combined maximum of characters. What is the recommended solution?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Add the export `LC_ALL=\"en_US.utf8\"` command to the `pre_build` section to ensure `POSIX` localization.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon Cognito to store key-value pairs for large numbers of environment variables.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Update the settings for the build project to use an Amazon S3 bucket for large numbers of environment variables.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS Systems Manager Parameter Store to store large numbers of environment variables.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 4,
+          "poolQNum": 62,
+          "question": {
+            "id": 4,
+            "questionText": "An application reads data from an Amazon DynamoDB table. Several times a day, for a period of 15 seconds, the application receives multiple `ProvisionedThroughputExceeded` errors. How should this exception be handled?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Create a new global secondary index for the table to help with the additional requests.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Retry the failed read requests with exponential backoff.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Immediately retry the failed read requests.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use the DynamoDB `UpdateItem` API to increase the provisioned throughput capacity of the table.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 5,
+          "poolQNum": 274,
+          "question": {
+            "id": 5,
+            "questionText": "A Developer created a new AWS account and must create a scalable AWS Lambda function that meets the following requirements for concurrent execution: Average execution time of 100 seconds 50 requests per second. Which step must be taken prior to deployment to prevent errors?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Implement dead-letter queues to capture invocation errors.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add an event source from Amazon API Gateway to the Lambda function.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Implement error handling within the application code.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Contact AWS Support to increase the concurrent execution limits.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 6,
+          "poolQNum": 306,
+          "question": {
+            "id": 6,
+            "questionText": "A company is providing services to many downstream consumers. Each consumer may connect to one or more services. This has resulted in a complex architecture that is difficult to manage and does not scale well. The company needs a single interface to manage these services to consumers. Which AWS service should be used to refactor this architecture?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "AWS Lambda.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "AWS X-Ray.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Amazon SQS.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Amazon API Gateway.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 7,
+          "poolQNum": 365,
+          "question": {
+            "id": 7,
+            "questionText": "According to best practice, how should access keys be managed in AWS? (Choose TWO)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use the same access key in all applications for consistency.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Delete all access keys for the account `root` user.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Leave unused access keys in the account for tracking purposes.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Embed and encrypt access keys in code for continuous deployment.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon IAM roles instead of access keys where possible.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "2",
+            "5"
+          ],
+          "correctOptions": [
+            "2",
+            "5"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 8,
+          "poolQNum": 310,
+          "question": {
+            "id": 8,
+            "questionText": "A company has three different environments: Development, QA, and Production. The company wants to deploy its code first in the Development environment, then QA, and then Production. Which AWS service can be used to meet this requirement?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use AWS CodeCommit to create multiple repositories to deploy the application.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS CodeBuild to create, configure, and deploy multiple build application projects.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS Data Pipeline to create multiple data pipeline provisions to deploy the application.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS CodeDeploy to create multiple deployment groups.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 9,
+          "poolQNum": 266,
+          "question": {
+            "id": 9,
+            "questionText": "Which of the following statements about SQS is true?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Messages will be delivered exactly once and messages will be delivered in First in, First out order.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Messages will be delivered exactly once and message delivery order is indeterminate.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Messages will be delivered one or more times and messages will be delivered in First in, First out order.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Messages will be delivered one or more times and message delivery order is indeterminate.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 10,
+          "poolQNum": 293,
+          "question": {
+            "id": 10,
+            "questionText": "To include objects defined by the AWS Serverless Application Model (SAM) in an AWS CloudFormation template, in addition to `Resources`, what section MUST be included in the document root?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "`Conditions`.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "`Globals`.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "`Transform`.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "`Properties`.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 11,
+          "poolQNum": 2,
+          "question": {
+            "id": 11,
+            "questionText": "Which of the following services are key/value stores? (Choose 3 answers)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Amazon ElastiCache.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Simple Notification Service.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "DynamoDB.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Simple Workflow Service.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Simple Storage Service.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "1",
+            "3",
+            "5"
+          ],
+          "correctOptions": [
+            "1",
+            "3",
+            "5"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 12,
+          "poolQNum": 328,
+          "question": {
+            "id": 12,
+            "questionText": "A Developer has published an update to an application that is served to a global user base using Amazon CloudFront. After deploying the application, users are not able to see the updated changes. How can the Developer resolve this issue?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Remove the origin from the CloudFront configuration and add it again.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Disable forwarding of query strings and request headers from the CloudFront distribution configuration.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Invalidate all the application objects from the edge caches.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Disable the CloudFront distribution and enable it again to update all the edge locations.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 13,
+          "poolQNum": 292,
+          "question": {
+            "id": 13,
+            "questionText": "A Developer wants to debug an application by searching and filtering log data. The application logs are stored in Amazon CloudWatch Logs. The Developer creates a new metric filter to count exceptions in the application logs. However, no results are returned from the logs. What is the reason that no filtered results are being returned?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "A setup of the Amazon CloudWatch interface VPC endpoint is required for filtering the CloudWatch Logs in the VPC.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "CloudWatch Logs only publishes metric data for events that happen after the filter is created.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "The log group for CloudWatch Logs should be first streamed to Amazon Elasticsearch Service before metric filtering returns the results.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Metric data points for logs groups can be filtered only after they are exported to an Amazon S3 bucket.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 14,
+          "poolQNum": 151,
+          "question": {
+            "id": 14,
+            "questionText": "A developer is writing an application that will process data delivered into an Amazon S3 bucket. The data is delivered approximately 10 times a day, and the developer expects the data will be processed in less than 1 minute, on average. How can the developer deploy and invoke the application with the lowest cost and lowest latency?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Deploy the application as an AWS Lambda function and invoke it with an Amazon CloudWatch alarm triggered by an S3 object upload.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Deploy the application as an AWS Lambda function and invoke it with an S3 event notification.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Deploy the application as an AWS Lambda function and invoke it with an Amazon CloudWatch scheduled event.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Deploy the application onto an Amazon EC2 instance and have it poll the S3 bucket for new objects.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 15,
+          "poolQNum": 194,
+          "question": {
+            "id": 15,
+            "questionText": "An online retail company has deployed a serverless application with AWS Lambda, Amazon API Gateway, Amazon S3, and Amazon DynamoDB using AWS CloudFormation. The company rolled out a new release with major upgrades to the Lambda function and deployed the release to production. Subsequently, the application stopped working. Which solution should bring the application back up as quickly as possible?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Redeploy the application on Amazon EC2 so the Lambda function can resolve dependencies.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Migrate DynamoDB to Amazon RDS and redeploy the Lambda function.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Roll back the Lambda function to the previous version.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Deploy the latest Lambda function in a different Region.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 16,
+          "poolQNum": 390,
+          "question": {
+            "id": 16,
+            "questionText": "A developer is deploying an application on Amazon EC2 instances that run in Account A. The application needs to read data from an existing Amazon Kinesis data stream in Account B. Which actions should the developer take to provide the application with access to the stream? (Choose two.)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Update the instance profile role in Account A with stream read permissions.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Create an IAM role with stream read permissions in Account B.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add a trust policy to the instance profile role and IAM role in Account B to allow the instance profile role to assume the IAM role.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add a trust policy to the instance profile role and IAM role in Account B to allow reads from the stream.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add a resource-based policy in Account B to allow read access from the instance profile role.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "3",
+            "4"
+          ],
+          "correctOptions": [
+            "1",
+            "5"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 17,
+          "poolQNum": 35,
+          "question": {
+            "id": 17,
+            "questionText": "An application running on EC2 instances is storing data in an S3 bucket. Security policy mandates that all data must be encrypted in transit. How can the Developer ensure that all traffic to the S3 bucket is encrypted?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Install certificates on the EC2 instances.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create a bucket policy that allows traffic where `SecureTransport` is `true`.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an HTTPS redirect on the EC2 instances.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create a bucket policy that denies traffic where `SecureTransport` is `false`.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 18,
+          "poolQNum": 324,
+          "question": {
+            "id": 18,
+            "questionText": "A Developer wants to enable AWS X-Ray for a secure application that runs in an Amazon ECS environment. What combination of steps will enable X-Ray? (Select THREE)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Create a Docker image that runs the X-Ray daemon.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Add instrumentation to the application code for X-Ray.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Install the X-Ray daemon on the underlying EC2 instance.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure and use an IAM EC2 instance role.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Register the application with X-Ray.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure and use an IAM role for tasks.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "1",
+            "5",
+            "6"
+          ],
+          "correctOptions": [
+            "1",
+            "2",
+            "6"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 19,
+          "poolQNum": 241,
+          "question": {
+            "id": 19,
+            "questionText": "A startup s photo-sharing site is deployed in a VPC. An ELB distributes web traffic across two subnets. ELB session stickiness is configured to use the AWS-generated session cookie, with a session TTL of 5 minutes. The webserver Auto Scaling Group is configured as: `min-size=4`, `max-size=4`, The startups preparing for a public launch, by running load-testing software installed on a single EC2 instance running in `us-west-2`. After 60 minutes of load-testing, the webserver logs show. Which recommendations can help ensure load-testing HTTP requests are evenly distributed across the four webservers? (Choose TWO)",
+            "questionImage": "images/question241.jpg",
+            "options": [
+              {
+                "text": "Launch and run the load-tester EC2 instance from `us-east-1` instead.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Re-configure the load-testing software to re-resolve DNS for each web request.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Use a 3rd-party load-testing service which offers globally-distributed test clients.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Configure ELB and Auto Scaling to distribute across `us-west-2a` and `us-west-2c`.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure ELB session stickiness to use the app-specific session cookie.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "3",
+            "4"
+          ],
+          "correctOptions": [
+            "2",
+            "3"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 20,
+          "poolQNum": 189,
+          "question": {
+            "id": 20,
+            "questionText": "A Developer has built an application running on AWS Lambda using AWS Serverless Application Model (AWS SAM). What is the correct order of execution to successfully deploy the application?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "1. Build the SAM template in Amazon EC2. 2. Package the SAM template to Amazon EBS storage. 3. Deploy the SAM template from Amazon EBS.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "1. Build the SAM template locally. 2. Package the SAM template onto Amazon S3. 3. Deploy the SAM template from Amazon S3.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "1. Build the SAM template locally. 2. Deploy the SAM template from Amazon S3. 3. Package the SAM template for use.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "1. Build the SAM template locally. 2. Package the SAM template from AWS CodeCommit. 3. Deploy the SAM template to CodeCommit.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 21,
+          "poolQNum": 240,
+          "question": {
+            "id": 21,
+            "questionText": "Which of the following statements about SWF are true? (Choose THREE)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "SWF tasks are assigned once and never duplicated.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "SWF requires an S3 bucket for workflow storage.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "SWF workflow executions can last up to a year.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "SWF triggers SNS notifications on task assignment.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "SWF uses deciders and workers to complete tasks.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "SWF requires at least 1 EC2 instance per domain.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "2",
+            "3",
+            "5"
+          ],
+          "correctOptions": [
+            "1",
+            "3",
+            "5"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 22,
+          "poolQNum": 286,
+          "question": {
+            "id": 22,
+            "questionText": "A company needs to distribute firmware updates to its customers around the world. Which service will allow easy and secure control of the access to the downloads at the lowest cost?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use Amazon CloudFront with signed URLs for Amazon S3.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Create a dedicated Amazon CloudFront Distribution for each customer.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon CloudFront with AWS Lambda@Edge.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon API Gateway and AWS Lambda to control access to an S3 bucket.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 23,
+          "poolQNum": 48,
+          "question": {
+            "id": 23,
+            "questionText": "The Lambda function below is being called through an API using Amazon API Gateway. The average execution time for the Lambda function is about 1 second. The pseudocode for the Lambda function is as shown in the exhibit. What two actions can be taken to improve the performance of this Lambda function without increasing the cost of the solution? (Select TWO)",
+            "questionImage": "images/question48.jpg",
+            "options": [
+              {
+                "text": "Package only the modules the Lambda function requires.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Use Amazon DynamoDB instead of Amazon RDS.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Move the initialization of the variable Amazon RDS connection outside of the handler function.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Implement custom database connection pooling with the Lambda function.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Implement local caching of Amazon RDS data so Lambda can re-use the cache.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "3",
+            "5"
+          ],
+          "correctOptions": [
+            "1",
+            "3"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 24,
+          "poolQNum": 187,
+          "question": {
+            "id": 24,
+            "questionText": "A Developer uses Amazon S3 buckets for static website hosting. The Developer creates one S3 bucket for the code and another S3 bucket for the assets, such as image and video files. Access is denied when a user attempts to access the assets bucket from the code bucket, with the website application showing a `403` error. How should the Developer solve this issue?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Create an IAM role and apply it to the assets bucket for the code bucket to be granted access.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Edit the bucket policy of the assets bucket to allow access from the code bucket.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Edit the bucket policy of the assets bucket to open access to all principals.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Change the code bucket to use AWS Lambda functions instead of static website hosting.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 25,
+          "poolQNum": 46,
+          "question": {
+            "id": 25,
+            "questionText": "A Developer needs to design an application running on AWS that will be used to consume Amazon SQS messages that range from 1 KB up to 1GB in size. How should the Amazon SQS messages be managed?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use Amazon S3 and the Amazon SQS CLI.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon S3 and the Amazon SQS Extended Client Library for Java.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Use Amazon EBS and the Amazon SQS CLI.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon EFS and the Amazon SQS CLI.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 26,
+          "poolQNum": 334,
+          "question": {
+            "id": 26,
+            "questionText": "In a move toward using microservices, a company's Management team has asked all Development teams to build their services so that API requests depend only on that service's data store. One team is building a Payments service which has its own database; the service needs data that originates in the Accounts database. Both are using Amazon DynamoDB. What approach will result in the simplest, decoupled, and reliable method to get near-real time updates from the Accounts database?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use Amazon Glue to perform frequent ETL updates from the Accounts database to the Payments database.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon ElastiCache in Payments, with the cache updated by triggers in the Accounts database.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon Kinesis Data Firehose to deliver all changes from the Accounts database to the Payments database.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon DynamoDB Streams to deliver all changes from the Accounts database to the Payments database.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 27,
+          "poolQNum": 217,
+          "question": {
+            "id": 27,
+            "questionText": "A Development team would like to migrate their existing application code from a GitHub repository to AWS CodeCommit. What needs to be created before they can migrate a cloned repository to CodeCommit over HTTPS?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "A GitHub secure authentication token.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "A public and private SSH key file.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "A set of Git credentials generated from IAM.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "An Amazon EC2 IAM role with CodeCommit permissions.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 28,
+          "poolQNum": 86,
+          "question": {
+            "id": 28,
+            "questionText": "A Developer is creating an Auto Scaling group whose instances need to publish a custom metric to Amazon CloudWatch. Which method would be the MOST secure way to authenticate a CloudWatch PUT request?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Create an IAM user with `PutMetricData` permission and put the user credentials in a private repository; have applications pull the credentials as needed.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an IAM user with `PutMetricData` permission, and modify the Auto Scaling launch configuration to inject the user credentials into the instance user data.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Modify the CloudWatch metric policies to allow the `PutMetricData` permission to instances from the Auto Scaling group.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an IAM role with `PutMetricData` permission and modify the Auto Scaling launching configuration to launch instances using that role.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 29,
+          "poolQNum": 375,
+          "question": {
+            "id": 29,
+            "questionText": "After installing the AWS CLI, a Developer tries to run the command `aws configure` but receives the following error: `Error: aws: command not found`. What is the most likely cause of this error?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "The `aws` executable is not in the `PATH` environment variable.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Access to the `aws` executable has been denied to the installer.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Incorrect AWS credentials were provided.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "The `aws` script does not have an executable file mode.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 30,
+          "poolQNum": 204,
+          "question": {
+            "id": 30,
+            "questionText": "A company's website runs on an Amazon EC2 instance and uses Auto Scaling to scale the environment during peak times. Website users across the world are experiencing high latency due to static content on the EC2 instance, even during non-peak hours. Which combination of steps will resolve the latency issue? (Choose TWO)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Double the Auto Scaling group's maximum number of servers.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Host the application code on AWS Lambda.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Scale vertically by resizing the EC2 instances.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an Amazon CloudFront distribution to cache the static content.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Store the application's static content in Amazon S3.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "4",
+            "5"
+          ],
+          "correctOptions": [
+            "4",
+            "5"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 31,
+          "poolQNum": 216,
+          "question": {
+            "id": 31,
+            "questionText": "A Developer must encrypt a 100-GB object using AWS KMS. What is the BEST approach?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Make an `Encrypt` API call to encrypt the plaintext data as ciphertext using a customer master key (CMK).",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Make an `Encrypt` API call to encrypt the plaintext data as ciphertext using a customer master key (CMK) with imported key material.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Make an `GenerateDataKey` API call that returns a plaintext key and an encrypted copy of a data key. Use a plaintext key to encrypt the data.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Make an `GenerateDataKeyWithoutPlaintext` API call that returns an encrypted copy of a data key. Use an encrypted key to encrypt the data.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 32,
+          "poolQNum": 18,
+          "question": {
+            "id": 32,
+            "questionText": "A developer needs to modify an application architecture to meet new functional requirements. Application data is stored in Amazon DynamoDB and processed for analysis in a nightly batch. The system analysts do not want to wait unit the next day to view the processed data and have asked to have it available in near-real time. Which application architect pattern would enables the data to be processed as it is received?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Event driven.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Client served driven.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Fan-out driven.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Schedule driven.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 33,
+          "poolQNum": 245,
+          "question": {
+            "id": 33,
+            "questionText": "When a Simple Queue Service message triggers a task that takes 5 minutes to complete, which process below will result in successful processing of the message and remove it from the queue while minimizing the chances of duplicate processing?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Retrieve the message with an increased visibility timeout, process the message, delete the message from the queue.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Retrieve the message with an increased visibility timeout, delete the message from the queue, process the message.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Retrieve the message with increased `DelaySeconds`, process the message, delete the message from the queue.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Retrieve the message with increased `DelaySeconds`, delete the message from the queue, process the message.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 34,
+          "poolQNum": 179,
+          "question": {
+            "id": 34,
+            "questionText": "A Developer implemented a static website hosted in Amazon S3 that makes web service requests hosted in Amazon API Gateway and AWS Lambda. The site is showing an error that reads: `No Access-Control-Allow-Origin` header is present on the requested resource. Origin `null` is therefore not allowed access.' What should the Developer do to resolve this issue?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Enable cross-origin resource sharing (CORS) on the S3 bucket.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Enable cross-origin resource sharing (CORS) for the method in API Gateway.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Add the `Access-Control-Request-Method` header to the request.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add the `Access-Control-Request-Headers` header to the request.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 35,
+          "poolQNum": 59,
+          "question": {
+            "id": 35,
+            "questionText": "Given the source code for an AWS Lambda function in the local `store.py` containing a handler function called `get_store` and the following AWS CloudFormation template. What should be done to prepare the template so that it can be deployed using the AWS CLI command `aws cloudformation deploy`?",
+            "questionImage": "images/question59.jpg",
+            "options": [
+              {
+                "text": "Use AWS CloudFormation compile to base64 encode and embed the source file into a modified CloudFormation template.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS CloudFormation package to upload the source code to an Amazon S3 bucket and produce a modified CloudFormation template.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Use AWS Lambda zip to package the source file together with the CloudFormation template and deploy the resulting zip archive.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS Serverless `create-package` to embed the source file directly into the existing CloudFormation template.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 36,
+          "poolQNum": 43,
+          "question": {
+            "id": 36,
+            "questionText": "An Amazon RDS database instance is used by many applications to look up historical data. The query rate is relatively constant. When the historical data is updated each day, the resulting write traffic slows the read query performance and affects all application users. What can be done to eliminate the performance impact on application users?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Make sure Amazon RDS is Multi-AZ so it can better absorb increased traffic.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an RDS Read Replica and direct all read traffic to the replica.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Implement Amazon ElastiCache in front of Amazon RDS to buffer the write traffic.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon DynamoDB instead of Amazon RDS to buffer the read traffic.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 37,
+          "poolQNum": 236,
+          "question": {
+            "id": 37,
+            "questionText": "In AWS, which security aspects are the customer's responsibility? (Choose FOUR)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Life-cycle management of IAM credentials.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Decommissioning storage devices.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Security Group and ACL (Access Control List) settings.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Encryption of EBS (Elastic Block Storage) volumes.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Controlling physical access to compute resources.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Patch management on the EC2 instance's operating system.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "1",
+            "3",
+            "4",
+            "5"
+          ],
+          "correctOptions": [
+            "1",
+            "3",
+            "4",
+            "6"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 38,
+          "poolQNum": 111,
+          "question": {
+            "id": 38,
+            "questionText": "An application under development is required to store hundreds of video files. The data must be encrypted within the application prior to storage, with a unique key for each video file. How should the Developer code the application?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use the `KMS Encrypt` API to encrypt the data. Store the encrypted data key and data.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use a cryptography library to generate an encryption key for the application. Use the encryption key to encrypt the data. Store the encrypted data.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use the `KMS GenerateDataKey` API to get a data key. Encrypt the data with the data key. Store the encrypted data key and data.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Upload the data to an S3 bucket using server side-encryption with an AWS KMS key.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 39,
+          "poolQNum": 9,
+          "question": {
+            "id": 39,
+            "questionText": "A company is building a compute-intensive application that will run on a fleet of Amazon EC2 instances. The application uses attached Amazon EBS disks for storing data. The application will process sensitive information and all the data must be encrypted. What should a developer do to ensure the data is encrypted on disk without impacting performance?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Configure the Amazon EC2 instance fleet to use encrypted EBS volumes for storing data.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Add logic to write all data to an encrypted Amazon S3 bucket.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add a custom encryption algorithm to the application that will encrypt and decrypt all data.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create a new Amazon Machine Image (AMI) with an encrypted root volume and store the data to ephemeral disks.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 40,
+          "poolQNum": 107,
+          "question": {
+            "id": 40,
+            "questionText": "An application has hundreds of users. Each user may use multiple devices to access the application. The Developer wants to assign unique identifiers to these users regardless of the device they use. Which of the following methods should be used to obtain unique identifiers?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Create a user table in Amazon DynamoDB as key-value pairs of users and their devices. Use these keys as unique identifiers.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use IAM-generated access key IDs for the users as the unique identifier, but do not store secret keys.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Implement developer-authenticated identities by using Amazon Cognito, and get credentials for these identities.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Assign IAM users and roles to the users. Use the unique IAM resource ID as the unique identifier.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 41,
+          "poolQNum": 268,
+          "question": {
+            "id": 41,
+            "questionText": "Company C is currently hosting their corporate site in an Amazon S3 bucket with Static Website Hosting enabled. Currently, when visitors go to `http://www.companyc.com` the `index.html` page is returned. Company C now would like a new page welcome.html to be returned when a visitor enters `http://www.companyc.com` in the browser. Which of the following steps will allow Company C to meet this requirement? (Choose TWO)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Upload an html page named welcome.html to their S3 bucket.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Create a welcome subfolder in their S3 bucket.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Set the Index Document property to welcome.html.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Move the `index.html` page to a welcome subfolder.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Set the Error Document property to welcome.html.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "1",
+            "3"
+          ],
+          "correctOptions": [
+            "1",
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 42,
+          "poolQNum": 72,
+          "question": {
+            "id": 42,
+            "questionText": "An application will ingest data at a very high throughput from many sources and must store the data in an Amazon S3 bucket. Which service would BEST accomplish this task?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Amazon Kinesis Firehose.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Amazon S3 Acceleration Transfer.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Amazon SQS.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Amazon SNS.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 43,
+          "poolQNum": 301,
+          "question": {
+            "id": 43,
+            "questionText": "A company maintains a REST service using Amazon API Gateway and the API Gateway native API key validation. The company recently launched a new registration page, which allows users to sign up for the service. The registration page creates a new API key using `CreateApiKey` and sends the new key to the user. When the user attempts to call the API using this key, the user receives a `403 Forbidden` error. Existing users are unaffected and can still call the API. What code updates will grant these new users access to the API?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "The `createDeployment` method must be called so the API can be redeployed to include the newly created API key.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "The `updateAuthorizer` method must be called to update the API's authorizer to include the newly created API key.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "The `importApiKeys` method must be called to import all newly created API keys into the current stage of the API.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "The `createUsagePlanKey` method must be called to associate the newly created API key with the correct usage plan.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 44,
+          "poolQNum": 331,
+          "question": {
+            "id": 44,
+            "questionText": "A company needs to secure its existing website running behind an Elastic Load Balancer. The website's Amazon EC2 instances are CPU-constrained. What should be done to secure the website while not increasing the CPU load on the EC2 web servers? (Select TWO)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Configure an Elastic Load Balancer with SSL pass-through.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure SSL certificates on an Elastic Load Balancer.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Configure an Elastic Load Balancer with a Loadable Storage System.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Install SSL certificates on the EC2 instances.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure an Elastic Load Balancer with SSL termination.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "2",
+            "5"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 45,
+          "poolQNum": 295,
+          "question": {
+            "id": 45,
+            "questionText": "A Developer is investigating an issue whereby certain requests are passing through an Amazon API Gateway endpoint /MyAPI, but the requests do not reach the AWS Lambda function backing /MyAPI. The Developer found that a second Lambda function sometimes runs at maximum concurrency allowed for the given AWS account. How can the Developer address this issue?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Manually reduce the concurrent execution limit at the account level.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add another API Gateway stage for /MyAPI, and shard the requests.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure the second Lambda function's concurrency execution limit.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Reduce the throttling limits in the API Gateway /MyAPI endpoint",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 46,
+          "poolQNum": 103,
+          "question": {
+            "id": 46,
+            "questionText": "An application stores images in an S3 bucket. Amazon S3 event notifications are used to trigger a Lambda function that resizes the images. Processing each image takes less than a second. How will AWS Lambda handle the additional traffic?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Lambda will scale out to execute the requests concurrently.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Lambda will handle the requests sequentially in the order received.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Lambda will process multiple images in a single execution.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Lambda will add more compute to each execution to reduce processing time.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 47,
+          "poolQNum": 112,
+          "question": {
+            "id": 47,
+            "questionText": "A developer is testing an application that invokes an AWS Lambda function asynchronously. During the testing phase, the Lambda function fails to process after two retries. How can the developer troubleshoot the failure?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Configure AWS CloudTrail logging to investigate the invocation failures.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure Dead Letter Queues by sending events to Amazon SQS for investigatio.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Configure Amazon Simple Workflow Service to process any direct unprocessed events.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Configure AWS Config to process any direct unprocessed events.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 48,
+          "poolQNum": 118,
+          "question": {
+            "id": 48,
+            "questionText": "A company has an application where reading objects from Amazon S3 is based on the type of user. The user types are registered user and guest user. The company has 25,000 users and is growing. Information is pulled from an S3 bucket depending on the user type. Which approaches are recommended to provide access to both user types? (Choose TWO)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Provide a different access key and secret access key in the application code for registered users and guest users to provide read access to the objects.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use S3 bucket policies to restrict read access to specific IAM users.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon Cognito to provide access using authenticated and unauthenticated roles.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Create a new IAM user for each user and grant read access.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use the AWS IAM service and let the application assume the different roles using the AWS Security Token Service (AWS STS) `AssumeRole` action depending on the type of user and provide read access to Amazon S3 using the assumed role.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "3",
+            "5"
+          ],
+          "correctOptions": [
+            "3",
+            "5"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 49,
+          "poolQNum": 104,
+          "question": {
+            "id": 49,
+            "questionText": "A company is building a stock trading application that requires sub-millisecond latency in processing trading requests. Amazon DynamoDB is used to store all the trading data that is used to process each request. After load testing the application, the development team found that due to data retrieval times, the latency requirement is not satisfied. Because of sudden high spikes in the number of requests, DynamoDB read capacity has to be significantly over-provisioned to avoid throttling. What steps should be taken to meet latency requirements and reduce the cost of running the application?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Add Global Secondary Indexes for trading data.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Store trading data in Amazon S3 and use Transfer Acceleration.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add retries with exponential back-off for DynamoDB queries.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use DynamoDB Accelerator to cache trading data.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 50,
+          "poolQNum": 219,
+          "question": {
+            "id": 50,
+            "questionText": "After launching an instance that you intend to serve as a NAT (Network Address Translation) device in a public subnet you modify your route tables to have the NAT device be the target of internet bound traffic of your private subnet. When you try and make an outbound connection to the Internet from an instance in the private subnet, you are not successful. NAT device be the target of internet bound traffic of your private subnet. Which of the following steps could resolve the issue?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Attaching a second Elastic Network interface (ENI) to the NAT instance, and placing it in the private subnet.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Attaching a second Elastic Network Interface (ENI) to the instance in the private subnet, and placing it in the public subnet.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Disabling the `Source/Destination Check` attribute on the NAT instance.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Attaching an Elastic IP address to the instance in the private subnet.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 51,
+          "poolQNum": 83,
+          "question": {
+            "id": 51,
+            "questionText": "A Lambda function is packaged for deployment to multiple environments, including development, test, production, etc. Each environment has unique set of resources such as databases, etc. How can the Lambda function use the resources for the current environment?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Apply tags to the Lambda functions.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Hardcore resources in the source code.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use environment variables for the Lambda functions.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Use separate function for development and production.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 52,
+          "poolQNum": 222,
+          "question": {
+            "id": 52,
+            "questionText": "Which of the following items are required to allow an application deployed on an EC2 instance to write data to a DynamoDB table? Assume that no security Keys are allowed to be stored on the EC2 instance. (Choose TWO)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Create an IAM User that allows write access to the DynamoDB table.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add an IAM Role to a running EC2 instance.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Add an IAM User to a running EC2 Instance.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Launch an EC2 Instance with the IAM Role included in the launch configuration.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Create an IAM Role that allows write access to the DynamoDB table.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Launch an EC2 Instance with the IAM User included in the launch configuration.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "4",
+            "5"
+          ],
+          "correctOptions": [
+            "4",
+            "5"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 53,
+          "poolQNum": 320,
+          "question": {
+            "id": 53,
+            "questionText": "A company is developing an application that will run on several Amazon EC2 instances in an Auto Scaling group and can access a database running on Amazon EC2. The application needs to store secrets required to connect to the database. The application must allow for periodic secret rotation, and there should be no changes to the application when a secret changes. What is the SAFEST way to meet these requirements?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Associate an IAM role to the EC2 instance where the application is running with permission to access the database.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS Systems Manager Parameter Store with the SecureString data type to store secrets.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Configure the application to store secrets in Amazon S3 object metadata.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Hard code the database secrets in the application code itself.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 54,
+          "poolQNum": 205,
+          "question": {
+            "id": 54,
+            "questionText": "A company is developing a web application that allows its employees to upload a profile picture to a private Amazon S3 bucket. There is no size limit for the profile pictures, which should be displayed every time an employee logs in. For security reasons, the pictures cannot be publicly accessible. What is a viable long-term solution for this scenario?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Generate a presigned URL when a picture is uploaded. Save the URL in an Amazon DynamoDB table. Return the URL to the browser when the employee logs in.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Save the picture's S3 key in an Amazon DynamoDB table. Create an Amazon S3 VPC endpoint to allow the employees to download pictures once they log in.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Encode a picture using base64. Save the base64 string in an Amazon DB table. Allow the browser to retrieve the string and convert it to a picture.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Save the picture's S3 key in an Amazon DynamoDB table. Use a function to generate a presigned URL every time an employee logs in. Return the URL to the browser.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "4"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 55,
+          "poolQNum": 373,
+          "question": {
+            "id": 55,
+            "questionText": "An on-premises legacy application is caching data files locally and writing shared images to local disks. What is necessary to allow for horizontal scaling when migrating the application to AWS?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Modify the application to have both shared images and caching data written to Amazon EBS.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Modify the application to read and write cache data on Amazon S3, and also store shared images on S3.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Modify the application to use Amazon S3 for serving shared images; cache data can then be written to local disks.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Modify the application to read and write cache data on Amazon S3, while continuing to write shared images to local disks.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 56,
+          "poolQNum": 190,
+          "question": {
+            "id": 56,
+            "questionText": "A company wants to migrate an imaging service to Amazon EC2 while following security best practices. The images are sourced and read from a non-public Amazon S3 bucket. What should a Developer do to meet these requirements?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Create an IAM user with read-only permissions for the S3 bucket. Temporarily store the user credentials in the Amazon EBS volume of the EC2 instance.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an IAM user with read-only permissions for the S3 bucket. Temporarily store the user credentials in the user data of the EC2 instance.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create an EC2 service role with read-only permissions for the S3 bucket. Attach the role to the EC2 instance.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Create an S3 service role with read-only permissions for the S3 bucket. Attach the role to the EC2 instance.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 57,
+          "poolQNum": 302,
+          "question": {
+            "id": 57,
+            "questionText": "A Developer is writing a mobile application that allows users to view images from an S3 bucket. The users must be able to log in with their Amazon login, as well as Facebook and/or Google accounts. How can the Developer provide this authentication functionality?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use Amazon Cognito with web identity federation.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Use Amazon Cognito with SAML-based identity federation.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS IAM Access/Secret keys in the application code to allow `Get*` on the S3 bucket.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use AWS STS `AssumeRole` in the application code and assume a role with `Get*` permissions on the S3 bucket.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 58,
+          "poolQNum": 349,
+          "question": {
+            "id": 58,
+            "questionText": "A stock market monitoring application uses Amazon Kinesis for data ingestion. During simulated tests of peak data rates, the Kinesis stream cannot keep up with the incoming data. What step will allow Kinesis to accommodate the traffic during peak hours?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Install the Kinesis Producer Library (KPL) for ingesting data into the stream.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Reduce the data retention period to allow for more data ingestion using `DecreaseStreamRetentionPeriod`.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Increase the shard count of the stream using `UpdateShardCount`.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Ingest multiple records into the stream in a single call using `PutRecords`.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 59,
+          "poolQNum": 92,
+          "question": {
+            "id": 59,
+            "questionText": "An application takes 40 seconds to process instructions received in an Amazon SQS message. Assuming the SQS queue is configured with the default `VisibilityTimeout` value, what is the BEST way, upon receiving a message, to ensure that no other instances can retrieve a message that has already been processed or is currently being processed?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use the `ChangeMessageVisibility` API to increase the `VisibilityTimeout`, then use the `DeleteMessage` API to delete the message.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Use the `DeleteMessage` API call to delete the message from the queue, then call `DeleteQueue` API to remove the queue.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use the `ChangeMessageVisibility` API to decrease the timeout value, then use the `DeleteMessage` API to delete the message.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use the `DeleteMessageVisibility` API to cancel the `VisibilityTimeout`, then use the `DeleteMessage` API to delete the message.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 60,
+          "poolQNum": 339,
+          "question": {
+            "id": 60,
+            "questionText": "An application running on Amazon EC2 instances must access objects within an Amaon S3 busket that are encrypted using server-side encryption using AWS KMS encryption keys (SSE-KMS). The application must have access to the customer master key (CMK) to decrypt the objects. Which combination of steps will grant the application access? (Select TWO)",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Write an S3 bucket policy that grants the bucket access to the key.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Grant access to the key in the IAM EC2 role attached to the application's EC2 instances.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Write a key policy that enables IAM policies to grant access to the key.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Grant access to the key in the S3 bucket's ACL.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create a Systems Manager parameter that exposes the KMS key to the EC2 instances.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": true
+          },
+          "userAns": [
+            "2",
+            "3"
+          ],
+          "correctOptions": [
+            "2",
+            "3"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 61,
+          "poolQNum": 168,
+          "question": {
+            "id": 61,
+            "questionText": "A company provides APIs as a service and commits to a service level agreement (SLA) with all its users. To comply with each SLA, what should the company do?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Enable throttling limits for each method in Amazon API Gateway.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Create a usage plan for each user and request API keys to access the APIs.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Enable API rate limiting in Amazon Cognito for each user.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Enable default throttling limits for each stage after deploying the APIs.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "3"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 62,
+          "poolQNum": 55,
+          "question": {
+            "id": 62,
+            "questionText": "A company wants to migrate its web application to AWS and leverage Auto Scaling to handle peak workloads. The Solutions Architect determined that the best metric for an Auto Scaling event is the number of concurrent users. Based on this information, what should the Developer use to autoscale based on concurrent users?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "An Amazon SNS topic to be triggered when a concurrent user threshold is met.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "An Amazon Cloudwatch NetworkIn metric.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Amazon CloudFront to leverage AWS Edge Locations.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "A Custom Amazon CloudWatch metric for concurrent users.",
+                "image": null,
+                "isCorrect": true
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "4"
+          ],
+          "isCorrect": false
+        },
+        {
+          "qNum": 63,
+          "poolQNum": 363,
+          "question": {
+            "id": 63,
+            "questionText": "An application runs on multiple EC2 instances behind an ELB. Where is the session data best written so that it can be served reliably across multiple requests?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Write data to Amazon ElastiCache.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Write data to Amazon Elastic Block Store.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Write data to Amazon EC2 Instance Store.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Write data to the `root` filesystem.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 64,
+          "poolQNum": 383,
+          "question": {
+            "id": 64,
+            "questionText": "A company developed a set of APIs that are being served through the Amazon API Gateway. The API calls need to be authenticated based on OpenID identity providers such as Amazon or Facebook. The APIs should allow access based on a custom authorization model. Which is the simplest and MOST secure design to use to build an authentication and authorization model for the APIs?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Use Amazon Cognito user pools and a custom authorizer to authenticate and authorize users based on JSON Web Tokens.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Build a OpenID token broker with Amazon and Facebook. Users will authenticate with these identify providers and pass the JSON Web Token to the API to authenticate each API call.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Store user credentials in Amazon DynamoDB and have the application retrieve temporary credentials from AWS STS. Make API calls by passing user credentials to the APIs for authentication and authorization.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Use Amazon RDS to store user credentials and pass them to the APIs for authentications and authorization.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "1"
+          ],
+          "correctOptions": [
+            "1"
+          ],
+          "isCorrect": true
+        },
+        {
+          "qNum": 65,
+          "poolQNum": 399,
+          "question": {
+            "id": 65,
+            "questionText": "A company is running a custom application on a set of on-premises Linux servers that are accessed using Amazon API Gateway. AWS X-Ray tracing has been enabled on the API test stage. How can a developer enable X-Ray tracing on the on-premises servers with the LEAST amount of configuration?",
+            "questionImage": null,
+            "options": [
+              {
+                "text": "Install and run the X-Ray SDK on the on-premises servers to capture and relay the data to the X-Ray service.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Install and run the X-Ray daemon on the on-premises servers to capture and relay the data to the X-Ray service.",
+                "image": null,
+                "isCorrect": true
+              },
+              {
+                "text": "Capture incoming requests on-premises and configure an AWS Lambda function to pull, process, and relay relevant data to X-Ray using the PutTraceSegments API call.",
+                "image": null,
+                "isCorrect": false
+              },
+              {
+                "text": "Capture incoming requests on-premises and configure an AWS Lambda function to pull, process, and relay relevant data to X-Ray using the PutTelemetryRecords API call.",
+                "image": null,
+                "isCorrect": false
+              }
+            ],
+            "isMultipleChoice": false
+          },
+          "userAns": [
+            "2"
+          ],
+          "correctOptions": [
+            "2"
+          ],
+          "isCorrect": true
+        }
+      ],
+      "questionMap": {
+        "1": 119,
+        "2": 243,
+        "3": 377,
+        "4": 62,
+        "5": 274,
+        "6": 306,
+        "7": 365,
+        "8": 310,
+        "9": 266,
+        "10": 293,
+        "11": 2,
+        "12": 328,
+        "13": 292,
+        "14": 151,
+        "15": 194,
+        "16": 390,
+        "17": 35,
+        "18": 324,
+        "19": 241,
+        "20": 189,
+        "21": 240,
+        "22": 286,
+        "23": 48,
+        "24": 187,
+        "25": 46,
+        "26": 334,
+        "27": 217,
+        "28": 86,
+        "29": 375,
+        "30": 204,
+        "31": 216,
+        "32": 18,
+        "33": 245,
+        "34": 179,
+        "35": 59,
+        "36": 43,
+        "37": 236,
+        "38": 111,
+        "39": 9,
+        "40": 107,
+        "41": 268,
+        "42": 72,
+        "43": 301,
+        "44": 331,
+        "45": 295,
+        "46": 103,
+        "47": 112,
+        "48": 118,
+        "49": 104,
+        "50": 219,
+        "51": 83,
+        "52": 222,
+        "53": 320,
+        "54": 205,
+        "55": 373,
+        "56": 190,
+        "57": 302,
+        "58": 349,
+        "59": 92,
+        "60": 339,
+        "61": 168,
+        "62": 55,
+        "63": 363,
+        "64": 383,
+        "65": 399
+      }
     }
   ]
 }
