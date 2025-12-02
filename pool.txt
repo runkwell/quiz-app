@@ -2012,10 +2012,10 @@
 
 --------------------------------------------------
 
-222. Which of the following items are required to allow an application deployed on an EC2 instance to write data to a DynamoDB table? Assume that no security Keys are allowed to be stored on the EC2 instance. (Choose TWO)
+222. Which of the following items are required to allow an application deployed on an EC2 instance to write data to a DynamoDB table? Assume that no security Keys are allowed to be stored on the EC2 instance. (Choose THREE)
 
 - [ ] Create an IAM User that allows write access to the DynamoDB table.
-- [ ] Add an IAM Role to a running EC2 instance.
+- [x] Add an IAM Role to a running EC2 instance.
 - [ ] Add an IAM User to a running EC2 Instance.
 - [x] Launch an EC2 Instance with the IAM Role included in the launch configuration.
 - [x] Create an IAM Role that allows write access to the DynamoDB table.

@@ -672,13 +672,13 @@ Answer D wrong because EC2 could host your own authentication service, but it do
 link ref: https://aws.amazon.com/cognito/
 
 55.Explain
-Answer A wrong because SNS notification.
+Answer A wrong because Amazon SNS (Simple Notification Service) is a notification service used to send messages (like emails, texts, or triggers to other services) when an Auto Scaling event happens (e.g., an instance launches). It is not used to define the metric or trigger the scaling policy itself. The scaling policy relies on a CloudWatch Alarm.
 
-Answer B wrong because NetworkIn bytes.
+Answer B wrong because The NetworkIn metric is a standard EC2 metric that tracks network traffic bytes coming into the instance. While network traffic is related to user activity, it is an indirect measure. The requirement explicitly states the metric is the number of concurrent users, which is not a standard EC2 metric and requires an application-level count.
 
-Answer C wrong because CloudFront CDN.
+Answer C wrong because Amazon CloudFront is a Content Delivery Network (CDN) used to deliver content quickly by caching it at edge locations. It improves performance and reduces load on the origin server but has no direct function in defining a metric for or triggering an EC2 Auto Scaling policy.
 
-Answer D correct because custom metric users scaling.
+Answer D correct because Since the number of concurrent users is a business-specific metric (not a default EC2 metric like CPU or NetworkIn), the application code must calculate this value and then publish it to Amazon CloudWatch using the AWS SDK (e.g., PutMetricData). The EC2 Auto Scaling group can then be configured with a Scaling Policy that uses a CloudWatch Alarm based on this Custom Metric to trigger scaling actions.
 
 link ref: https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html
 
@@ -1014,13 +1014,13 @@ Answer D wrong because IAM internal.
 link ref: https://aws.amazon.com/cognito/
 
 83.Explain
-Answer A wrong because tags no env vars.
+Answer A wrong because Tags are key-value pairs used for metadata (e.g., identifying the owner, cost center, or environment type) and cost allocation. They are not directly accessible by the Lambda function's code at runtime to retrieve configuration values like database connection strings or API keys.
 
-Answer B wrong because hardcore no flexible.
+Answer B wrong because Hardcoding resources (like database URLs or API endpoints) in the source code is a poor practice that makes the code non-portable, requires code changes and redeployment for every environment change, and poses a major security risk (exposing sensitive data).
 
-Answer C correct because env vars inject per env.
+Answer C correct because Environment variables are the standard, secure, and flexible method for injecting configuration settings (like database names, API URLs, or queue names) into the Lambda function's runtime environment. The code simply reads the variable name, and the AWS service manages the specific value for each deployed instance (e.g., Development/Production).
 
-Answer D wrong because separate duplicate.
+Answer D wrong because While you will have separate deployed instances (e.g., MyApp-Dev, MyApp-Prod), having separate source code for each environment is inefficient and difficult to maintain. The goal is to deploy the same code package across all environments and use environment-specific configuration (like environment variables) to point it to the correct resources.
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html
 
@@ -1115,13 +1115,13 @@ Answer D wrong because CodeCommit CloudWatch no SNS.
 link ref: https://aws.amazon.com/codepipeline/
 
 92.Explain
-Answer A correct because ChangeMessageVisibility increase timeout process delete.
+Answer A correct because The ChangeMessageVisibility API call allows the consumer to extend the lock time (visibility timeout) for the specific message it is currently processing. The developer should increase the timeout to be greater than 40 seconds (e.g., 60 seconds). Once processing is complete, the DeleteMessage API call permanently removes the message from the queue, preventing any further retrieval.
 
-Answer B wrong because DeleteQueue entire queue.
+Answer B wrong because You cannot delete a message before processing is complete. More importantly, calling the DeleteQueue API would delete the entire queue, stopping the entire application workflow, which is not the goal.
 
-Answer C wrong because decrease timeout visible sooner re-process.
+Answer C wrong because Decreasing the visibility timeout would make the message visible to other consumers even sooner (in less than 30 seconds), guaranteeing duplicate processing.
 
-Answer D wrong because no DeleteMessageVisibility API.
+Answer D wrong because There is no such API call as DeleteMessageVisibility. To immediately make a message visible again (canceling the current timeout), you would use ChangeMessageVisibility and set the timeout to $\mathbf{0}$ seconds. This is the opposite of the desired outcome.
 
 link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 
@@ -1341,13 +1341,13 @@ Answer D wrong because SSE-KMS is server-side after upload, not app-level prior 
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/services-s3.html
 
 112.Explain
-Answer A wrong because CloudTrail logs API calls, not async invocation details/failures.
+Answer A wrong because AWS CloudTrail records API calls made to AWS services (e.g., lambda:Invoke). While it confirms that the Lambda function was invoked, it does not capture the function's internal application logs (like why the code failed) or the failing event payload. CloudWatch Logs is where the function's runtime logs are stored.
 
-Answer B correct because Dead Letter Queues (DLQ) capture unprocessed events after retries; SQS DLQ allows inspection of failed messages.
+Answer B correct because For asynchronous invocations, Lambda automatically retries the function twice upon failure. If all retries fail, the event is discarded by default. A Dead Letter Queue (DLQ), which can be an Amazon SQS queue or an Amazon SNS topic, is specifically designed to capture these failed, unprocessed events. The developer can then inspect the payload in the DLQ to understand why the function failed.
 
-Answer C wrong because SWF is workflow orchestration, not for Lambda async failures.
+Answer C wrong because Amazon Simple Workflow Service (SWF) is an older coordination service for business processes. While it can handle task failures, it is not the standard or direct mechanism for capturing failed Lambda asynchronous events. The correct, native solution for this is a DLQ or Lambda Destinations.
 
-Answer D wrong because Config tracks resource configs, not event processing.
+Answer D wrong because AWS Config is a service used for assessing, auditing, and evaluating the configurations of your AWS resources. It tracks changes to resource configurations over time (e.g., if the Lambda memory setting changed), but it has no role in capturing or processing failed event payloads from a Lambda asynchronous invocation.
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq
 
@@ -1413,15 +1413,15 @@ Answer D wrong because options expose.
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
 118.Explain
-Answer A wrong because keys code insecure.
+Answer A wrong because This is a security risk (hardcoding secrets in application code) and unscalable. It doesn't allow for per-user authentication or role-based access for 25,000+ users and is a poor security practice (managing static long-term credentials).
 
-Answer B wrong because policies users no scalable.
+Answer B wrong because While S3 bucket policies are essential for access control, restricting access to specific IAM users is unscalable for 25,000 individual users. This approach is better for controlling access for AWS services or a limited number of known administrators/systems, not a large, growing user base.
 
-Answer C correct because Cognito auth/unauth roles.
+Answer C correct because Amazon Cognito is the standard, scalable AWS solution for managing web/mobile application users. It handles authentication and authorization, allowing you to map users (registered -> authenticated role) and guests (guest -> unauthenticated role) to specific IAM Roles. These roles then grant temporary read access to S3.
 
-Answer D wrong because IAM per user no.
+Answer D wrong because Creating 25,000+ IAM Users is unscalable, difficult to manage, and violates the principle of using IAM Users only for people or services who interact directly with AWS APIs (e.g., administrators, developers, background services), not end-users of a web/mobile application.
 
-Answer E correct because STS AssumeRole roles type.
+Answer E correct because This is a secure and scalable pattern, especially for backend services. The application backend can first authenticate the user and then use AWS STS AssumeRole to get temporary credentials for either the "Registered User Role" or the "Guest User Role." This grants only necessary, temporary S3 read permissions. This is the underlying mechanism used by Cognito, but can also be implemented directly.
 
 link ref: https://aws.amazon.com/cognito/
 
@@ -2031,13 +2031,13 @@ Answer D wrong because cross-zone load balancing affects traffic distribution, n
 link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html#lambda-permissions
 
 168.Explain
-Answer A wrong because throttling limits rate but doesn’t enforce per-user SLAs or require API keys.
+Answer A wrong because Throttling limits applied to individual methods (e.g., POST /items) are static limits that apply to all callers collectively. They help protect the backend but do not allow for differentiated access or per-user control required to enforce an SLA that is unique to each user or usage tier.
 
-Answer B correct because usage plans in API Gateway allow per-user rate limits, quotas, and require API keys—enabling SLA compliance and tracking.
+Answer B correct because Usage Plans in Amazon API Gateway are specifically designed to manage traffic and usage for individual customers or tiers. A usage plan allows you to: 1) Throttle requests (rate and burst limits), and 2) Enforce Quotas (total requests per time period). By associating each user's API Key with a specific Usage Plan, the company can enforce the exact terms of their SLA, ensuring premium users get higher limits and all users stay within their contracted bounds.
 
-Answer C wrong because Cognito manages authentication, not API rate limiting.
+Answer C wrong because Amazon Cognito handles authentication and authorization (who you are and what you can do) but does not handle API rate limiting and usage quotas. API throttling is a function of Amazon API Gateway.
 
-Answer D wrong because default stage throttling is global, not per-user.
+Answer D wrong because dStage-level throttling sets limits that apply to all traffic hitting that deployment stage (e.g., /prod). Like method throttling, this protects the backend but does not provide the necessary granularity to enforce per-user or per-tier SLAs.
 
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans.html
 
@@ -2298,11 +2298,13 @@ Answer D wrong because CodeCommit not used in packaging.
 link ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference.html
 
 190.Explain
-Answer A/B wrong because storing credentials (even temporarily) in EBS or user data is insecure.
+Answer A wrong because This violates security best practices. Storing long-term credentials (access keys and secret keys) anywhere on the EC2 instance (EBS volume, file system, etc.) makes them vulnerable to compromise if the instance is breached.
 
-Answer C correct because EC2 instance profile with IAM role grants secure, rotating access to S3 without credentials.
+Answer B wrong because This violates security best practices. User data is intended for bootstrapping scripts and configuration, not for storing sensitive long-term credentials. This method is insecure and non-scalable.
 
-Answer D wrong because S3 service role doesn’t exist—roles are for EC2/Lambda.
+Answer C correct because This is the standard and most secure AWS practice. The EC2 instance assumes an IAM Role via an Instance Profile. The application can then access temporary, frequently rotated credentials from the EC2 instance metadata service to read S3, meaning no static credentials are ever stored on the instance.
+
+Answer D wrong because There is no such thing as an "S3 service role" that is attachable to an EC2 instance. The role you create to grant permissions to an EC2 instance is an IAM Role designed for the EC2 service to assume (often called an EC2 service role).
 
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
@@ -2679,17 +2681,17 @@ Answer E wrong because 100 IAM no. The limit applies to the AWS account.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html
 
 222.Explain
-Answer A wrong because user write no.
+Answer A wrong because IAM Users require long-term credentials (access key and secret key). The requirement is that no security keys are allowed to be stored on the EC2 instance, making this approach unsuitable.
 
-Answer B wrong because add role running.
+Answer B correct because This action attaches the necessary permissions to the running EC2 instance. The EC2 instance uses the Instance Profile to assume the IAM Role, which allows the application to get temporary, automatically rotated credentials via the instance's metadata service.
 
-Answer C wrong because add user no.
+Answer C wrong because You cannot "add an IAM User" to a running EC2 instance. IAM Users are associated with static credentials, which is forbidden by the prompt's constraint.
 
-Answer D correct because launch role.
+Answer D correct because This is the ideal way to achieve the goal: Launching the instance with the role pre-configured. Since the prompt asks for required items, this is functionally similar to "Add an IAM Role," but "Add an IAM Role" is also a valid step for an existing instance. Both the launch and post-launch attachment ultimately rely on having the IAM Role and having it associated with the instance. For completeness in a multi-choice question, the key components are the Role itself and its association.
 
-Answer E correct because role write.
+Answer E correct because An IAM Role is a security identity with permissions that does not have associated static long-term credentials. It is the necessary component to define what the EC2 instance is authorized to do (i.e., write to DynamoDB).
 
-Answer F wrong because user launch no.
+Answer F wrong because EC2 launch configurations do not support including an IAM User directly. They use IAM Roles via an Instance Profile to grant permissions.
 
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
@@ -3175,7 +3177,7 @@ Answer A wrong because The table size would grow by approximately $3.6$ million 
 
 Answer B wrong because Deleting $3.6$ million items requires $3.6$ million Delete API calls, which directly consumes Write Capacity Units (WCUs) and is billed. This is expensive and wastes provisioned throughput on cleanup.
 
-Answer C correct Deleting an entire DynamoDB table is a single free control-plane operation that removes all items and associated storage instantly (from a billing perspective). This is far more efficient and cheaper than running $3.6$ million individual delete operations. The process would be: Create Table A $\rightarrow$ Write for 1 hour $\rightarrow$ Analyze $\rightarrow$ Create Table B, Delete Table A $\rightarrow$ Write for 1 hour $\rightarrow$ Analyze $\rightarrow$ Create Table C, Delete Table B, etc.
+Answer C correct Deleting an entire DynamoDB table is a single free control-plane operation that removes all items and associated storage instantly (from a billing perspective). This is far more efficient and cheaper than running $3.6$ million individual delete operations. The process would be: Create Table A -> Write for 1 hour -> Analyze -> Create Table B, Delete Table A -> Write for 1 hour -> Analyze -> Create Table C, Delete Table B, etc.
 
 Answer D wrong because This addresses the table creation side but fails to address the deletion and cost-saving side. This would lead to 24 unused tables being retained after a day, wasting storage. (Note: Using Time to Live (TTL) would be the standard DynamoDB approach for item expiration, as it doesn't consume WCUs, but the "delete table" strategy is an even more aggressive form of partition-by-time data management often used for temporary, high-throughput data.)
 
@@ -3708,13 +3710,13 @@ Answer D correct The **`createUsagePlanKey`** method is necessary to link the ne
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html
 
 302.Explain
-Answer A correct because Cognito web federation for social logins.
+Answer A correct because Amazon Cognito is the standard, scalable AWS service for user management and authentication in mobile/web applications. Web Identity Federation allows users to authenticate using public identity providers like Amazon, Facebook, Google, etc. Cognito then exchanges the token from the identity provider for temporary AWS credentials via an IAM role, which the mobile app can use to securely access S3.
 
-Answer B wrong because SAML for enterprise.
+Answer B wrong because SAML (Security Assertion Markup Language)-based federation is primarily used for enterprise scenarios (like corporate logins using Active Directory or Okta), not typically for consumer mobile applications using public providers like Facebook or Google.
 
-Answer C wrong because keys in code insecure.
+Answer C wrong because This is a major security violation. Storing long-term IAM credentials in a mobile application's code is extremely risky, as the keys can be easily extracted and used maliciously, compromising the entire AWS account.
 
-Answer D wrong because STS assume for roles.
+Answer D wrong because While AWS STS AssumeRole is a secure way to get temporary credentials, a mobile application cannot securely call AssumeRole directly because it would need static IAM credentials (or a complicated server-side setup) to make the initial call. Cognito abstracts this complexity and handles the federation flow for the developer, making it the appropriate and secure choice for client-side applications.
 
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-amazon-cognito-with-web-and-mobile-apps.html
 
@@ -4751,13 +4753,13 @@ Answer D wrong because CloudFront is a Content Delivery Network (CDN) used for c
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/stages.html
 
 383.Explain
-Answer A correct because Cognito user pools with custom authorizer for JWT.
+Answer A correct because This is the standard, simplest, and most secure AWS approach. Cognito User Pools handle user signup/sign-in and integrate directly with OpenID Providers (Amazon, Facebook, etc.) (Web Identity Federation). Cognito issues standard JSON Web Tokens (JWTs). An Amazon API Gateway Custom Authorizer (which is a Lambda function) can then receive this JWT, validate it, and execute the custom authorization logic based on the user's claims/groups before allowing the API request to proceed.
 
-Answer B wrong because custom broker complex.
+Answer B wrong because This requires the developer to build, maintain, and secure a complex custom token broker. While technically possible, it is neither the simplest nor the most secure solution, as it involves significant engineering overhead and potential security pitfalls compared to leveraging the managed Amazon Cognito service.
 
-Answer C wrong because DynamoDB with STS insecure.
+Answer C wrong because Storing raw user credentials (passwords) in DynamoDB is a major security violation. Even if only temporary credentials (from STS) were used, passing any form of long-term or temporary AWS secret keys (rather than a simple access token) to authenticate a public-facing API is overly complex and highly discouraged.
 
-Answer D wrong because RDS for creds bad practice.
+Answer D wrong because Similar to the DynamoDB option, storing user credentials (passwords) in a database like Amazon RDS is an insecure practice when a managed identity service like Cognito is available. This approach completely bypasses standard identity federation mechanisms (OpenID, Facebook, etc.).
 
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html
 
