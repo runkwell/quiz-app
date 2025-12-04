@@ -1702,9 +1702,9 @@
 188. A company has implemented AWS CodePipeline to automate its release pipelines. The Development team is writing an AWS Lambda function what will send notifications for state changes of each of the actions in the stages. Which steps must be taken to associate the Lambda function with the event source?
 
 - [ ] Create a trigger that invokes the Lambda function from the Lambda console by selecting CodePipeline as the event source.
-- [x] Create an event trigger and specify the Lambda function from the CodePipeline console.
+- [ ] Create an event trigger and specify the Lambda function from the CodePipeline console.
 - [ ] Create an Amazon CloudWatch alarm that monitors status changes in Code Pipeline and triggers the Lambda function.
-- [ ] Create an Amazon CloudWatch Events rule that uses CodePipeline as an event source.
+- [x] Create an Amazon CloudWatch Events rule that uses CodePipeline as an event source.
 
 --------------------------------------------------
 
@@ -3548,8 +3548,8 @@
 
 - [ ] Prefix folder names with user id; for example, `s3://BUCKET/2013-FOLDERNAME/FILENAME.zip`.
 - [ ] Prefix file names with timestamps; for example, `s3://BUCKET/FOLDERNAME/2013-26-05-15-00-00-FILENAME.zip`.
-- [ ] Prefix file names with random hex hashes; for example, `s3://BUCKET/FOLDERNAME/23a6-FILENAME.zip`.
-- [x] Prefix folder names with random hex hashes; for example, `s3://BUCKET/23a6-FOLDERNAME/FILENAME.zip`.
+- [x] Prefix file names with random hex hashes; for example, `s3://BUCKET/FOLDERNAME/23a6-FILENAME.zip`.
+- [ ] Prefix folder names with random hex hashes; for example, `s3://BUCKET/23a6-FOLDERNAME/FILENAME.zip`.
 
 --------------------------------------------------
 
