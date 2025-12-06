@@ -130,8 +130,9 @@ Answer A wrong because default The KMS Encrypt API has a 4 KB limit on the data 
 
 Answer B wrong because The S3 managed key (SSE-S3) is used for server-side encryption. If you specify SSE-S3 in your upload request, the encryption happens after the file is uploaded to S3. This violates the requirement to encrypt the file before uploading.
 -> This is server-side encryption.
+
 Answer C correct because This implements client-side envelope encryption . The Lambda function calls KMS's GenerateDataKey to obtain a temporary, plaintext data key (which is returned alongside its encrypted copy). The Lambda function uses the plaintext key to encrypt the 3 MB file locally before uploading. The encrypted file and the encrypted data key are then stored in S3.
--> BEST Fit. Follows the best practice for encrypting large objects client-side.
+-> Best fit. Follows the best practice for encrypting large objects client-side.
 
 Answer D wrong because This option suggests using the CMK directly (likely via the Encrypt API), which would still violate the 4 KB size limit imposed by KMS. The data key pattern must be used for large objects.
 -> Fails. Violates the 4 KB KMS limit.
@@ -219,7 +220,7 @@ link ref: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.h
 
 18.Explain
 Answer A correct because This pattern involves components reacting immediately to an event (a change in state). When new data is written to the DynamoDB table, an event (via DynamoDB Streams) is generated, which can instantly trigger a processor (e.g., an AWS Lambda function).
--> Best Fit. Guarantees processing starts in near-real time as soon as the data is received, fulfilling the requirement to eliminate the nightly delay.
+-> Best fit. Guarantees processing starts in near-real time as soon as the data is received, fulfilling the requirement to eliminate the nightly delay.
 
 Answer B wrong because A generic term often referring to a request-response model where a client explicitly requests a service (e.g., via an API call).
 -> Does not describe how backend data processing is initiated upon data receipt; focuses on the client-server interaction model.
@@ -296,13 +297,33 @@ Answer C wrong You only need to **update** the environment with a new version; *
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-sourcebundle.html
 
 24.Explain
-Answer A correct because /tmp for local caching in Lambda.
+Answer A correct because AWS Lambda's /tmp directory persists across invocations within the same execution environment. Since the function is called "multiple times a second," there's a high probability of execution environment reuse. Caching the 50MB file in /tmp means subsequent invocations can read from local storage instead of downloading from the internet, providing massive performance gains.
 
-Answer B wrong because timeout increase not cache.
+Answer B wrong because Increasing execution time doesn't solve the performance problem - it just allows the slow operation to run longer. The 50MB download will still take the same amount of time on each invocation. This doesn't address the root cause of repeated downloads and provides no performance improvement.
 
-Answer C wrong because ELB not Lambda.
+Answer C wrong because Load balancers distribute traffic across multiple targets, but Lambda functions are invoked directly by AWS services or API Gateway. A load balancer doesn't reduce the file download time within each Lambda execution and isn't applicable to Lambda's invocation model. This doesn't address the performance bottleneck.
 
-Answer D wrong because S3 adds latency.
+Answer D wrong because While S3 provides reliable storage, this doesn't solve the performance issue. The Lambda function would still need to download the file from S3 on every invocation, which involves network latency and transfer time. S3 access is faster than internet downloads but still much slower than local /tmp directory access.
+
+Why /tmp Directory Caching is Most Effective:
+**AWS Lambda Execution Environment Reuse:**
+- Lambda maintains execution environments for some time after function execution
+- High-frequency invocations ("multiple times a second") increase the likelihood of environment reuse
+- The /tmp directory persists across invocations within the same execution environment
+**Performance Benefits:**
+- Massive Speed Improvement: Local file system access vs. 50MB internet download
+- Reduced Latency: Eliminates network transfer time for cached files
+- Cost Savings: Reduces execution time and data transfer costs
+- Improved Reliability: No dependency on external internet connectivity for cached data
+**Key Considerations:**
+- Cache Validation: Implement logic to check if the cached file is still valid
+- Memory Limits: Ensure the 50MB file fits within Lambda's /tmp storage limits (512MB to 10GB)
+- Cold Starts: First invocation in a new execution environment will still need to download
+- File Cleanup: Consider cleaning up old cached files if needed
+**Performance Impact:**
+- First Invocation: Normal download time + caching overhead
+- Subsequent Invocations: Near-instantaneous file access from local storage
+- Overall Improvement: Dramatic reduction in average execution time for high-frequency invocations
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html
 
@@ -478,13 +499,13 @@ Answer D wrong because S3/CloudFront static.
 link ref: https://aws.amazon.com/elasticbeanstalk/
 
 40.Explain
-Answer A correct because context request ID logging.
+Answer A correct because The Lambda context object contains the AwsRequestId (or request_id depending on the runtime), which is a unique identifier for each function invocation. Writing logs to the console (using console.log, print, puts, etc.) is the standard and recommended approach for Lambda logging, as Lambda automatically captures stdout/stderr and streams these logs to CloudWatch Logs.
 
-Answer B wrong because event no ID, file less reliable.
+Answer B wrong because The event object contains the input data passed to the function (like API Gateway request data, S3 event data, etc.), but it does NOT contain the unique request identifier for the Lambda invocation. Additionally, writing logs to files is not recommended in Lambda because the file system is ephemeral and files may not persist between invocations.
 
-Answer C wrong because event ID console standard.
+Answer C wrong because While writing to the console is correct, the event object does NOT contain the unique request identifier. The event object contains the input payload/data that triggered the Lambda function, not Lambda runtime information like the request ID.
 
-Answer D wrong because context ID file less.
+Answer D wrong because While the context object correctly contains the request identifier, writing logs to files is not the recommended approach for Lambda. Lambda's file system is ephemeral, and files may not persist. The standard practice is to write to stdout/stderr (console), which Lambda automatically captures and sends to CloudWatch Logs.
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html
 
@@ -637,7 +658,8 @@ Answer B wrong because cross-bucket copy is valid and common.
 Answer C wrong because max timeout is 900s (15 min); 500s fits if CPU is sufficient.
 
 Answer D wrong because Java runtime is fully supported; EC2 proves logic works.
-Root cause: Insufficient memory → insufficient CPU → execution too slow → hits 900s limit.
+
+**Root cause:** Insufficient memory → insufficient CPU → execution too slow → hits 900s limit.
 Fix: Increase memory to ≥1GB (e.g., 1536MB) to reduce runtime <900s.
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html
@@ -651,7 +673,7 @@ Answer C wrong because The data is already "at rest" in the stream as soon as it
 
 Answer D correct because The question asks specifically about encryption at rest for data stored inside Amazon Kinesis Streams.
 Kinesis supports this directly through server-side encryption (SSE) using AWS KMS-managed keys.
-When SSE is enabled:
+**When SSE is enabled:**
 - Data records are encrypted before being written to storage in the stream.
 - Encrypted data remains protected for the full retention period (up to 7 days or extended retention).
 - Decryption is handled transparently when consumers read the records.
@@ -667,12 +689,12 @@ The requirement is to allow customers to sign up and authenticate in a mobile ap
 It must integrate with the organization’s existing SAML 2.0 identity provider.
 Needs to be scalable and with a limited budget.
 
-👉 Amazon Cognito User Pools support:
-SAML 2.0 federation
-OAuth / OpenID Connect
-Social logins (Google, Facebook, etc.)
-Built-in sign-up / sign-in / token issuance
-Fully managed and low cost
+**Amazon Cognito User Pools support:**
+- SAML 2.0 federation
+- OAuth / OpenID Connect
+- Social logins (Google, Facebook, etc.)
+- Built-in sign-up / sign-in / token issuance
+- Fully managed and low cost
 This makes Cognito the best choice.
 
 Answer C wrong because IAM is for workforce access and AWS resource permissions — not designed for customer authentication in mobile apps. Also IAM doesn’t support user self-sign-up.
@@ -700,7 +722,7 @@ Answer B wrong because CloudFormation can deploy the entire stack (Lambda, Dynam
 -> Inefficient. CloudFormation syntax is verbose for serverless components.
 
 Answer C correct because The AWS Serverless Application Model (SAM) is an extension of CloudFormation. It uses simpler, shorter syntax (e.g., AWS::Serverless::Function instead of AWS::Lambda::Function). SAM templates are processed by CloudFormation, meaning they deploy the entire stack (including API Gateway and DynamoDB) and automatically gain CloudFormation's built-in rollback capabilities. The sam build and sam deploy commands automate packaging and dependency resolution, making deployment far easier than pure CloudFormation.
--> BEST FIT. Simplifies definition and automatically enables CloudFormation's robust rollback mechanism.
+-> Best fit. Simplifies definition and automatically enables CloudFormation's robust rollback mechanism.
 
 Answer D wrong because This requires the developer to write and maintain complex logic for sequencing the creation/updates of Lambda, API Gateway, and DynamoDB resources, and manually implement rollback logic.
 -> Poor. Requires excessive custom scripting and lacks built-in reliability.
@@ -814,13 +836,13 @@ Answer D correct because Step Functions state.
 link ref: https://aws.amazon.com/step-functions/
 
 66.Explain
-Answer A wrong because single profile no.
+Answer A wrong because This uses the IAM instance profile for the permissions. All containers (tasks) on the same EC2 instance would share the same set of combined permissions, violating the principle of least privilege. If one container is compromised, it could potentially access services required by the other three, which is highly insecure.
 
-Answer B wrong because roles per service task no.
+Answer B wrong because While using distinct IAM roles, the ECS Service role is primarily used for the ECS control plane to make calls on your behalf (e.g., registering/deregistering with a Load Balancer, scaling). It is not the mechanism for providing specific permissions to the running containers (tasks) themselves to access other AWS services like S3 or DynamoDB.
 
-Answer C wrong because group cluster no per task.
+Answer C wrong because this misuses or misunderstands the appropriate assignment mechanism. IAM Groups are for managing users, not for assigning runtime roles to containers. Configuring the ECS Cluster to reference an IAM entity is not the correct AWS pattern for providing task-specific permissions.
 
-Answer D correct because roles per task least.
+Answer D correct because This utilizes Task IAM Roles, which is the AWS best practice for assigning granular permissions to containers in ECS. By defining a specific IAM role for each Task Definition, only the containers associated with that specific game service receive the exact, limited permissions required for their function. This strictly adheres to the principle of least privilege, making it the most secure option.
 
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html
 
@@ -902,7 +924,7 @@ Answer D wrong because config separate. While it may be logically grouped with c
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html
 
 72.Explain
-Answer A correct because BEST FIT. Specifically designed for high-throughput, serverless data streaming into S3, handling buffering, compression, and error retry logic automatically.
+Answer A correct because Best fit. Specifically designed for high-throughput, serverless data streaming into S3, handling buffering, compression, and error retry logic automatically.
 -> Managed data ingestion and delivery service. Automatically captures, transforms, and loads high-volume streaming data into destinations like Amazon S3, Redshift, or OpenSearch Service.
 
 Answer B wrong because This is a network feature to speed up uploads, not a service for orchestrating ingestion from many sources or handling streaming data transformation/delivery.
@@ -998,13 +1020,13 @@ Answer D wrong because no options getRecords.
 link ref: https://docs.aws.amazon.com/streams/latest/dev/kinesis-using-sdk-java-get-records.html
 
 80.Explain
-Answer A wrong because Lambda reactive no prevent.
+Answer A wrong because This is a reactive approach that only detects violations after they occur. It doesn't prevent unencrypted uploads from happening in the first place. While useful for monitoring, it doesn't ensure compliance since unencrypted data would already be stored in the bucket before the notification is sent.
 
-Answer B correct because policy prevent no encryption header.
+Answer B correct because A bucket policy can proactively deny s3:PutObject operations that don't include the x-amz-server-side-encryption header. This prevents unencrypted uploads from occurring in the first place, ensuring 100% compliance with the encryption requirement. The policy uses a "Deny" effect with conditions to block non-compliant uploads.
 
-Answer C wrong because Events after no prevent.
+Answer C wrong because Like the Lambda option, this is reactive monitoring that detects issues after they occur. CloudWatch events can monitor S3 operations but cannot prevent unencrypted uploads from happening. This approach allows policy violations to occur before detection.
 
-Answer D wrong because prevent with header no require.
+Answer D wrong because This option is backwards - it would prevent encrypted uploads and allow unencrypted ones, which is the opposite of what's needed. This would actually violate the security policy rather than enforce it.
 
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html
 
@@ -1077,7 +1099,7 @@ link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-r
 87.Explain
 Answer A wrong because Poor. This field has extremely low cardinality (only 5 distinct values). Almost all traffic would be concentrated into only five partitions, leading to severe hot partitioning and throttling.
 
-Answer B correct because BEST FIT. A UUID is designed to be globally unique and highly random. Using this as the partition key ensures that every new write (review) and every read (single review lookup) is spread uniformly across the maximum number of partitions, resulting in the MOST consistent and scalable performance.
+Answer B correct because Best fit. A UUID is designed to be globally unique and highly random. Using this as the partition key ensures that every new write (review) and every read (single review lookup) is spread uniformly across the maximum number of partitions, resulting in the MOST consistent and scalable performance.
 
 Answer C wrong because Poor. This field is large, not designed for uniformity, and would not be used for primary lookups, making it an inappropriate key choice.
 
@@ -1210,6 +1232,22 @@ Answer C wrong because validate after.
 
 Answer D wrong because validate no order.
 
+**Key Points about CodeDeploy Hook Order:**
+**Complete Sequence (including all hooks):**
+- ApplicationStop
+- BeforeInstall
+- Install (automatic)
+- AfterInstall
+- ApplicationStart
+- ValidateService
+**Why This Order Makes Sense:**
+- ApplicationStop: Gracefully stop the running application to prepare for deployment
+- BeforeInstall: Perform pre-installation tasks like backups and cleanup
+- Install: CodeDeploy automatically copies new application files
+- AfterInstall: Configure the new application, set permissions, etc.
+- ApplicationStart: Start the updated application services
+- ValidateService: Final verification that the deployment was successful
+
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html
 
 99.Explain
@@ -1224,13 +1262,21 @@ Answer D wrong because IAM no API.
 link ref: https://docs.aws.amazon.com/STS/latest/APIReference/API_DecodeAuthorizationMessage.html
 
 100.Explain
-Answer A wrong because S3 signed manual.
+Answer A wrong because While S3 with KMS encryption is secure, this approach requires significant administrative effort: creating S3 buckets, managing KMS keys, generating signed URLs, handling URL expiration, implementing custom code to retrieve secrets from S3, and managing the lifecycle of secrets. This is not the least administrative effort solution.
 
-Answer B wrong because metadata insecure.
+Answer B wrong because This is highly insecure and not recommended. Instance metadata is not designed for storing secrets and is accessible to anyone with access to the EC2 instance. Instance metadata is not encrypted and can be easily compromised. This violates security best practices for secrets management.
 
-Answer C wrong because DynamoDB client complex.
+Answer C wrong because This approach requires substantial administrative effort: setting up DynamoDB tables, implementing client-side encryption libraries, managing encryption keys, writing custom code for secret storage/retrieval, handling key rotation, and managing the DynamoDB infrastructure. This is complex and requires significant development and maintenance effort.
 
-Answer D correct because Parameter Store secure effort.
+Answer D correct because the LEAST administrative effort. Parameter Store is specifically designed for secrets management and provides: built-in encryption with KMS, simple API calls to retrieve secrets, automatic integration with IAM roles, no infrastructure to manage, native support in AWS SDKs, hierarchical organization of parameters, and minimal code required (just ssm:GetParameters permission and simple API calls). It's a managed service that handles encryption, access control, and retrieval automatically.
+
+**Key Advantages of Parameter Store:**
+- Minimal Setup: Just create parameters and assign IAM permissions
+- Built-in Security: Automatic encryption with KMS for SecureString parameters
+- Simple Access: Single API call (GetParameter or GetParameters) to retrieve secrets
+- No Infrastructure: Fully managed service, no servers to maintain
+- Cost-Effective: No additional charges for standard parameters
+- Integration: Native support in AWS SDKs and services like CodeDeploy
 
 link ref: https://aws.amazon.com/systems-manager/parameter-store/
 
@@ -1423,13 +1469,31 @@ Answer D wrong because Introduces S3 and AWS Step Functions as unnecessary inter
 link ref: https://docs.aws.amazon.com/codecommit/latest/userguide/how-to-migrate-repository.html
 
 117.Explain
-Answer A wrong because env vars long-lived insecure.
+Answer A wrong because Environment variables are not secure for storing AWS credentials. They can be easily exposed through process lists, system logs, error messages, or debugging output. Environment variables are visible to anyone with access to the system and can be accidentally logged or exposed. This violates AWS security best practices.
 
-Answer B wrong because file insecure.
+Answer B wrong because Storing credentials in files (like ~/.aws/credentials) is not secure for production applications. These files contain long-term static credentials that can be compromised if the file system is accessed. Files can be accidentally committed to version control, backed up insecurely, or accessed by unauthorized users.
 
-Answer C correct because instance profile rotated secure.
+Answer C correct because Instance profiles provide temporary, automatically rotating credentials through the EC2 metadata service. They eliminate the need to store long-term credentials on the instance, provide automatic credential rotation, use IAM roles for fine-grained permissions, and are delivered securely through the metadata service that's only accessible from the instance itself.
 
-Answer D wrong because options expose.
+Answer D wrong because Passing credentials via command line options is extremely insecure. Command line arguments are visible in process lists, system logs, shell history, and can be seen by other users on the system. This is one of the worst ways to handle credentials and should never be used in production.
+
+**Why Instance Profile Credentials are Most Secure:**
+**Automatic Security Features:**
+- Temporary Credentials: Automatically rotated every few hours
+- No Storage Required: No need to store long-term credentials on the instance
+- Metadata Service: Credentials delivered securely through EC2 metadata service (169.254.169.254)
+- IAM Integration: Uses IAM roles for fine-grained permission control
+**Security Benefits:**
+- No Credential Exposure: Credentials never stored in files, environment variables, or code
+- Automatic Rotation: AWS handles credential lifecycle automatically
+- Least Privilege: IAM roles can be configured with minimal required permissions
+- Audit Trail: All credential usage is logged in CloudTrail
+- No Network Exposure: Metadata service is only accessible from the instance itself
+**Implementation:**
+- Create an IAM role with required permissions
+- Attach the role to the EC2 instance via instance profile
+- AWS SDKs automatically discover and use these credentials
+- No code changes needed - credentials are handled transparently
 
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
@@ -1610,7 +1674,7 @@ link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-apps
 Answer A wrong because Used for event-driven processing (e.g., triggering Lambda functions) or implementing replication. It has no direct impact on reducing the latency of the primary read and write operations.
 -> Captures a time-ordered sequence of item-level modifications (inserts, updates, and deletes) in the table.
 
-Answer B correct because BEST FIT. DAX provides a managed, high-performance, in-memory cache that significantly reduces latency for read-heavy workloads (microsecond response times) and supports eventual consistency for writes, reducing the load and improving the effective throughput of the backend table.
+Answer B correct because Best fit. DAX provides a managed, high-performance, in-memory cache that significantly reduces latency for read-heavy workloads (microsecond response times) and supports eventual consistency for writes, reducing the load and improving the effective throughput of the backend table.
 -> In-memory Caching Layer that sits in front of DynamoDB.
 
 Answer C wrong because Used for disaster recovery and lowering latency for geographically distant users. It does not reduce the microsecond latency for a local application or cache reads/writes.
@@ -1714,13 +1778,25 @@ Answer D wrong because This would only be true if the IAM Role's Explicit Deny p
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
 
 140.Explain
-Answer A wrong because count no retain.
+Answer A wrong because Setting the count limit to zero would disable the count-based lifecycle rule, but this doesn't address the source bundle deletion issue. The lifecycle policy would still be active and could delete source bundles based on other rules (like age-based rules). This doesn't specifically control source bundle retention.
 
-Answer B wrong because disable no retain.
+Answer B wrong because Disabling the entire lifecycle policy would prevent automatic cleanup of application versions, which could lead to hitting the application version quota (1000 versions per region). The team specifically wants to keep the 25-version limit while retaining source bundles, so disabling the policy entirely defeats the purpose.
 
-Answer C wrong because age no retain.
+Answer C wrong because Setting the age limit to zero would disable the age-based lifecycle rule, but like option 1, this doesn't specifically control source bundle retention. The count-based rule (25 versions) would still be active and could still delete source bundles if not configured properly.
 
-Answer D correct because Retention keeps bundle.
+Answer D correct because This setting specifically controls whether source bundles are deleted from S3 when application versions are removed by the lifecycle policy. By setting this option, Elastic Beanstalk will delete the application version from its database but retain the source bundle in S3.
+
+Key Understanding from AWS Documentation:
+**Default Behavior:**
+- "By default, Elastic Beanstalk leaves the application version's source bundle in Amazon S3 to prevent loss of data"
+- "When Elastic Beanstalk deletes an application version from its database, you can no longer deploy that version to an environment. The source bundle remains in S3 unless you configure the rule to delete it"
+**The Problem:** The team is experiencing source bundle deletion, which means the lifecycle policy is configured with DeleteSourceFromS3 set to true in either the MaxCountRule or MaxAgeRule.
+**The Solution:** The correct setting is to configure the retention policy to NOT delete source bundles from S3. This is controlled by the DeleteSourceFromS3 parameter in the lifecycle rules:
+**Important Notes:**
+- Application versions are deleted from Elastic Beanstalk's database but source bundles remain in S3
+- You cannot redeploy a deleted application version, but you can create a new version from the retained source bundle
+- Source bundles don't count toward the application version quota
+- You may incur S3 storage costs for retained source bundles
 
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.as-versions.html
 
@@ -1865,13 +1941,29 @@ Highest Cost (24/7 compute), Higher Latency (due to polling interval).
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
 
 152.Explain
-Answer A wrong because SSL auth not restrict account.
+Answer A wrong because Client-side SSL certificates are used to verify that HTTP requests to your backend systems are from API Gateway, not to authenticate end users or restrict access to specific AWS accounts. This is for backend authentication, not user access control to the API itself.
 
-Answer B correct because resource policies restrict source.
+Answer B correct because  API Gateway resource policies are JSON policy documents that can explicitly restrict API access to users from specified AWS accounts. They provide fine-grained control and can restrict access based on AWS principals (users, roles, accounts), making them ideal for limiting access to test account users only.
 
-Answer C wrong because CORS cross-origin.
+Answer C wrong because CORS is a browser security feature that controls how web pages from one domain can access resources from another domain. It's not an authentication or authorization mechanism and doesn't restrict access based on AWS accounts. CORS is about cross-domain web requests, not AWS account-based access control.
 
-Answer D wrong because usage plans throttling.
+Answer D wrong because 	Usage plans are used for API throttling, quota management, and API key distribution to track and limit usage. While they can control access through API keys, they don't provide AWS account-based restrictions and are primarily for rate limiting and billing purposes, not security-based access control.
+
+**Key Security Benefits:**
+- Explicit Allow/Deny: Only specified AWS accounts can access the API
+- Fine-Grained Control: Can restrict down to specific IAM users, roles, or entire accounts
+- Resource-Level Security: Attached directly to the API resource
+- No Additional Infrastructure: Built-in AWS feature with no extra components
+- Audit Trail: All access attempts are logged in CloudTrail
+**Additional Security Considerations:**
+- Combine with IAM: Resource policies work with IAM policies for defense in depth
+- Condition Keys: Can add conditions like aws:SourceAccount for additional validation
+- Method-Level Control: Can restrict access to specific HTTP methods or resources
+- VPC Restrictions: Can also restrict based on VPC endpoints if needed
+**Implementation Requirements:**
+- Enable AWS_IAM authorization on API methods when using account-based principals
+- Ensure test account users have proper IAM permissions to invoke the API
+- Use signed requests (SigV4) when making API calls from AWS accounts
 
 link ref: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies.html
 
@@ -2069,7 +2161,10 @@ link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/la
 168.Explain
 Answer A wrong because Throttling limits applied to individual methods (e.g., POST /items) are static limits that apply to all callers collectively. They help protect the backend but do not allow for differentiated access or per-user control required to enforce an SLA that is unique to each user or usage tier.
 
-Answer B correct because Usage Plans in Amazon API Gateway are specifically designed to manage traffic and usage for individual customers or tiers. A usage plan allows you to: 1) Throttle requests (rate and burst limits), and 2) Enforce Quotas (total requests per time period). By associating each user's API Key with a specific Usage Plan, the company can enforce the exact terms of their SLA, ensuring premium users get higher limits and all users stay within their contracted bounds.
+Answer B correct because Usage Plans in Amazon API Gateway are specifically designed to manage traffic and usage for individual customers or tiers. A usage plan allows you to: 
+1) Throttle requests (rate and burst limits), and 
+2) Enforce Quotas (total requests per time period). 
+By associating each user's API Key with a specific Usage Plan, the company can enforce the exact terms of their SLA, ensuring premium users get higher limits and all users stay within their contracted bounds.
 
 Answer C wrong because Amazon Cognito handles authentication and authorization (who you are and what you can do) but does not handle API rate limiting and usage quotas. API throttling is a function of Amazon API Gateway.
 
@@ -2121,13 +2216,27 @@ Answer D wrong because Lambda@Edge is for edge logic, not identity federation.
 link ref: https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html
 
 171.Explain
-Answer A wrong because CLI supports custom metrics via put-metric-data.
+Answer A wrong because The AWS CLI fully supports sending custom metrics to CloudWatch. The documentation clearly shows examples of using CLI commands to publish custom metrics.
 
-Answer B correct because put-metric-data publishes custom metrics; put-metric-alarm creates alarms, not metrics.
+Answer B correct because  The Developer is using 'put-metric-alarm' which is used to CREATE ALARMS, not to publish metric data. To publish custom metrics to CloudWatch, you must use 'put-metric-data'. The 'put-metric-alarm' command creates alarms based on existing metrics, but it doesn't create the underlying metric data itself.
 
-Answer C wrong because unified agent is optional; CLI/SDK can publish metrics.
+Answer C wrong because While the CloudWatch agent is one way to publish custom metrics, it's not required. You can publish custom metrics directly using the AWS CLI 'put-metric-data' command, AWS SDKs, or API calls without needing the CloudWatch agent.
 
-Answer D wrong because location doesn’t matter—CLI works anywhere with credentials.
+Answer D wrong because Custom metrics can be published from anywhere with proper AWS credentials and network access - EC2 instances, on-premises servers, Lambda functions, or any other environment. The location where the code runs doesn't prevent custom metrics from appearing in CloudWatch.
+
+**The Core Issue:**
+**The Developer is confusing two different AWS CLI commands:**
+1. 'put-metric-data' - Used to PUBLISH custom metric data to CloudWatch
+aws cloudwatch put-metric-data --namespace "MyApp/Status" --metric-data MetricName=ServiceStatus,Value=1,Unit=Count
+2. 'put-metric-alarm' - Used to CREATE ALARMS based on existing metrics
+aws cloudwatch put-metric-alarm --alarm-name "ServiceDown" --metric-name ServiceStatus --namespace "MyApp/Status"
+**Correct Workflow:**
+First: Use put-metric-data to publish the custom metrics (1 for up, 0 for down)
+Then: Use put-metric-alarm to create alarms based on those published metrics
+**Why the metrics don't appear:**
+- 'put-metric-alarm' only creates alarms; it doesn't create the underlying metric data
+- Without metric data being published via put-metric-data, there are no metrics to display in the CloudWatch console
+- The alarm creation might succeed, but it will be in an "INSUFFICIENT_DATA" state because no metric data exists
 
 link ref: https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-data.html
 
@@ -2714,13 +2823,13 @@ Answer D wrong because The private instance needs outbound internet access, not 
 link ref: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html
 
 220.Explain
-Answer A correct because eventual consistency GETs.
+Answer A correct because The US-STANDARD region (now called US East - N. Virginia) historically used eventual consistency for new object uploads, meaning there could be a delay between when an object was successfully written and when it became readable from all locations. This behavior was possible before December 2020 when S3 implemented strong consistency globally.
 
-Answer B wrong because no replication.
+Answer B wrong because S3 objects become visible within the same region immediately after upload (with strong consistency) or shortly after (with eventual consistency). Cross-region replication is a separate feature and is not required for object visibility within the original region. Objects don't need to replicate to other regions to be readable.
 
-Answer C wrong because no delay.
+Answer C wrong because There was no fixed 1-second delay imposed by S3. The eventual consistency model meant delays could vary and were typically much shorter than 1 second, but there was no specific mandated delay period. The timing was based on internal replication processes, not a fixed delay.
 
-Answer D wrong because no limit.
+Answer D wrong because S3 buckets have virtually unlimited object capacity with no practical limit that would cause this behavior. Exceeding object limits would not cause an object to be successfully stored but then not readable - it would prevent the upload entirely.
 
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Introduction.html#ConsistencyModel
 
@@ -2769,13 +2878,13 @@ Answer E wrong because default deny.
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
 
 224.Explain
-Answer A wrong because NAT public.
+Answer A wrong because NAT instances are used to provide outbound internet access for instances in private subnets, not to enable inbound internet access to instances in public subnets. Since all instances are already in a public subnet and three are working fine, a NAT instance won't solve the connectivity issue for the fourth instance.
 
-Answer B wrong because routing ok assumed.
+Answer B wrong because The routing table is already correctly configured since three instances in the same subnet can successfully communicate with the Internet. The routing table must already have a route to the Internet Gateway (0.0.0.0/0 → IGW), so modifying it won't fix the issue.
 
-Answer C wrong because OS IP no.
+Answer C wrong because Public IP addresses cannot be configured within the operating system of an EC2 instance. Public IP addressing is managed entirely by AWS at the VPC level through the Internet Gateway's NAT functionality. The instance OS only sees its private IP address.
 
-Answer D correct because EIP public access.
+Answer D correct because This is the correct solution. For an instance in a public subnet to be accessible from the Internet, it must have a public IP address. The fourth instance likely doesn't have one, either because auto-assign public IP was disabled or not requested during launch. An Elastic IP address will provide the necessary public IP address for Internet connectivity.
 
 link ref: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html
 
@@ -2852,13 +2961,30 @@ Answer E wrong because CloudFront distribution.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html
 
 231.Explain
-Answer A wrong because deleted on fail.
+Answer A wrong because This is not the default behavior. By default, CloudFormation does not preserve resources when stack creation fails. This behavior is only available if you explicitly choose the "Preserve successfully provisioned resources" option during stack creation, which is not the default setting.
 
-Answer B correct because rollback deletes.
+Answer B correct because When stack creation fails, CloudFormation automatically performs a rollback operation that deletes all resources that were successfully created up to the point of failure. This ensures the environment is returned to its original state before the stack creation attempt, preventing partial deployments and resource orphaning.
 
-Answer C wrong because stops on fail.
+Answer C wrong because CloudFormation does not continue creating resources after encountering a failure. When a resource creation fails, CloudFormation immediately stops the creation process and begins the rollback procedure. It does not attempt to create remaining resources in the template.
 
-Answer D wrong because not advance.
+Answer D wrong because While CloudFormation does validate template syntax and some basic resource configurations before starting deployment, it cannot guarantee success. Many failures occur during actual resource provisioning due to factors like insufficient permissions, resource limits, dependency issues, or external service problems that cannot be detected during template validation.
+
+**Key Points about Default CloudFormation Behavior:**
+**Default Rollback Process:**
+- When any resource creation fails, CloudFormation stops the creation process
+- All successfully created resources are automatically deleted
+- The stack status becomes CREATE_FAILED
+- No partial stack remains in your AWS account
+**Why This is the Default:**
+- Consistency: Prevents partial deployments that could cause confusion
+- Clean Environment: Ensures no orphaned resources remain
+- Predictability: You either get a complete stack or no stack at all
+- Cost Control: Prevents charges for partially created resources
+**Alternative Behavior (Non-Default):**
+- You can choose "Preserve successfully provisioned resources" during stack creation
+- This keeps successfully created resources and puts the stack in CREATE_FAILED state
+- Useful for debugging and troubleshooting
+- Must be explicitly selected - not the default behavior
 
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-stack-rollback.html
 
@@ -3020,15 +3146,24 @@ Answer E wrong because This is only a change in the type of cookie used (Applica
 link ref: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-sticky-sessions.html
 
 242.Explain
-Answer A correct because HTTP.
+Answer A correct because HTTP is a supported SNS delivery transport. SNS can deliver messages to HTTP endpoints, and the documentation specifically mentions HTTP/HTTPS endpoints as supported protocols for message delivery.
 
-Answer B wrong because UDP no.
+Answer B wrong because UDP (User Datagram Protocol) is not a supported SNS delivery transport. SNS does not support UDP-based message delivery. UDP is a low-level network protocol, not an application-level messaging transport that SNS uses.
 
-Answer C correct because SMS.
+Answer C correct because SMS is a supported SNS delivery transport. Amazon SNS provides mobile text messaging (SMS) capabilities and can deliver messages directly to phone numbers. The documentation clearly shows SMS as one of the supported messaging protocols.
 
-Answer D wrong because DynamoDB no.
+Answer D wrong because DynamoDB is not a delivery transport for SNS. While DynamoDB is an AWS database service, it's not a messaging protocol or delivery mechanism that SNS uses to deliver notifications. SNS delivers messages to endpoints, not databases.
 
-Answer E wrong because pipes no.
+Answer E wrong because Named Pipes are not supported by SNS. Named Pipes are an inter-process communication mechanism used in operating systems, not a network-based messaging transport that SNS supports for message delivery.
+
+**Complete List of Valid SNS Delivery Transports:**
+- HTTP/HTTPS - Web endpoints
+- Email/Email-JSON - Email addresses
+- SMS - Mobile phone numbers
+- Amazon SQS - SQS queues
+- AWS Lambda - Lambda functions
+- Mobile Push Notifications - iOS, Android, etc.
+- Amazon Kinesis Data Firehose - Data streaming
 
 link ref: https://aws.amazon.com/sns/features/
 
@@ -3168,13 +3303,33 @@ Answer F wrong because SQS separate.
 link ref: https://aws.amazon.com/elasticbeanstalk/
 
 253.Explain
-Answer A wrong because IAM user creds insecure.
+Answer A wrong because This is highly insecure. Distributing long-term AWS credentials with mobile apps exposes them to reverse engineering, decompilation, and extraction. These credentials could be compromised and used maliciously. Mobile apps are downloaded to user devices where credentials can be extracted.
 
-Answer B wrong because root creds bad.
+Answer B wrong because This is the worst possible approach. Root account credentials provide unlimited access to all AWS services and resources. Distributing root credentials in a mobile app would be catastrophic from a security perspective, potentially compromising the entire AWS account.
 
-Answer C correct because web federation temp creds.
+Answer C correct because most secure approach. Web identity federation allows the app to exchange Facebook authentication tokens for temporary AWS credentials through AWS STS. These credentials are short-lived, automatically expire, and are scoped to specific permissions via IAM roles.
 
-Answer D wrong because cross-account for accounts.
+Answer D wrong because Cross-account access is not applicable here since the mobile app isn't an AWS account. Even if it were, this doesn't solve the fundamental problem of how to securely authenticate individual users and provide appropriate credentials.
+
+**Why Web Identity Federation is Most Secure:**
+**Security Benefits:**
+- No Long-term Credentials: No permanent AWS credentials stored in the mobile app
+- Temporary Credentials: STS provides short-lived credentials that automatically expire
+- User-Specific Access: Each user gets their own temporary credentials based on their Facebook identity
+- Fine-Grained Permissions: IAM roles can be configured with minimal required permissions
+- Automatic Rotation: Credentials refresh automatically without manual intervention
+**How Web Identity Federation Works:**
+- User Authentication: User logs into Facebook within the mobile app
+- Token Exchange: App receives Facebook authentication token
+- STS Request: App calls AWS STS AssumeRoleWithWebIdentity with Facebook token
+- Temporary Credentials: STS returns temporary AWS credentials (AccessKeyId, SecretAccessKey, SessionToken)
+- DynamoDB Access: App uses temporary credentials to sign DynamoDB API requests
+- Automatic Expiration: Credentials expire after a set time (typically 1 hour)
+**Additional Security Features:**
+- User Isolation: Each user can only access their own game data
+- Conditional Access: IAM policies can restrict access based on Facebook user ID
+- No Credential Storage: No need to store or manage credentials on the device
+- Audit Trail: All access is logged in CloudTrail
 
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html
 
@@ -3380,13 +3535,17 @@ Answer D wrong because RC5 not.
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html
 
 270.Explain
-Answer A correct because annotations for custom data indexed.
+Answer A correct because Annotations are simple key-value pairs that are indexed by X-Ray for use with filter expressions. They allow you to record data that you want to use to group traces in the console or when calling the GetTraceSummaries API. X-Ray indexes up to 50 annotations per trace, making them perfect for filtering large amounts of data. Annotations can have string, number, or Boolean values and are specifically designed for searchability and filtering.
 
-Answer B wrong because metadata not indexed.
+Answer B wrong because Metadata are key-value pairs that can have values of any type (including objects and lists), but they are NOT indexed by X-Ray. While metadata is useful for storing detailed information in traces, it cannot be used for filtering or searching traces. Since the requirement is to implement indexing for filtering, metadata won't achieve the desired goal.
 
-Answer C wrong because env vars config.
+Answer C wrong because Environment variables are used for basic X-Ray configuration (like enabling tracing, setting sampling rules, or configuring the daemon endpoint), but they don't provide the ability to add custom indexed data for filtering. Environment variables won't help with instrumenting code to provide more detailed, filterable information.
 
-Answer D wrong because plugins SDK.
+Answer D wrong because While plugins can enhance X-Ray's ability to trace AWS services (like automatically tracing AWS SDK calls), they don't provide the capability to add custom indexed data for filtering. Plugins are for automatic instrumentation of AWS services, not for adding custom filterable data to traces.
+
+**Key Distinction:**
+- Annotations = Indexed and searchable (perfect for filtering large datasets)
+- Metadata = Not indexed, used only for storing additional information
 
 link ref: https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-annotations
 
@@ -3495,11 +3654,9 @@ link ref: https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html
 Answer A wrong because High-resolution is correct, but 30-second publishing is too slow → cannot reflect load in last 15 seconds.
 
 Answer B correct 
-Scaling based on user load in the last 15 seconds requires CloudWatch metrics with a granularity of 1 second (high-resolution).
-
-CloudWatch can evaluate scaling policies using the most recent datapoints, so publishing every 5 seconds ensures the system always has fresh data when making scaling decisions.
-
-This meets the requirement of reacting within 15 seconds.
+- Scaling based on user load in the last 15 seconds requires CloudWatch metrics with a granularity of 1 second (high-resolution).
+- CloudWatch can evaluate scaling policies using the most recent datapoints, so publishing every 5 seconds ensures the system always has fresh data when making scaling decisions.
+- This meets the requirement of reacting within 15 seconds.
 
 Answer C wrong because Standard resolution is 1-minute granularity → CANNOT scale based on last 15 seconds + 30 sec interval is too slow.
 
@@ -3744,15 +3901,28 @@ Answer D correct because more memory increases CPU proportionally.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/resource-model.html
 
 299.Explain
-Answer A wrong because async Lambda still waits for login.
+Answer A wrong because This doesn't address the core issue. The problem is the database query bottleneck during login, not the compute platform. Moving to Lambda won't solve the database performance issue and may actually add complexity and cold start latency. The user still needs to wait for the database query to complete before seeing their customized page.
 
-Answer B correct because Memcached caches user data, speeding login.
+Answer B correct because This directly addresses the bottleneck. Caching user account data and preferences in ElastiCache provides sub-millisecond response times instead of querying RDS every time. This is ideal for login scenarios where user data is frequently accessed and relatively static. The cache-aside pattern can store user profiles, reducing database load significantly.
 
-Answer C wrong because ALB balances, but bottleneck is DB.
+Answer C wrong because Load balancing distributes traffic across multiple EC2 instances but doesn't solve the database query performance issue. If the database query is the bottleneck, spreading the same slow queries across more instances won't improve individual user login times. The problem is at the data layer, not the application layer distribution.
 
-Answer D correct because async DB call doesn't block.
+Answer D correct because This can improve user experience. By making the database call asynchronous, the application can potentially load other page elements or show a loading state while the user data is being fetched. However, this requires careful implementation to ensure the user-specific content loads properly once the database query completes.
 
-Answer E wrong because batch increases latency.
+Answer E wrong because This is not practical for login scenarios. Users log in individually and expect immediate access to their personalized data. Batching would introduce unacceptable delays as users would have to wait for other users' login requests to be batched together. Login is inherently a real-time, individual operation.
+
+**Why These Two Solutions Work Best:**
+**ElastiCache for MemCached:**
+- Microsecond Latency: Provides sub-millisecond response times vs. database queries
+- Reduced Database Load: Offloads frequent read operations from RDS
+- Perfect Use Case: User profiles and preferences are ideal for caching (frequently read, infrequently changed)
+- Cache-Aside Pattern: Check cache first, query database only on cache miss
+- Scalability: Handles high concurrent login requests without database strain
+**Asynchronous Database Calls:**
+- Non-Blocking: Allows other page elements to load while user data is fetched
+- Better User Experience: Can show loading states or partial content immediately
+- Parallel Processing: Can fetch user data while loading static page elements
+- Perceived Performance: Users see immediate response even if data takes time to load
 
 link ref: https://aws.amazon.com/elasticache/memcached/
 
@@ -3958,13 +4128,17 @@ Answer D wrong because CodeCommit is a code repository, not a credential manager
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html
 
 315.Explain
-Answer A wrong because RDS queryable but not for metrics.
+Answer A wrong because While technically possible, this is highly inefficient and expensive for simple counter data. It requires running and managing an RDS instance, and you'd need to build a custom application to query the data and implement the alerting logic.
+-> High cost of RDS instance (EC2 + storage), high operational overhead, custom alerting development required.
 
-Answer B wrong because X-Ray with Lambda for tracing.
+Answer B wrong because X-Ray is for tracing application requests and troubleshooting latency, not for aggregating simple business metrics like a callback count. It would require complex, custom logic in Lambda to parse trace data for a simple count, making it difficult to maintain and non-cost-effective.
+-> X-Ray is the wrong tool for aggregate metrics, requires complex custom Lambda logic, Lambda and X-Ray costs for processing thousands of events.
 
-Answer C wrong because Kinesis/DynamoDB complex.
+Answer C wrong because This provides excellent real-time streaming capability, but it introduces unnecessary complexity and costs for a simple 10-day metric count and alerting requirement. It requires Kinesis, Lambda, and DynamoDB (3 paid services) where a single service (CloudWatch) is sufficient.
+-> High complexity (3 services), higher cost of Kinesis Stream and DynamoDB writes, Lambda execution costs, only slightly less operational burden than RDS.
 
-Answer D correct because CloudWatch custom metrics with alarms cost-effective.
+Answer D correct because CloudWatch is the native service for monitoring and observability. Pushing a custom metric (e.g., "CallbackCount") is a simple API call. It handles the time-series data storage and retention, and the CloudWatch Alarms feature is the most cost-effective and simplest way to set up automated threshold alerts.
+-> The most cost-effective solution; designed specifically for time-series metrics and alerting. CloudWatch Alarms are cheap and fully integrated.
 
 link ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
 
@@ -4089,13 +4263,13 @@ link ref: https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon-ecs.html
 https://docs.aws.amazon.com/xray/latest/devguide/scorekeep-ecs.html
 
 325.Explain
-Answer A wrong because acl condition not for encryption.
+Answer A wrong because The 's3:x-amz-acl' condition key is related to Access Control Lists (ACLs) and object permissions, not encryption. This controls who can access objects but does not encrypt the data at rest. ACLs are about access control, not data protection through encryption.
 
-Answer B wrong because RDS not for S3.
+Answer B wrong because Amazon RDS is a relational database service, not a storage solution for the S3 application being designed. RDS encryption would not encrypt data stored in S3 buckets. This option is completely unrelated to S3 data-at-rest encryption requirements.
 
-Answer C wrong because SecureTransport for transit.
+Answer C wrong because The 'aws:SecureTransport' condition enforces encryption in transit (HTTPS/TLS) but does not provide encryption at rest. This ensures data is encrypted while being transmitted to/from S3, but once stored, the data would not be encrypted unless additional measures are taken.
 
-Answer D correct because default SSE-S3 encrypts at rest.
+Answer D correct because S3 default encryption ensures that all objects uploaded to the bucket are automatically encrypted at rest. Since January 5, 2023, S3 automatically applies SSE-S3 encryption by default, but you can also configure SSE-KMS or DSSE-KMS for additional control. This directly addresses the compliance requirement for data-at-rest encryption.
 
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-bucket-encryption.html
 
@@ -4187,13 +4361,15 @@ Answer D wrong because The buildspec.yaml file is used by AWS CodeBuild to defin
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
 
 333.Explain
-Answer A wrong because sticky for same instance.
+Answer A wrong because Sticky sessions route users to the same EC2 instance, but if that instance fails, the session is broken and session state is lost. This approach has limitations in fault tolerance and can lead to uneven load distribution.
 
-Answer B wrong because SQS not for sessions.
+Answer B wrong because SQS is a message queuing service designed for asynchronous communication between services, not for storing session state data. It's not appropriate for session management.
 
-Answer C correct because DynamoDB scalable for sessions.
+Answer C correct because DynamoDB provides a highly available and scalable external storage solution for session data. Sessions are stored outside of EC2 instances, so if an instance fails, session data remains accessible from the shared backing store. This decouples session state from individual instances and ensures fault tolerance.
 
-Answer D wrong because draining for termination.
+Answer D wrong because Connection draining helps complete existing requests before removing an instance, but it doesn't prevent session loss when an instance fails. It's a graceful shutdown mechanism, not a session persistence solution.
+
+**Key Point:** The recommended approach for fault-tolerant session management is using a shared backing store like Amazon DynamoDB, Amazon RDS, or Amazon ElastiCache (Redis). This ensures session data persists independently of individual EC2 instances and provides seamless scaling and fault tolerance.
 
 link ref: https://aws.amazon.com/blogs/aws/elastic-load-balancer-support-for-amazon-dynamodb/
 
@@ -4355,13 +4531,44 @@ Answer D wrong because quoting for args.
 link ref: https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
 
 346.Explain
-Answer A wrong because security groups for network.
+Answer A wrong because Security groups control network traffic at the instance level by defining inbound and outbound rules, but they don't define port mappings for containers. Security groups specify which ports are allowed for network access, but not how container ports map to host ports.
 
-Answer B wrong because ECR for images.
+Answer B wrong because ECR is a container image registry service used to store, manage, and deploy Docker container images. It doesn't contain configuration for how containers run, including port mappings. ECR only stores the container images themselves.
 
-Answer C wrong because agent runs containers.
+Answer C wrong because The ECS container agent is responsible for managing containers on EC2 instances and communicating with the ECS service, but it doesn't define port mappings. The agent reads configuration from task definitions and implements the port mappings, but doesn't define them.
 
-Answer D correct because task definition defines ports.
+Answer D correct because  Port mappings are defined in the task definition as part of the container configuration. The task definition specifies how container ports map to host ports through the 'portMappings' parameter in the container definition.
+
+**PortMapping Configuration in Task Definition:**
+{
+  "containerDefinitions": [
+    {
+      "name": "my-container",
+      "image": "my-app:latest",
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ]
+    }
+  ]
+}
+**Key PortMapping Parameters:**
+- containerPort: The port number on the container that receives traffic
+- hostPort: The port number on the host that maps to the container port
+- protocol: The protocol used (tcp or udp)
+- name: Optional name for the port mapping (used with Service Connect)
+**Network Mode Considerations:**
+- awsvpc mode: hostPort should match containerPort or be omitted
+- bridge mode: Supports dynamic port mapping when hostPort is omitted
+- host mode: Container uses host's network directly
+>> **Dynamic Port Mapping:** When hostPort is omitted in bridge mode, ECS automatically assigns available ports from the ephemeral port range (typically 32768-65535), allowing multiple containers with the same containerPort to run on the same host.
+**Integration with Other Services:**
+- Load Balancers: Use the port mappings to route traffic to containers
+- Service Discovery: References port mappings for service-to-service communication
+- Security Groups: Must allow traffic on the mapped host ports
 
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html
 
@@ -4425,13 +4632,20 @@ Answer D wrong because delay worsens.
 link ref: https://docs.aws.amazon.com/general/latest/gr/api-retries.html
 
 352.Explain
-Answer A wrong because script with cron managed.
+Answer A wrong because This approach requires maintaining EC2 instances, writing custom scripts, and managing cron jobs. It's more complex, costly, and consumes write capacity units for deletions. Not the simplest solution.
 
-Answer B correct because TTL auto-deletes old items.
+Answer B correct because  This is the simplest and most cost-effective solution. DynamoDB's TTL feature automatically deletes expired items without consuming write capacity units. You simply add an attribute with epoch timestamp and enable TTL on that attribute. DynamoDB handles the deletion process automatically.
 
-Answer C wrong because new table daily costly.
+Answer C wrong because  This creates operational complexity with multiple tables, makes querying across time periods difficult, and is not suitable for session data that may have varying expiration times.
 
-Answer D wrong because ItemExpiration not standard; use TTL.
+Answer D wrong because Simply adding an attribute named ItemExpiration does nothing by itself. You must also enable the TTL feature and configure it to use that attribute. The attribute name can be anything valid, but TTL must be enabled.
+
+**Key Points:**
+- TTL deletes are free (no write capacity units consumed)
+- TTL runs automatically in the background without impacting table performance
+- TTL processes run approximately every 6 hours, with items typically deleted within 48 hours of expiration
+- The TTL attribute must contain epoch timestamp values (seconds since January 1, 1970)
+- TTL is the recommended AWS best practice for automatically removing expired data
 
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-how-to.html
 
@@ -4447,13 +4661,19 @@ Answer D wrong because join first serial.
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html
 
 354.Explain
-Answer A correct because multi-part for large objects.
+Answer A correct because The error occurs because single PUT operations in S3 have a maximum limit of 5 GB per object. Since the file is 15 GB, it exceeds this limit. Multipart upload allows you to upload objects up to 48.8 TiB (53.7 TB) by breaking the object into smaller parts (5 MiB to 5 GiB each) and uploading them separately. AWS recommends using multipart upload for objects larger than 100 MB, and it's required for objects larger than 5 GB.
 
-Answer B wrong because Direct Connect network, not size.
+Answer B wrong because AWS Direct Connect provides a dedicated network connection between your premises and AWS, which can improve bandwidth and reduce costs, but it doesn't change S3's object size limits. The 5 GB single PUT operation limit still applies regardless of the network connection type. Direct Connect won't solve the "maximum allowed object size" error.
 
-Answer C wrong because no support contact for size.
+Answer C wrong because The 5 GB limit for single PUT operations is a hard limit built into S3's architecture and cannot be increased by AWS Support. This is a fundamental design constraint of the service. AWS provides multipart upload specifically to handle larger objects, so there's no need to request limit increases.
 
-Answer D wrong because region not issue.
+Answer D wrong because S3's object size limits are consistent across all AWS regions. The 5 GB limit for single PUT operations applies globally. Changing regions won't resolve the "maximum allowed object size" error - the same limit exists everywhere.
+
+**Key Technical Details:**
+- Single PUT limit: 5 GB maximum per object
+- Multipart upload limit: Up to 48.8 TiB (53.7 TB) maximum per object
+- Multipart specifications: Maximum 10,000 parts, each part 5 MiB to 5 GiB
+- Recommendation: Use multipart upload for objects > 100 MB, required for objects > 5 GB
 
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
 
@@ -4582,15 +4802,15 @@ Answer D wrong because The root filesystem is part of the instance's local stora
 link ref: https://aws.amazon.com/elasticache/
 
 364.Explain
-Answer A correct because SQS for async message passing.
+Answer A correct because Fully managed message queuing service that enables decoupling and scaling of microservices through **asynchronous** communication. Messages are stored in queues until consumed, providing reliable message delivery.
 
-Answer B wrong because Cognito auth.
+Answer B wrong because Identity and access management service for user authentication and authorization. Not designed for message passing between microservices.
 
-Answer C wrong because Kinesis streaming.
+Answer C wrong because Real-time data streaming service for processing and analyzing streaming data. While it can handle messaging, it's primarily designed for real-time analytics rather than general microservices communication.
 
-Answer D correct because SNS for pub/sub.
+Answer D correct because Pub/sub messaging service that allows decoupled applications to communicate **asynchronously**. Enables delivery of messages to multiple subscribers simultaneously, perfect for fan-out scenarios.
 
-Answer E wrong because ElastiCache caching.
+Answer E wrong because In-memory caching service (Redis/Memcached) used to improve application performance. Not a messaging service for asynchronous communication.
 
 link ref: https://aws.amazon.com/sqs/
 
@@ -4707,9 +4927,7 @@ link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/php-ha-tutorial
 372.Explain
 Answer A correct
 SQS long polling allows the consumer to wait for messages to arrive instead of polling immediately and receiving empty responses.
-
 This reduces the delay between message arrival and processing, especially for infrequently updated messages.
-
 It also reduces the number of empty responses and unnecessary API calls.
 
 Answer B wrong because Message size does not affect queue-to-dashboard latency; it affects network payload efficiency.
@@ -4870,24 +5088,42 @@ Answer D correct because Elastic Beanstalk looks for configuration files with th
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html
 
 385.Explain
-Answer A wrong because more RAM increases CPU but connection is bottleneck.
+Answer A wrong because While increasing RAM also increases the vCPU allocated to the Lambda function (improving CPU-bound task speed), it does not fix the underlying issue of connection setup latency. This is a common performance tip, but it's an expensive band-aid for a problem that is fundamentally about code structure and connection management. Also, the claim that more RAM increases the number of threads is an oversimplification; the increase in threads is primarily due to the increased vCPU power.
 
-Answer B wrong because DB size not connections.
+Answer B wrong because Increasing the size of the RDS instance may improve its capacity to handle more requests overall but will not reduce the latency of establishing an individual connection. The issue is on the Lambda side, not necessarily the RDS capacity.
 
-Answer C correct because global connection reuse reduces init time.
+Answer C correct because Moving the connection outside the handler and into the global/initialization space allows the Lambda execution environment to reuse the connection across subsequent requests, avoiding the costly connection setup/teardown overhead on every call. This dramatically reduces the execution time for Warm Starts, which happen frequently when a function is run hundreds of times per hour.
 
-Answer D wrong because DynamoDB no pooling needed.
+Answer D wrong because Replacing RDS with DynamoDB is an architectural shift that may be unnecessary. While DynamoDB is faster for many use cases and can handle high write loads, the performance issue here is related to the connection management pattern for a relational database (RDS). The simplest and most direct fix is to optimize the existing Lambda code for RDS.
 
 link ref: https://docs.aws.amazon.com/lambda/latest/operatorguide/connection-reuse.html
 
 386.Explain
-Answer A wrong because region not CORS.
+Answer A wrong because S3 buckets in different regions can be accessed from anywhere on the internet. The region location doesn't prevent JavaScript from downloading images. Cross-region access is a normal and supported operation for S3 static websites.
 
-Answer B wrong because same bucket not required.
+Answer B wrong because There's no requirement for images to be in the same S3 bucket as the website. S3 allows cross-bucket access, and it's common practice to separate static assets across different buckets for organization, security, or performance reasons.
 
-Answer C wrong because port 80 security unrelated.
+Answer C wrong because S3 buckets don't use security groups - that's an EC2 concept. S3 is a managed service that handles network access automatically. S3 static websites are accessible over standard HTTP (port 80) and HTTPS (port 443) without any security group configuration.
 
-Answer D correct because CORS enables cross-bucket access.
+Answer D correct because When JavaScript running on a website hosted in one S3 bucket tries to access resources (images) from another S3 bucket, browsers enforce the Same-Origin Policy. This security feature blocks cross-origin requests unless CORS is properly configured on the target bucket.
+
+**Why CORS is the Issue:**
+**Browser Security Policy:**
+- Modern browsers implement the Same-Origin Policy as a security measure
+- This policy blocks JavaScript from accessing resources from different origins (different domains, protocols, or ports)
+- An S3 static website and another S3 bucket have different origins (different bucket names = different domains)
+**How CORS Solves the Problem:**
+- CORS tells the browser that cross-origin requests are allowed
+- The image bucket must explicitly allow requests from the website's origin
+- Without CORS, the browser blocks the JavaScript image download requests
+- With proper CORS configuration, the browser allows the cross-origin image requests
+**Configuration Steps:**
+- Go to the S3 console for the images bucket
+- Navigate to Permissions tab
+- Edit CORS configuration
+- Add rules allowing the website's origin
+- Include GET method in AllowedMethods
+- Save the configuration
 
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html
 

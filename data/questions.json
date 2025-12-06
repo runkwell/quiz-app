@@ -5338,7 +5338,7 @@
       {
         "text": "Create an event trigger and specify the Lambda function from the CodePipeline console.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "Create an Amazon CloudWatch alarm that monitors status changes in Code Pipeline and triggers the Lambda function.",
@@ -5348,7 +5348,7 @@
       {
         "text": "Create an Amazon CloudWatch Events rule that uses CodePipeline as an event source.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       }
     ],
     "isMultipleChoice": false
@@ -6309,7 +6309,7 @@
   },
   {
     "id": 222,
-    "questionText": "Which of the following items are required to allow an application deployed on an EC2 instance to write data to a DynamoDB table? Assume that no security Keys are allowed to be stored on the EC2 instance. (Choose TWO)",
+    "questionText": "Which of the following items are required to allow an application deployed on an EC2 instance to write data to a DynamoDB table? Assume that no security Keys are allowed to be stored on the EC2 instance. (Choose THREE)",
     "questionImage": null,
     "options": [
       {
@@ -6320,7 +6320,7 @@
       {
         "text": "Add an IAM Role to a running EC2 instance.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Add an IAM User to a running EC2 Instance.",
@@ -11180,12 +11180,12 @@
       {
         "text": "Prefix file names with random hex hashes; for example, `s3://BUCKET/FOLDERNAME/23a6-FILENAME.zip`.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Prefix folder names with random hex hashes; for example, `s3://BUCKET/23a6-FOLDERNAME/FILENAME.zip`.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       }
     ],
     "isMultipleChoice": false

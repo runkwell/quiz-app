@@ -160,26 +160,68 @@ app.get('/', (req, res) => {
 // 2. Route Bắt đầu bài thi (Bốc thăm ngẫu nhiên, giới hạn 65 câu và Ánh xạ)
 app.post('/start', (req, res) => {
   const questionsRaw = loadQuestions();
+    const { stats } = getQuestionStats(); // Lấy thống kê số lần thi
 
-  let randomizedQuestions = [...questionsRaw];
-  shuffleArray(randomizedQuestions);
+    if (questionsRaw.length === 0) {
+      req.session.error = "Không có câu hỏi nào trong Pool.";
+      return res.redirect('/');
+    }
 
-  // GIỚI HẠN số lượng câu hỏi cho bài thi
-  const questionsToUse = randomizedQuestions.slice(0, EXAM_QUESTION_LIMIT);
-
-  // Tạo Question Map và đánh số lại cho Exam
-  const questionMap = {};
-  const questionsForExam = [];
-  
-  questionsToUse.forEach((q, index) => {
-    questionMap[index + 1] = q.id; 
-    
-    questionsForExam.push({
+    // 1. Gắn số lần thi (count) vào từng câu hỏi trong Pool
+    const questionsWithStats = questionsRaw.map(q => {
+      // Tìm số lần thi của câu hỏi này (stats là mảng, cần tìm theo qNum/id)
+      const statItem = stats.find(s => s.qNum === q.id);
+      const count = statItem ? statItem.count : 0;
+      return {
         ...q,
-        id: index + 1
+        count: count
+      };
     });
-  });
-  
+
+    // 2. Sắp xếp: Ưu tiên câu hỏi có số lần thi (count) ít hơn
+    // Nếu số lần thi bằng nhau, việc sắp xếp không cố định sẽ tạo ra tính ngẫu nhiên ngang hàng
+    questionsWithStats.sort((a, b) => a.count - b.count);
+
+    // 3. Lựa chọn các câu hỏi tiềm năng (Ưu tiên)
+    // Chọn tất cả câu hỏi, nhưng đã được sắp xếp.
+    let potentialQuestions = questionsWithStats; 
+
+    // 4. Áp dụng Ngẫu nhiên Ngang hàng (Trong nhóm có cùng count)
+    // Chúng ta sẽ chia Pool thành các nhóm có cùng số lần thi (count), sau đó xáo trộn nội bộ.
+    const groupedQuestions = potentialQuestions.reduce((groups, question) => {
+        const key = question.count;
+        if (!groups[key]) {
+            groups[key] = [];
+        }
+        groups[key].push(question);
+        return groups;
+    }, {});
+
+    let questionsForExam = [];
+    
+    // Xáo trộn nội bộ từng nhóm (đảm bảo ngẫu nhiên ngang hàng) và gộp lại
+    Object.keys(groupedQuestions).sort((a, b) => a - b).forEach(count => {
+        shuffleArray(groupedQuestions[count]);
+        questionsForExam = questionsForExam.concat(groupedQuestions[count]);
+    });
+
+    // 5. Giới hạn số câu hỏi cho bài thi
+    questionsForExam = questionsForExam.slice(0, EXAM_QUESTION_LIMIT);
+    
+    // 6. Tạo Map và gán lại ID từ 1 đến 65 (ID trong bài thi)
+    const questionMap = {};
+    const finalExamQuestions = [];
+    
+    questionsForExam.forEach((q, index) => {
+      // questionMap: ID trong bài thi (1..65) -> ID trong Pool gốc (q.id)
+      questionMap[index + 1] = q.id; 
+      
+      finalExamQuestions.push({
+          ...q,
+          id: index + 1 // Gán lại ID bài thi
+      });
+    });
+      
   // Initialize session
   req.session.exam = {
     questions: questionsForExam,
