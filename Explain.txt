@@ -1213,13 +1213,29 @@ Answer D wrong because Similar to environment variables, storing a static creden
 link ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html
 
 97.Explain
-Answer A wrong because buildspec future no current.
+Answer A wrong because This is unnecessary and overly complex. CodeBuild automatically sends all build output to CloudWatch Logs by default. Adding custom steps to send output to CloudWatch would be redundant and doesn't help with immediate troubleshooting of existing failures.
 
-Answer B wrong because X-Ray tracing no build logs.
+Answer B wrong because X-Ray is for distributed tracing of application requests, not for debugging build compilation failures. X-Ray won't help identify source code compilation issues, dependency problems, or build configuration errors. This is the wrong tool for build troubleshooting.
 
-Answer C correct because history logs failed phases.
+Answer C correct because Build logs contain detailed information about what went wrong during each build phase (PROVISIONING, DOWNLOAD_SOURCE, INSTALL, PRE_BUILD, BUILD, POST_BUILD, etc.). This is the most direct and efficient way to identify compilation failures.
+**Why Checking Build Logs is the Best Approach:**
+**Immediate Access to Failure Information:**
+- Build History: CodeBuild maintains build history for up to one year
+- Phase-by-Phase Breakdown: Logs show exactly which phase failed (BUILD, PRE_BUILD, etc.)
+- Detailed Error Messages: Complete compilation errors, dependency issues, and stack traces
+- Environment Information: Shows the exact build environment, runtime versions, and configurations used
+**Build Log Information Includes:**
+- Compilation Errors: Syntax errors, missing dependencies, build tool failures
+- Environment Details: Runtime versions, environment variables, build image information
+- Command Output: Complete output from all build commands in buildspec.yml
+- Timing Information: Duration of each phase to identify performance issues
+- Exit Codes: Specific error codes that indicate the type of failure
+**How to Access Build Logs:**
+- AWS Console: Navigate to CodeBuild → Projects → Select Project → Build History → Select Failed Build
+- AWS CLI: Use aws codebuild batch-get-builds --ids <build-id>
+- CloudWatch Logs: Logs are automatically sent to CloudWatch Logs groups
 
-Answer D wrong because local no AWS env.
+Answer D wrong because While this might eventually help, it's not the most efficient first step. Local environments often differ from CodeBuild environments (different OS, dependencies, environment variables, etc.). The issue might not reproduce locally, and this approach ignores the readily available build logs.
 
 link ref: https://docs.aws.amazon.com/codebuild/latest/userguide/view-build-details.html
 
@@ -1979,13 +1995,28 @@ Answer D wrong because replicate to DynamoDB changes app.
 link ref: https://aws.amazon.com/documentdb/
 
 154.Explain
-Answer A wrong because Kinesis Streams streaming.
+Answer A wrong because While SQS can be used for error handling (like Dead Letter Queues), it's not the primary method for logging errors for troubleshooting. This adds unnecessary complexity and cost for basic error logging. SQS is better suited for processing failed events, not logging for system administrators to review.
 
-Answer B wrong because X-Ray tracing.
+Answer B wrong because CloudWatch Events (now EventBridge) is for event-driven automation, not for basic error logging. This would be overly complex for the simple requirement of logging errors for troubleshooting. It's designed for triggering actions based on events, not storing logs for review.
 
-Answer C correct because CloudWatch Logs for errors.
+Answer C correct because This is the standard, recommended approach for Lambda error logging. Developers should implement proper logging statements in their code using console.log, logger libraries, or built-in logging mechanisms. These logs automatically go to CloudWatch Logs where system administrators can easily access and search them.
+**Built-in Integration:**
+- Lambda automatically captures all stdout/stderr output and sends it to CloudWatch Logs
+- No additional AWS services or configuration required
+- Logs are automatically organized by function name and execution context
+**Automatic Log Information: Lambda automatically includes:**
+- Timestamp
+- Request ID
+- Function name and version
+- Duration and memory usage
+- START, END, and REPORT lines for each invocation
+**Advanced Logging Features:**
+- Log Levels: Configure different log levels (DEBUG, INFO, WARN, ERROR)
+- JSON Format: Structured logging for better analysis
+- Custom Log Groups: Direct logs to specific CloudWatch log groups
+- Log Retention: Configure automatic log retention policies
 
-Answer D wrong because Config compliance.
+Answer D wrong because SNS is for notifications and messaging, not for storing logs. While SNS can be used to notify administrators when errors occur, it doesn't provide the detailed logging information needed for troubleshooting. SNS messages are transient and not suitable for log storage and analysis.
 
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html
 
@@ -2321,13 +2352,22 @@ Answer D wrong because customer-provided keys (SSE-C) require client-side key ma
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html
 
 178.Explain
-Answer A wrong because EBS snapshot on boot doesn’t share data across instances.
+Answer A wrong because EBS volumes can only be attached to one instance at a time (except for Multi-Attach which has limitations). Using snapshots would create separate volumes for each instance, meaning uploads to one instance wouldn't be visible to others. This doesn't provide shared storage.
 
-Answer B correct because S3 is durable, shared, and immediately accessible by all Auto Scaling instances.
+Answer B correct because S3 provides shared, scalable object storage that all instances in an Auto Scaling group can access simultaneously. Uploads are immediately available to all instances, and S3 handles the scalability and durability requirements automatically.
+**Why Amazon S3 is the Best Solution:**
+**Immediate Availability:**
+- All instances can access S3 simultaneously
+- Uploads are immediately visible to all instances
+- No synchronization delays or eventual consistency issues for new uploads
+**Auto Scaling Compatibility:**
+- No attachment/detachment complexity when instances scale up/down
+- New instances automatically have access to all existing uploads
+- No storage capacity planning required per instance
 
-Answer C wrong because instance storage is ephemeral and not shared.
+Answer C wrong because Instance storage is local to each EC2 instance and cannot be shared between instances. Each instance has its own ephemeral storage that's not accessible to other instances. This doesn't provide shared storage capabilities.
 
-Answer D wrong because file sync introduces complexity and eventual consistency.
+Answer D wrong because This approach is complex, unreliable, and doesn't meet the "immediately available" requirement. File synchronization introduces delays and potential conflicts. EBS volumes are still attached to individual instances, requiring complex synchronization logic.
 
 link ref: https://aws.amazon.com/s3/
 
@@ -2948,15 +2988,26 @@ Answer D wrong because Ref DNSName no.
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-elasticloadbalancing-loadbalancer.html
 
 230.Explain
-Answer A wrong because Hosting no restrict.
+Answer A wrong because Virtual hosting is a method for accessing S3 buckets using domain names (e.g., bucket-name.s3.amazonaws.com) instead of path-style URLs. It's about how you access S3, not about controlling who can access it. Virtual hosting doesn't provide any access control mechanisms.
 
-Answer B correct because bucket policy restrict.
+Answer B correct because Bucket policies are JSON-formatted IAM resource-based policies attached to S3 buckets that define who can access the bucket and objects, and what actions they can perform. They're one of the primary methods for controlling access to S3 data.
 
-Answer C wrong because Federation identities.
+Answer C wrong because IAM Identity Federation allows external identities (like corporate users) to assume AWS roles and access AWS resources. While it's part of the authentication process, it doesn't directly restrict access to S3 data. The actual access control is still handled by IAM policies, bucket policies, or ACLs.
 
-Answer D correct because ACL restrict.
+Answer D correct because Access Control Lists (ACLs) are XML-formatted policies that grant basic read/write permissions to AWS accounts or predefined groups. They can be applied at both bucket and object levels to control access to S3 data.
 
-Answer E wrong because CloudFront distribution.
+Answer E wrong because CloudFront is a content delivery network (CDN) service that can serve content from S3, but creating a distribution doesn't restrict access to the underlying S3 data. While CloudFront can be used with Origin Access Control (OAC) to restrict direct S3 access, the distribution itself doesn't provide access restrictions.
+
+**Important Notes:**
+**Modern Recommendations:**
+- Bucket Policies Preferred: AWS recommends using bucket policies over ACLs for most use cases
+- ACLs Disabled by Default: New buckets have "Bucket owner enforced" Object Ownership setting, which disables ACLs
+- Policy Flexibility: Bucket policies offer more granular and flexible access control than ACLs
+**Access Control Hierarchy:**
+- IAM Policies: Control what IAM users/roles can do
+- Bucket Policies: Control access to specific buckets and objects
+- ACLs: Basic access control (legacy, limited functionality)
+- Block Public Access: Override settings to prevent public access
 
 link ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html
 
@@ -3459,15 +3510,34 @@ Answer D correct because The mobile application's backend service (or an associa
 link ref: https://docs.aws.amazon.com/sns/latest/dg/sns-mobile-application-as-subscriber.html
 
 264.Explain
-Answer A wrong because no storage instances.
+Answer A wrong because DynamoDB is a managed service where storage is automatically handled by AWS. There's no concept of "provisioning storage instances" that users manage. Storage scales automatically and isn't related to throughput exceptions.
 
-Answer B wrong because range secondary.
+Answer B wrong because "Range Key" is outdated terminology. In current DynamoDB terminology, this would be called a "Sort Key," and sort keys don't directly cause partition-level throttling. The issue is with partition distribution, not sort key values.
 
-Answer C correct because hot hash key throttling.
+Answer C correct because In DynamoDB terminology, the Hash Key is now called the "Partition Key." When too many requests target the same partition key value(s), it creates a "hot partition" that can exceed the partition-level throughput limits, causing throttling even when overall table capacity isn't exceeded.
+**Hot Partition Problem:**
+- DynamoDB distributes data across multiple partitions based on the partition key (hash key)
+- Each partition has throughput limits (typically around 1,000 WCU and 3,000 RCU per second per partition)
+- When many requests target the same partition key value(s), they all go to the same partition
+- This can cause that specific partition to exceed its limits, resulting in ProvisionedThroughputExceededException
+**Why CloudWatch Metrics Can Be Misleading:**
+- Table-Level vs Partition-Level: CloudWatch shows aggregate metrics across all partitions
+- Time Granularity: CloudWatch metrics are typically 1-minute averages, but partition limits are enforced per second
+- Uneven Distribution: You might have plenty of unused capacity on other partitions while one partition is overloaded
+**How to Identify Hot Partitions:**
+- Use CloudWatch Contributor Insights for DynamoDB
+- Look for KeyRangeThroughputExceeded throttling reasons
+- Monitor partition-level metrics
+- Check for uneven access patterns in your application
+**Solutions:**
+- Improve Partition Key Design: Use more evenly distributed partition keys
+- Add Randomization: Append random suffixes to partition keys
+- Pre-warm Capacity: Increase provisioned capacity temporarily to split partitions
+- Use Write Sharding: Distribute writes across multiple partition key values
 
-Answer D wrong because sort not capacity.
+Answer D wrong because Sort keys (formerly Range Keys) don't directly cause partition-level throttling. Multiple items with different sort keys but the same partition key would still be on the same partition. The throttling occurs at the partition level, which is determined by the partition key, not the sort key.
 
-Answer E wrong because no auto scaling then.
+Answer E wrong because Auto Scaling helps with overall table capacity management but doesn't solve hot partition issues. Even with Auto Scaling, you can still experience partition-level throttling if traffic is unevenly distributed across partition keys.
 
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html
 
@@ -4385,13 +4455,29 @@ Answer D correct because DynamoDB Streams is a built-in feature that captures a 
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html
 
 335.Explain
-Answer A wrong because Subversion centralized.
+Answer A wrong because Subversion (SVN) is a centralized version control system, not distributed. It doesn't support peer-to-peer synchronization between multiple distributed repositories. Users cannot work productively offline since SVN requires constant connection to the central server for most operations. Also, it's not a fully-managed AWS service.
 
-Answer B wrong because CodeBuild builds.
+Answer B wrong because CodeBuild is a fully managed continuous integration service for compiling source code, running tests, and producing software packages. It's not a source control service at all - it's a build service that works with source control systems but doesn't provide version control functionality itself.
 
-Answer C correct because CodeCommit distributed git.
+Answer C correct because CodeCommit is a fully-managed Git-based source control service. Git is a distributed version control system that supports peer-to-peer synchronization between repositories and allows users to work productively offline with full local repository copies.
+**Why AWS CodeCommit is the Correct Answer:**
+**Fully-Managed Service:**
+- AWS Managed: No need to maintain servers, handle scaling, or manage infrastructure
+- High Availability: Built-in redundancy and availability across AWS infrastructure
+- Security: Integrated with AWS IAM, encryption at rest and in transit
+- Scalability: Automatically scales to handle repository size and user load
+**Distributed Version Control (Git-based):**
+- Git Foundation: Built on Git, which is inherently a distributed version control system
+- Peer-to-Peer Synchronization: Multiple repositories can synchronize changes through push/pull operations
+- Distributed Architecture: Each developer has a complete copy of the repository with full history
+- Decentralized Workflow: No single point of failure, multiple repositories can exist independently
+**Offline Work Capability:**
+- Local Repository: Full repository history available locally for offline work
+- Local Operations: Commit, branch, merge, and view history work offline
+- Sync When Connected: Push/pull changes when network connectivity is restored
+- Complete Functionality: All Git operations available without network connection
 
-Answer D wrong because CodeStar projects.
+Answer D wrong because CodeStar is a project management service that helps set up and manage development projects by integrating various AWS developer tools (including CodeCommit, CodeBuild, CodePipeline, etc.). It's not a source control service itself - it's an orchestration service that can use CodeCommit for source control.
 
 link ref: https://aws.amazon.com/codecommit/
 
@@ -4455,13 +4541,13 @@ Answer E wrong Parameter Store is for secure storage; it does not grant permissi
 link ref: https://docs.aws.amazon.com/kms/latest/developerguide/iam-policies.html#iam-policy-example-s3
 
 340.Explain
-Answer A correct because delay hides on add.
+Answer A correct because Delay queues postpone the delivery of new messages to consumers for a specified duration (0 seconds to 15 minutes) when messages are first added to the queue. During this delay period, messages remain invisible to consumers.
 
-Answer B wrong because after consume not delay.
+Answer B wrong because This describes visibility timeout, not delay queues. Visibility timeout makes messages invisible after they are consumed (received) from the queue to prevent other consumers from processing the same message simultaneously.
 
-Answer C wrong because poll time consumer side.
+Answer C wrong because This describes long polling (WaitTimeSeconds parameter), which allows consumers to wait for messages to arrive rather than immediately returning empty responses. This is not related to delay queue functionality.
 
-Answer D wrong because delete delay not exist.
+Answer D wrong because This is not a feature of SQS delay queues. Messages can be deleted immediately after being consumed if the consumer chooses to do so. There's no built-in mechanism to prevent message deletion for a specific time period.
 
 link ref: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-delay-queues.html
 
