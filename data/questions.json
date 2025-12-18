@@ -2493,7 +2493,7 @@
       {
         "text": "Use IAM policy condition.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       },
       {
         "text": "Use IAM policy principal.",
@@ -2503,7 +2503,7 @@
       {
         "text": "Use IAM policy variables.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Use IAM policy resource.",

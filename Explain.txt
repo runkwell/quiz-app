@@ -137,6 +137,29 @@ Answer C correct because CloudFront is specifically designed to solve this exact
 
 Answer D wrong because S3 already supports high request rates (5,500 GET requests per second per prefix), and the issue is latency/performance for global users, not rate limits.
 
+**Key Benefits of CloudFront for This Scenario:**
+**1. Global Edge Network:**
+- 600+ Points of Presence: CloudFront has edge locations in 100+ cities across 50+ countries
+- Reduced Latency: Content served from the nearest edge location to users
+- AWS Backbone Network: Optimized routing through AWS's global infrastructure
+**2. Optimized for Static Content: According to AWS documentation:**
+- "CloudFront can speed up the delivery of your static content (for example, images, style sheets, JavaScript, and so on) to viewers across the globe."
+**3. Seamless S3 Integration:**
+- Origin Access Control: Secure integration with S3 buckets
+- Automatic Caching: Images cached at edge locations after first request
+- No Application Changes: Transparent to existing application architecture
+**4. Performance Improvements:**
+- Faster Download Times: Content delivered from nearest edge location
+- Persistent Connections: CloudFront maintains optimized connections to S3
+- TCP Optimizations: Enhanced performance through protocol optimizations
+**How CloudFront Works for This Use Case:**
+**Initial Request Flow:**
+- User requests image from application
+- Request routed to nearest CloudFront edge location
+- If image not cached, CloudFront fetches from S3 origin
+- Image cached at edge location and served to user
+- Subsequent requests served directly from edge cache
+
 link ref: https://aws.amazon.com/cloudfront/features/
 
 11.Explain
@@ -409,13 +432,13 @@ Answer D wrong because The throughput consumption is fixed based on the consiste
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
 
 29.Explain
-Answer A correct because console upload deploy.
+Answer A correct because The Elastic Beanstalk console provides a straightforward way to upload and deploy new application versions.
 
-Answer B wrong because eb init setup.
+Answer B wrong because eb init is used to initialize a new Elastic Beanstalk application, not to deploy new versions. The correct CLI command for deployment is eb deploy.
 
-Answer C wrong because terminate destructive.
+Answer C wrong because This is unnecessarily destructive and causes downtime. Elastic Beanstalk supports in-place version updates without terminating environments.
 
-Answer D wrong because ebextensions config.
+Answer D wrong because The .ebextensions folder is for configuration files, not for deploying new application versions.
 
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-versions.html
 
@@ -1159,13 +1182,34 @@ Answer D wrong because Good for specific query, but poor for consistency. While 
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html
 
 88.Explain
-Answer A correct because condition ${aws:username}.
+Answer A wrong because Conditions are used to specify when a policy is in effect, not to make resource ARNs dynamic. They control the circumstances under which policies apply.
 
-Answer B wrong because principal who.
+Answer B wrong because Principals specify who the policy applies to (users, roles, accounts), not how to make resource paths dynamic. This is used in resource-based policies, not identity-based policies.
 
-Answer C wrong because variables ${aws:username}.
+Answer C correct because  IAM policy variables like ${aws:username} allow dynamic substitution of values in resource ARNs at policy evaluation time.
 
-Answer D wrong because resource what.
+Answer D wrong because The resource element specifies what the policy applies to, but the question is about making the resource path dynamic, not changing the resource element itself.
+
+**Why IAM Policy Variables is the Correct Answer:**
+**Perfect Solution for Dynamic User Folders:** According to AWS documentation:
+- "You can use policy variables in Amazon S3 ARNs. At policy-evaluation time, these predefined variables are replaced by their corresponding values."
+**The ${aws:username} Variable:** The documentation specifically shows this exact use case:
+- "To grant users permission to their folders, you can specify a policy variable in the resource ARN: arn:aws:s3:::bucket_name/developers/${aws:username}/"
+**How to Transform the Policy:**
+**Original Policy (Hardcoded):**
+{
+  "Sid": "AllowS3ActionToFolders",
+  "Effect": "Allow",
+  "Action": ["s3:*"],
+  "Resource": ["arn:aws:s3:::company-name/home/TeamMemberX/*"]
+}
+**Generic Policy Using Variables:**
+{
+  "Sid": "AllowS3ActionToFolders",
+  "Effect": "Allow",
+  "Action": ["s3:*"],
+  "Resource": ["arn:aws:s3:::company-name/home/${aws:username}/*"]
+}
 
 link ref: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_variables.html
 
@@ -1685,13 +1729,20 @@ Answer D wrong because code creds insecure.
 link ref: https://aws.amazon.com/secrets-manager/
 
 126.Explain
-Answer A wrong because all at once downtime.
+Answer A wrong because While this provides full cutover, it causes significant downtime as all instances go offline simultaneously. This violates the "LEAST amount of downtime" requirement.
 
-Answer B wrong because rolling batch partial.
+Answer B wrong because This doesn't provide full cutover - old and new versions run simultaneously during deployment, which is incompatible with the requirement for incompatible versions.
 
-Answer C correct because new env swap no downtime.
+Answer C correct because Blue/Green deployment provides instant cutover with zero downtime and easy rollback capability.
 
-Answer D wrong because rolling gradual downtime.
+Answer D wrong because Similar to rolling with additional batch, this creates a mixed-version state during deployment, which doesn't work for incompatible versions.
+
+**Why Blue/Green Deployment (Environment URL Swap) is the Correct Answer:**
+**Perfect Match for Requirements: The scenario requires:**
+- Full cutover - All instances must switch at once
+- Incompatible versions - Old and new versions cannot coexist
+- Minimal downtime - LEAST amount of downtime
+- Rollback capability - Ability to revert if deployment fails
 
 link ref: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.CNAMESwap.html
 
@@ -2856,13 +2907,33 @@ Memory (MB)    | vCPU Equivalent | CPU Power
 link ref: https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html
 
 207.Explain
-Answer A correct because update connection strings to RDS endpoint/port for seamless migration.
+Answer A correct because The primary change needed is updating the connection string to use the RDS endpoint instead of the EC2 instance's address.
 
-Answer B wrong because SDK creds unnecessary; RDS uses IAM DB auth optional.
+Answer B wrong because While this could be used for credential management, it's not the primary requirement for the migration. The main need is updating connection parameters.
 
-Answer C wrong because new EC2 role doesn't update existing app connections.
+Answer C wrong because Creating a new EC2 instance is unnecessary. The existing application instances just need updated connection parameters.
 
-Answer D wrong because Lambda routing adds latency/complexity.
+Answer D wrong because Lambda functions don't route database traffic. Applications connect directly to RDS instances using standard database connections.
+
+**Why Updating Database Connection Parameters is the Correct Answer:**
+- Core Requirement for Database Migration: When migrating from a self-hosted MySQL database on EC2 to Amazon RDS MySQL, the fundamental change required is updating the application's database connection configuration to point to the new RDS endpoint.
+**What Needs to Change:**
+**1. Database Endpoint/Host:**
+# Before (EC2-hosted MySQL)
+DATABASE_HOST = "10.0.1.100"  # EC2 private IP
+# or
+DATABASE_HOST = "ec2-instance-name.compute.amazonaws.com"
+# After (RDS MySQL)
+DATABASE_HOST = "mydb.123456789012.us-east-1.rds.amazonaws.com"  # RDS endpoint
+**2. Connection String Examples:**
+// Before
+String url = "jdbc:mysql://10.0.1.100:3306/myapp";
+// After
+String url = "jdbc:mysql://mydb.123456789012.us-east-1.rds.amazonaws.com:3306/myapp";
+**Finding RDS Connection Information:**
+aws rds describe-db-instances \
+    --db-instance-identifier mydb \
+    --query 'DBInstances[0].[Endpoint.Address,Endpoint.Port,MasterUsername]'
 
 link ref: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToInstance.html
 
@@ -3942,13 +4013,27 @@ Answer E wrong because GuardDuty security.
 link ref: https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store.html
 
 283.Explain
-Answer A wrong because dockerrun for ECS.
+Answer A wrong because This file is used by AWS Elastic Beanstalk for Docker deployments, not by AWS CodeDeploy for serverless applications.
 
-Answer B wrong because buildspec for CodeBuild.
+Answer B wrong because This file is used by AWS CodeBuild to define build commands and settings, not by CodeDeploy for deployment specifications.
 
-Answer C correct because appspec for deployment hooks.
+Answer C correct because The AppSpec file is the configuration file that CodeDeploy uses to manage deployments, including serverless applications.
 
-Answer D wrong because ebextensions config.
+Answer D wrong because This file is used by AWS Elastic Beanstalk for environment configuration, not by CodeDeploy for deployments.
+
+**Why appspec.yml is the Correct Answer:**
+**CodeDeploy's Core Configuration File:** According to AWS documentation:
+"The AppSpec file is a YAML-formatted or JSON-formatted file used by CodeDeploy to map the source files in your application revision to their destinations on the instance and specify scripts to be run on the instance during the deployment."
+**Key Functions of the AppSpec File:**
+**1. Deployment Instructions:**
+- File Mapping: Specifies which files to copy and where to place them
+- Lifecycle Hooks: Defines scripts to run at different deployment stages
+- Permissions: Sets file and directory permissions (for EC2/On-Premises)
+- Validation: Includes validation tests for serverless deployments
+**2. Platform Support: The AppSpec file supports multiple deployment platforms:**
+- AWS Lambda: Serverless function deployments
+- Amazon ECS: Container deployments
+- EC2/On-Premises: Traditional server deployments
 
 link ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html
 
@@ -4086,11 +4171,24 @@ link ref: https://docs.aws.amazon.com/serverless-application-model/latest/develo
 294.Explain
 Answer A wrong because Multi-AZ HA.
 
-Answer B wrong because SQS messaging.
+Answer B wrong because SQS is a message queuing service for decoupling applications, not for database caching or improving read performance.
 
-Answer C correct because ElastiCache caches queries.
+Answer C correct because ElastiCache is specifically designed as an in-memory cache to improve performance for repeated read queries by storing frequently accessed data.
 
-Answer D wrong because replica scales reads.
+Answer D wrong because While read replicas can help with read scaling, they don't provide the in-memory caching benefits needed for repeated read queries. They're still database queries, just distributed.
+
+**Why Amazon ElastiCache is the Correct Answer:**
+- Perfect Match for the Use Case: The scenario specifically mentions "repeated read requests" and asks for an "in-memory store." ElastiCache is AWS's managed in-memory caching service designed exactly for this purpose.
+**Key Benefits of ElastiCache for This Scenario:**
+**1. In-Memory Performance: According to AWS documentation:**
+- "Amazon ElastiCache can serve frequently requested items at sub-millisecond response times, and enables you to easily scale for higher loads without growing the costlier backend database layer."
+**2. Ideal for Repeated Queries:**
+- "Database query results caching, persistent session caching, and full-page caching are all popular examples of caching with ElastiCache."
+**3. Reduces Database Load:**
+- "ElastiCache can help you save database costs by storing frequently accessed data in a cache. If your application has high read throughput requirements, you can achieve high scale, fast performance, and lowered data storage costs by using ElastiCache."
+**How ElastiCache Works for This Use Case:**
+**Architecture Pattern:**
+Web Application (Tomcat) → Check ElastiCache → If miss, query RDS MySQL → Store result in ElastiCache
 
 link ref: https://aws.amazon.com/elasticache/
 
@@ -4578,11 +4676,18 @@ Answer E wrong Similar to CodeCommit, CloudFormation cannot directly pull code f
 link ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
 
 330.Explain
-When deploying an AWS Lambda function, the execution environment needs access to all required code and dependencies.
-
 Answer A wrong because Lambda functions cannot directly reference and load code or libraries hosted externally on Amazon S3 during execution time; the necessary code must be included in the deployment package or a Lambda Layer.
 
-Answer B correct because For custom libraries and dependencies (especially those not available in the standard runtime environment), the developer must **install them locally** (e.g., using `npm install` or `pip install` with a local target directory) and then **bundle the entire folder structure** (including the function code and the library files) into a **$\text{ZIP}$ file** for upload. When the function executes, the runtime environment finds the library within the deployed package.
+Answer B correct because For custom libraries and dependencies (especially those not available in the standard runtime environment), the developer must **install them locally** (e.g., using `npm install` or `pip install` with a local target directory) and then **bundle the entire folder structure** (including the function code and the library files) into a **ZIP file** for upload. When the function executes, the runtime environment finds the library within the deployed package.
+**When deploying an AWS Lambda function, the execution environment needs access to all required code and dependencies.**
+**COPY tất cả dependencies rồi nén lại nhét vào layer trên lambda**
+my-function.zip
+├── lambda_function.py          # Your function code
+├── requests/                   # Third-party library
+├── urllib3/                    # Dependency of requests
+├── custom_library/             # Your custom library
+└── other_dependencies/
+
 
 Answer C wrong because Lambda blueprints are starter templates and do not automatically include custom, proprietary, or specific third-party libraries.
 
@@ -5236,13 +5341,25 @@ Answer D wrong because Violates Scalability. Storing shared images on local disk
 link ref: https://aws.amazon.com/s3/
 
 374.Explain
-Answer A wrong because SNS sync.
+Answer A wrong because DynamoDB streams don't directly publish to SNS. This adds unnecessary complexity and SNS triggers Lambda asynchronously, not synchronously.
 
-Answer B wrong because SNS async.
+Answer B wrong because DynamoDB streams don't directly publish to SNS. This approach adds an unnecessary intermediate service.
 
-Answer C correct because stream sync trigger.
+Answer C correct because DynamoDB streams directly trigger Lambda functions synchronously through event source mappings.
 
-Answer D wrong because async not guarantee order.
+Answer D wrong because DynamoDB streams invoke Lambda functions synchronously, not asynchronously. This is how the integration is designed to work.
+
+**Why DynamoDB Streams with Synchronous Lambda Invocation is Correct:**
+**Direct Integration Pattern:** According to AWS documentation:
+- "The AWS Lambda service polls the stream for new records four times per second and invokes the function synchronously when new records are available."
+**How DynamoDB Streams Work with Lambda:**
+**1. Event Source Mapping: The integration uses an event source mapping that:**
+- Polls the DynamoDB stream for new records
+- Batches records together
+- Invokes the Lambda function synchronously
+- Handles retries and error processing
+**2. Synchronous Invocation Model:**
+- "AWS Lambda starts polling the stream" and "invokes the function synchronously when new records are available"
 
 link ref: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.html
 

@@ -793,9 +793,9 @@
 
 88. A development team consists of 10 team members. Similar to a home directory for each team member, the manager wants to grant access to user-specific folders in an Amazon S3 bucket. For the team member with the username `TeamMemberX`, the snippet of the IAM policy looks like this. Instead of creating distinct policies for each team member, what approach can be used to make this policy snippet generic for all team members? ![Question 88](images/question88.jpg)
 
-- [x] Use IAM policy condition.
+- [ ] Use IAM policy condition.
 - [ ] Use IAM policy principal.
-- [ ] Use IAM policy variables.
+- [x] Use IAM policy variables.
 - [ ] Use IAM policy resource.
 
 --------------------------------------------------
