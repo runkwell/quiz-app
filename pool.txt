@@ -658,9 +658,9 @@
 73. A Developer is creating a Lambda function and will be using external libraries that are not included in the standard Lambda libraries. What action would minimize the Lambda compute time consumed?
 
 - [ ] Install the dependencies and external libraries at the beginning of the Lambda function.
-- [ ] Create a Lambda deployment package that includes the external libraries.
+- [x] Create a Lambda deployment package that includes the external libraries.
 - [ ] Copy the external libraries to Amazon S3, and reference the external libraries to the S3 location.
-- [x] Install the external libraries in Lambda Layer to be available to all Lambda functions.
+- [ ] Install the external libraries in Lambda Layer to be available to all Lambda functions.
 
 --------------------------------------------------
 
@@ -991,7 +991,7 @@
 
 --------------------------------------------------
 
-110. An application overwrites an object in Amazon S3, and then immediately reads the same object. Why would the application sometimes retrieve the old version of the object?
+110. An application overwrites an object in Amazon S3, and then immediately reads the same object. Why would the application sometimes retrieve the old version of the object? (OLD- bypass)
 
 - [x] S3 overwrite PUTS are eventually consistent, so the application may read the old object.
 - [ ] The application needs to add extra metadata to label the latest version when uploading to Amazon S3.

@@ -2073,7 +2073,7 @@
       {
         "text": "Create a Lambda deployment package that includes the external libraries.",
         "image": null,
-        "isCorrect": false
+        "isCorrect": true
       },
       {
         "text": "Copy the external libraries to Amazon S3, and reference the external libraries to the S3 location.",
@@ -2083,7 +2083,7 @@
       {
         "text": "Install the external libraries in Lambda Layer to be available to all Lambda functions.",
         "image": null,
-        "isCorrect": true
+        "isCorrect": false
       }
     ],
     "isMultipleChoice": false
@@ -3113,7 +3113,7 @@
   },
   {
     "id": 110,
-    "questionText": "An application overwrites an object in Amazon S3, and then immediately reads the same object. Why would the application sometimes retrieve the old version of the object?",
+    "questionText": "An application overwrites an object in Amazon S3, and then immediately reads the same object. Why would the application sometimes retrieve the old version of the object? (OLD- bypass)",
     "questionImage": null,
     "options": [
       {
